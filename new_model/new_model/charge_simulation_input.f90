@@ -31,7 +31,7 @@ subroutine charge_simulation_input_moments(data_NW_PI1,data_NW_PI,&
     !Store vector variables    
     real(SP),dimension(L_PI,obs,groups,1500)::assets_pi_age_group,assets_pi_age_group_b !1500: maximum number of individuals in a group
     real(SP),dimension(2,obs,8000)::assets_ut
-    real(SP),dimension(f_t,obs,groups,2000)::assets_ic
+    real(SP),dimension(f_t,obs,groups,4000)::assets_ic
     !Individual data from HRS variables
     real(SP),dimension(indv,obs):: fc_h,NW,ic_h
     integer,dimension(indv,obs):: IC_q,govmd
@@ -88,7 +88,7 @@ subroutine charge_simulation_input_moments(data_NW_PI1,data_NW_PI,&
             elseif (u<sum(IC_pr_i(i_l,1:2))) then
                 f_l=2
             else
-                f_l=3
+                print*,'error in charge sim input'
             end if
             do t_l=obs,1,-1
                 !Sample health status using Kim Smoother

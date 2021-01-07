@@ -63,14 +63,13 @@ subroutine data_moments_W()
     call empty_missing(data_moments,data_moments_new,int(moment_conditions),real_moments)
     
     !Compute optimal weighting matrix using bootstrap
-    !call optimal_W()
-    !open(unit=9,file='W_opt.txt')
-    !    write(9,*) W_opt
-    !close(9)
+    call optimal_W()
+    open(unit=9,file='W_opt.txt')
+        write(9,*) W_opt
+    close(9)
     open(unit=9,file='W_opt.txt')
         read(9,*) W_opt
     close(9)
-
     
     !!Or identity matrix
     !W_opt=0.0_sp

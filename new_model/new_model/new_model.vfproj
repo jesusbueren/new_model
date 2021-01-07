@@ -5,7 +5,7 @@
 	<Configurations>
 		<Configuration Name="Debug|Win32">
 				<Tool Name="VFFortranCompilerTool" SuppressStartupBanner="true" DebugInformationFormat="debugEnabled" Optimization="optimizeDisabled" WarnInterfaces="true" Traceback="true" BoundsCheck="true" StackFrameCheck="true" RuntimeLibrary="rtMultiThreadedDebugDLL"/>
-				<Tool Name="VFLinkerTool" LinkIncremental="linkIncrementalNo" SuppressStartupBanner="true" GenerateDebugInformation="true" SubSystem="subSystemConsole"/>
+				<Tool Name="VFLinkerTool" LinkIncremental="linkIncrementalNo" SuppressStartupBanner="true" GenerateDebugInformation="true" SubSystem="subSystemConsole" StackReserveSize="80000000"/>
 				<Tool Name="VFResourceCompilerTool"/>
 				<Tool Name="VFMidlTool" SuppressStartupBanner="true"/>
 				<Tool Name="VFCustomBuildTool"/>
@@ -36,6 +36,7 @@
 		<File RelativePath=".\counterfactuals.f90"/>
 		<File RelativePath=".\create_tables_draft.f90"/>
 		<File RelativePath=".\data_moments_W.f90"/>
+		<File RelativePath="..\..\..\..\Health Dynamics\medical_expenditures\discretize_shocks.f90"/>
 		<File RelativePath=".\discretize_var_ep.f90"/>
 		<File RelativePath=".\ECV_V_k_l2.f90"/>
 		<File RelativePath=".\experiment.f90"/>
@@ -44,6 +45,7 @@
 		<File RelativePath=".\linmin.f90"/>
 		<File RelativePath=".\load_HRS_data.f90"/>
 		<File RelativePath=".\main.f90"/>
+		<File RelativePath="..\..\..\..\Health Dynamics\medical_expenditures\med_expenditures.f90"/>
 		<File RelativePath=".\medicaid_provision.f90"/>
 		<File RelativePath=".\mnbrak.f90"/>
 		<File RelativePath=".\modules.f90"/>
