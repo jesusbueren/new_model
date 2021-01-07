@@ -3,7 +3,7 @@ function SMM(parameters)
     implicit none
     real(SP),dimension(parameters_to_est),intent(in)::parameters
     integer,dimension(nkk,clusters,nzz,nzz2,L_gender,L_PI2,f_t,generations)::a_policy
-    real(SP),dimension(nkk,clusters,nzz,nzz2,L_gender,L_PI2,f_t,generations)::g_policy
+    real(SP),dimension(nkk,clusters,nzz,nzz2,L_gender,L_PI2,f_t,generations)::g_policy,beq100_policy
     integer::i_l,h_l,z_l
     real(SP),dimension(nkk,clusters,nzz2,f_t,L_PI2)::lfc_x
     real(SP),dimension(moment_conditions,1)::model_moments1,model_moments, &
@@ -39,11 +39,11 @@ function SMM(parameters)
     end do;end do
     
     !Solve the model given a set of parameters
-    call solve_model(a_policy,g_policy,lfc_x,u_x)
+    call solve_model(a_policy,g_policy,lfc_x,u_x,beq100_policy)
 
     !Simulate model given the policy function
     !print*,'Simulating Model'
-    call simulate_model(a_policy,g_policy,lfc_x, & !policy fcts
+    call simulate_model(a_policy,g_policy,lfc_x,beq100_policy, & !policy fcts
                         model_moments1,model_moments) !moments
         
     !Missing moments in the data to missing in the model

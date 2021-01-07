@@ -1,8 +1,8 @@
-subroutine solve_model(a_policy,g_policy,lfc_x,u_x)
+subroutine solve_model(a_policy,g_policy,lfc_x,u_x,beq100_policy)
     use dimensions;use nrtype; use structural_p2; use grids; use structural_p1; use MD_reform
     implicit none
-    real(SP),dimension(nkk,clusters,nzz,nzz2,L_gender,L_PI2,f_t,generations),intent(out)::g_policy
-    integer,dimension(nkk,clusters,nzz,nzz2,L_gender,L_PI2,f_t,generations),intent(out)::a_policy  !Policy for Medicaid & for assets
+    real(SP),dimension(nkk,clusters,nzz,nzz2,L_gender,L_PI2,f_t,generations),intent(out)::g_policy,beq100_policy
+    integer,dimension(nkk,clusters,nzz,nzz2,L_gender,L_PI2,f_t,generations),intent(out)::a_policy  !Policy for assets
     real(SP),dimension(nkk,clusters,nzz2,f_t,L_PI2),intent(out)::u_x
     real(SP),dimension(nkk,clusters,nzz2,f_t,L_PI2),intent(out)::lfc_x
     real(SP),dimension(nkk,clusters+1,nzz,nzz2,2)::V
@@ -39,6 +39,7 @@ subroutine solve_model(a_policy,g_policy,lfc_x,u_x)
     !Solve intertemporal problem by standard VFI
     a_policy=-9
     g_policy=-9
+    beq100_policy=-9
     call tick(calc)
     
     !$OMP PARALLEL default(none) private(i_l,t_l,ps_l,h_l,x_l,z_l,k2_l_min,V_k2,ECV_k2_no_beq,V_MD,V_wo_MD,k2_wo_MD,k_l2,ge_l,f_l,V) shared(g_policy,a_policy,u_x,u_bar,coh_grid,delta,lambda,sigma,sigma_beq,omega,beta,V_70,sigma_varep)

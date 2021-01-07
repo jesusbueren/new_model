@@ -6,12 +6,12 @@ subroutine optimal_W()
     integer::i_l,t_l,m_l,ind,real_moments,s_l,i_l2,f_l
     !Individual data from HRS variables
     real(SP),dimension(indv,obs):: fc_h,NW,ic_h
-    integer,dimension(indv,obs):: IC_q,govmd
+    integer,dimension(indv,obs):: IC_q,beq100
     !Random draw if computing uncertainty of data
     real(SP)::u
     !Moment variables variables
     real(SP),dimension(L_PI,clusters)::fc_pi_h_it
-    real(SP),dimension(L_PI,clusters)::govmd_pi_h_it
+    real(SP),dimension(L_PI)::beq100_ic_it
     real(SP),dimension(f_t,clusters)::fc_ic_h_it
     real(SP),dimension(f_t,obs,groups)::nw_ic_it  
     real(SP),dimension(L_PI,obs,groups)::assets_pi_age_group_it,assets_pi_age_group_it_b
@@ -29,7 +29,7 @@ subroutine optimal_W()
     IC_q=reshape(data_moments_HRS(2,:,:), (/indv, obs/), order = (/ 2, 1 /))
     NW=reshape(data_moments_HRS(3,:,:), (/indv, obs/), order = (/ 2, 1 /))
     NW=NW/1000.0_sp
-    govmd=reshape(data_moments_HRS(4,:,:), (/indv, obs/), order = (/ 2, 1 /))
+    beq100=reshape(data_moments_HRS(4,:,:), (/indv, obs/), order = (/ 2, 1 /))
     
     !Compute data moments from original data
     !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -51,7 +51,7 @@ subroutine optimal_W()
             end if
             assets_pi_age_group_it=0.0_sp
             assets_pi_age_group_it_b=0.0_sp
-            govmd_pi_h_it=0.0_sp
+            beq100_ic_it=0.0_sp
             nw_ic_it=0.0_sp
             fc_pi_h_it=0.0_sp
             fc_ic_h_it=0.0_sp
@@ -93,8 +93,8 @@ subroutine optimal_W()
                 if (fc_h(i_l,t_l)/=-9.0_sp) then
                     fc_pi_h_it(PI_q_i(i_l),h_i(i_l,t_l,1))=fc_h(i_l,t_l)-data_lfc_PI(PI_q_i(i_l),h_i(i_l,t_l,1))
                 end if
-                if (govmd(i_l,t_l)/=-9) then
-                    govmd_pi_h_it(PI_q_i(i_l),h_i(i_l,t_l,1))=govmd(i_l,t_l)-data_MD_PI(PI_q_i(i_l),h_i(i_l,t_l,1))
+                if (beq100(i_l,t_l)/=-9) then
+                    beq100_ic_it(f_l)=beq100(i_l,t_l)-data_beq100_ic(f_l)
                 end if
                 if (NW(i_l,t_l)/=-9.0_sp) then
                     !By ic
@@ -126,7 +126,7 @@ subroutine optimal_W()
 
                 moments_it(:,t_l)=(/reshape(assets_pi_age_group_it,(/L_PI*obs*groups,1/)),&
                                     reshape(assets_pi_age_group_it_b,(/L_PI*obs*groups,1/)),&
-                                    reshape(govmd_pi_h_it,(/L_PI*clusters,1/)), &
+                                    reshape(beq100_ic_it,(/f_t,1/)), &
                                     reshape(nw_ic_it,(/f_t*obs*groups,1/)), &
                                     reshape(fc_pi_h_it,(/L_PI*clusters,1/)), &
                                     reshape(fc_ic_h_it,(/f_t*clusters,1/))/)
