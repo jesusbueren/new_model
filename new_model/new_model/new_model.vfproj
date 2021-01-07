@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<VisualStudioProject ProjectCreator="Intel Fortran" Keyword="Console Application" Version="11.0" ProjectIdGuid="{7A89702F-1736-47E9-808D-2A91CBE6919B}">
+	<Platforms>
+		<Platform Name="Win32"/></Platforms>
+	<Configurations>
+		<Configuration Name="Debug|Win32">
+				<Tool Name="VFFortranCompilerTool" SuppressStartupBanner="true" DebugInformationFormat="debugEnabled" Optimization="optimizeDisabled" WarnInterfaces="true" Traceback="true" BoundsCheck="true" StackFrameCheck="true" RuntimeLibrary="rtMultiThreadedDebugDLL"/>
+				<Tool Name="VFLinkerTool" LinkIncremental="linkIncrementalNo" SuppressStartupBanner="true" GenerateDebugInformation="true" SubSystem="subSystemConsole"/>
+				<Tool Name="VFResourceCompilerTool"/>
+				<Tool Name="VFMidlTool" SuppressStartupBanner="true"/>
+				<Tool Name="VFCustomBuildTool"/>
+				<Tool Name="VFPreLinkEventTool"/>
+				<Tool Name="VFPreBuildEventTool"/>
+				<Tool Name="VFPostBuildEventTool"/>
+				<Tool Name="VFManifestTool" SuppressStartupBanner="true"/></Configuration>
+		<Configuration Name="Release|Win32">
+				<Tool Name="VFFortranCompilerTool" SuppressStartupBanner="true" RuntimeLibrary="rtMultiThreadedDLL"/>
+				<Tool Name="VFLinkerTool" LinkIncremental="linkIncrementalNo" SuppressStartupBanner="true" SubSystem="subSystemConsole"/>
+				<Tool Name="VFResourceCompilerTool"/>
+				<Tool Name="VFMidlTool" SuppressStartupBanner="true"/>
+				<Tool Name="VFCustomBuildTool"/>
+				<Tool Name="VFPreLinkEventTool"/>
+				<Tool Name="VFPreBuildEventTool"/>
+				<Tool Name="VFPostBuildEventTool"/>
+				<Tool Name="VFManifestTool" SuppressStartupBanner="true"/></Configuration></Configurations>
+	<Files>
+		<Filter Name="Header Files" Filter="fi;fd;h;inc">
+		<File RelativePath=".\amoeba.f90"/>
+		<File RelativePath=".\brent.f90"/>
+		<File RelativePath=".\buid_grids.f90"/>
+		<File RelativePath=".\charge_estimation_results.f90"/>
+		<File RelativePath=".\charge_simulation_input.f90"/>
+		<File RelativePath=".\compute_median.f90"/>
+		<File RelativePath=".\compute_se.f90"/>
+		<File RelativePath=".\compute_stats.f90"/>
+		<File RelativePath=".\counterfactuals.f90"/>
+		<File RelativePath=".\create_tables_draft.f90"/>
+		<File RelativePath=".\data_moments_W.f90"/>
+		<File RelativePath=".\discretize_var_ep.f90"/>
+		<File RelativePath=".\ECV_V_k_l2.f90"/>
+		<File RelativePath=".\experiment.f90"/>
+		<File RelativePath=".\first_step_p.f90"/>
+		<File RelativePath=".\Jacobian.f90"/>
+		<File RelativePath=".\linmin.f90"/>
+		<File RelativePath=".\load_HRS_data.f90"/>
+		<File RelativePath=".\main.f90"/>
+		<File RelativePath=".\medicaid_provision.f90"/>
+		<File RelativePath=".\mnbrak.f90"/>
+		<File RelativePath=".\modules.f90"/>
+		<File RelativePath=".\nr.f90"/>
+		<File RelativePath=".\nrutil.f90"/>
+		<File RelativePath=".\optimal_W.f90"/>
+		<File RelativePath=".\optimization_sa.f90"/>
+		<File RelativePath=".\p2R_R2p.f90"/>
+		<File RelativePath=".\ran1_s.f90"/>
+		<File RelativePath=".\ran_state.f90"/>
+		<File RelativePath=".\role_of_risk.f90"/>
+		<File RelativePath=".\simulate_HRS_70.f90"/>
+		<File RelativePath=".\simulate_i.f90"/>
+		<File RelativePath=".\simulate_model.f90"/>
+		<File RelativePath=".\simulate_model_se.f90"/>
+		<File RelativePath=".\SMM.f90"/>
+		<File RelativePath=".\SMM_se.f90"/>
+		<File RelativePath=".\solve_intratemporal.f90"/>
+		<File RelativePath=".\solve_model.f90"/>
+		<File RelativePath=".\sort.f90"/>
+		<File RelativePath=".\std_vfi.f90"/></Filter>
+		<Filter Name="Resource Files" Filter="rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe"/>
+		<Filter Name="Source Files" Filter="f90;for;f;fpp;ftn;def;odl;idl"/></Files>
+	<Globals/></VisualStudioProject>
