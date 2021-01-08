@@ -1,8 +1,8 @@
 subroutine solve_model(a_policy,g_policy,lfc_x,u_x,beq100_policy)
     use dimensions;use nrtype; use structural_p2; use grids; use structural_p1; use MD_reform
     implicit none
-    real(SP),dimension(nkk,clusters,nzz,nzz2,L_gender,L_PI2,f_t,generations),intent(out)::g_policy,beq100_policy
-    integer,dimension(nkk,clusters,nzz,nzz2,L_gender,L_PI2,f_t,generations),intent(out)::a_policy  !Policy for assets
+    real(SP),dimension(nkk,clusters,nzz,nzz2,L_gender,L_PI2,f_t,generations),intent(out)::beq100_policy
+    integer,dimension(nkk,clusters,nzz,nzz2,L_gender,L_PI2,f_t,generations),intent(out)::a_policy,g_policy  !Policy for assets
     real(SP),dimension(nkk,clusters,nzz2,f_t,L_PI2),intent(out)::u_x
     real(SP),dimension(nkk,clusters,nzz2,f_t,L_PI2),intent(out)::lfc_x
     real(SP),dimension(nkk,clusters+1,nzz,nzz2,2)::V
@@ -51,6 +51,11 @@ subroutine solve_model(a_policy,g_policy,lfc_x,u_x,beq100_policy)
         V=-9.0_sp
         do x_l=1,nkk
             V(x_l,clusters+1,:,:,1:2)=lambda(f_l)*(coh_grid(x_l)+delta(f_l))**(1.0_sp-sigma_beq)/(1.0_sp-sigma_beq)
+            if (a_grid(x_l)>100.0d0) then
+                beq100_policy(x_l,clusters+1,:,:,:,:,:,:)=1.0d0
+            else
+                beq100_policy(x_l,clusters+1,:,:,:,:,:,:)=0.0d0
+            end if
         end do
     do t_l=generations,1,-1 
     do z_l=1,nzz2
@@ -73,20 +78,14 @@ subroutine solve_model(a_policy,g_policy,lfc_x,u_x,beq100_policy)
         !    call ECV_V_k_l2(u_x(x_l-k_l2+1,h_l,z_l,f_l,i_l),V,ge_l,i_l,f_l,t_l,h_l,ps_l,x_l,k_l2,V_k2,ECV_k2_no_beq)
         !end if
         !Discrete choice
-        V(x_l,h_l,ps_l,z_l,1)=sigma_varep(h_l)*log(exp(V_MD/sigma_varep(h_l))+exp(V_wo_MD/sigma_varep(h_l)))
-        if (V(x_l,h_l,ps_l,z_l,1)==-1.0d0/0.0d0 .or. V(x_l,h_l,ps_l,z_l,1)==1.0d0/0.0d0 .or. isnan(V(x_l,h_l,ps_l,z_l,1))) then
-            if (V_MD>=V_wo_MD) then
-                V(x_l,h_l,ps_l,z_l,1)=V_MD
-                a_policy(x_l,h_l,ps_l,z_l,ge_l,i_l,f_l,t_l)=1
-                g_policy(x_l,h_l,ps_l,z_l,ge_l,i_l,f_l,t_l)=1.0_sp
-            else
-                V(x_l,h_l,ps_l,z_l,1)=V_wo_MD
-                a_policy(x_l,h_l,ps_l,z_l,ge_l,i_l,f_l,t_l)=k2_wo_MD
-                g_policy(x_l,h_l,ps_l,z_l,ge_l,i_l,f_l,t_l)=0.0_sp
-            end if
+        if (V_MD>=V_wo_MD) then
+            V(x_l,h_l,ps_l,z_l,1)=V_MD
+            a_policy(x_l,h_l,ps_l,z_l,ge_l,i_l,f_l,t_l)=1
+            g_policy(x_l,h_l,ps_l,z_l,ge_l,i_l,f_l,t_l)=1
         else
-            g_policy(x_l,h_l,ps_l,z_l,ge_l,i_l,f_l,t_l)=exp(V_MD/sigma_varep(h_l))/(exp(V_MD/sigma_varep(h_l))+exp(V_wo_MD/sigma_varep(h_l)))
+            V(x_l,h_l,ps_l,z_l,1)=V_wo_MD
             a_policy(x_l,h_l,ps_l,z_l,ge_l,i_l,f_l,t_l)=k2_wo_MD
+            g_policy(x_l,h_l,ps_l,z_l,ge_l,i_l,f_l,t_l)=0
         end if
         !if (V(x_l,h_l,ps_l,z_l,1)==-1.0d0/0.0d0 ) then
         !    print*,''
