@@ -37,8 +37,8 @@ use nrtype
     !h_t:health type
     !g_t: gender type
     !PI_t: permanent income type                                                     
-    integer,parameter::nkk=300,f_t=2,clusters=4,L_gender=2,L_PI=5,generations=21,nzz=3,nzz2=1,variables=12,groups=4,parameters_to_est=8,obs=9, &
-                        wealth_q=3,L_PI2=10,samples_per_i=50,min_obs=39
+    integer,parameter::nkk=300,f_t=2,clusters=4,L_gender=2,L_PI=5,generations=21,nzz=3,variables=12,groups=4,parameters_to_est=9,obs=9, &
+                        wealth_q=3,L_PI2=10,samples_per_i=500,min_obs=39
     integer,parameter:: moment_conditions=L_PI*obs*groups*2+f_t+f_t*obs*groups+L_PI*clusters+f_t*clusters
 end module dimensions
         
@@ -58,7 +58,7 @@ module targets
     implicit none
     real(SP),dimension(L_PI,obs,groups)::data_NW_PI,data_NW_PI1,data_NW_PIb,data_NW_PI1b
     real(SP),dimension(2,obs)::data_NW_h_ut
-    real(SP),dimension(L_PI)::data_beq100_IC
+    real(SP),dimension(f_t)::data_beq100_IC
     real(SP),dimension(L_PI,clusters)::data_lfc_PI
     real(SP),dimension(f_t,clusters)::data_lfc_IC
     real(SP),dimension(f_t,obs,groups)::data_NW_IC,data_NW_IC1
@@ -68,16 +68,13 @@ end module targets
 module structural_p2
     use dimensions; use nrtype
     implicit none
-    real(SP),dimension(nzz2,1)::pr_varep
-    real(SP),dimension(nzz2,clusters-1)::varep_grid
     real(SP):: sigma,sigma_beq,nu,beta,omega
-    real(SP),dimension(clusters)::sigma_varep
     real(SP),dimension(clusters):: kappa_h,delta_h,u_bar_no_f,x_bar
-    real(SP),dimension(clusters,f_t,nzz2)::u_bar
-    real(SP),dimension(clusters-1)::alpha_mu,sigma2_varep
-    real(SP),dimension(clusters,nzz2)::c_bar,l_bar
+    real(SP),dimension(clusters,f_t)::u_bar
+    real(SP),dimension(clusters-1)::alpha_mu
+    real(SP),dimension(clusters)::c_bar,l_bar
     real(SP),dimension(f_t):: lambda,delta
-    real(SP),dimension(clusters,nzz2):: mu
+    real(SP),dimension(clusters):: mu
     real(SP),dimension(moment_conditions,moment_conditions):: W_opt,Phi
     real(SP),dimension(parameters_to_est)::se
 end module structural_p2
@@ -142,7 +139,7 @@ end module
 module MD_reform
 use dimensions;use nrtype
 implicit none
-real(SP),dimension(nkk,clusters+1,nzz,nzz2,L_gender,L_PI2,f_t)::V_70_or,V_70_new,V_70
+real(SP),dimension(nkk,clusters+1,nzz,L_gender,L_PI2,f_t)::V_70_or,V_70_new,V_70
 integer::ind_or=1
 real(SP)::p_sub=0.0_sp
 end module

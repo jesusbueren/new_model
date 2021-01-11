@@ -19,23 +19,22 @@ program jmp
     
     !!Optimization with Nelder-Mead algorithm
     !Don't forget changing the number of parameters in amoeba.f90 and amebsa.f90
-    call optimization_sa(parameters)
-    open(unit=9,file='parameters_p18.txt')
-        write(9,*) parameters
-    close(9)
+    !call optimization_sa(parameters)
+    !open(unit=9,file='parameters_p18.txt')
+    !    write(9,*) parameters
+    !close(9)
     
     !Compute standard errors of estimated parameters
     !open(unit=9,file='parameters_p18.txt')
     !    read(9,*) parameters
     !close(9)
     !call compute_se(parameters)
-    
-    !Create paper's tables in Latex
+    !
+    !!Create paper's tables in Latex
     !open(unit=9,file='parameters_p18.txt')
     !    read(9,*) parameters
     !close(9)
     !call create_tables_draft(parameters)
-    
     
     !Compute the counterfactuals to identify key mechanisms
     open(unit=9,file='parameters_p18.txt')

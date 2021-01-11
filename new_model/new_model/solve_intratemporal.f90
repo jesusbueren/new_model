@@ -1,8 +1,8 @@
-subroutine solve_intratemporal(p2_fc,cts,h,z,l_i,u,l_fc,c)
+subroutine solve_intratemporal(p2_fc,cts,h,l_i,u,l_fc,c)
     use structural_p1; use structural_p2
     implicit none
     real(SP),intent(in)::cts,l_i,p2_fc
-    integer,intent(in)::h,z
+    integer,intent(in)::h
     real(SP),intent(out)::u,l_fc,c
     real(SP)::l_fc_min,l_fc_max,l_fc_g,mu_c,mu_l_fc
     real(SP)::TINY=1.0e-3
@@ -14,8 +14,8 @@ subroutine solve_intratemporal(p2_fc,cts,h,z,l_i,u,l_fc,c)
     l_fc_g=l_fc_min
     c=cts-p2_fc*l_fc_g
     mu_c=c
-    mu_l_fc=p2_fc**(1.0_sp/sigma)*(mu(h,z)/delta_h(h))**(-1.0_sp/sigma)*(l_fc_g+omega*l_i+kappa_h(h))**(nu/sigma)
-    if (mu_c<mu_l_fc .or. mu(h,z)==0.0_sp) then
+    mu_l_fc=p2_fc**(1.0_sp/sigma)*(mu(h)/delta_h(h))**(-1.0_sp/sigma)*(l_fc_g+omega*l_i+kappa_h(h))**(nu/sigma)
+    if (mu_c<mu_l_fc .or. mu(h)==0.0_sp) then
         go to 1
     end if
     
@@ -31,7 +31,7 @@ subroutine solve_intratemporal(p2_fc,cts,h,z,l_i,u,l_fc,c)
 2   l_fc_g=(l_fc_min+l_fc_max)/2
     c=cts-p2_fc*l_fc_g
     mu_c=c
-    mu_l_fc=p2_fc**(1.0_sp/sigma)*(mu(h,z)/delta_h(h))**(-1.0_sp/sigma)*(l_fc_g+omega*l_i+kappa_h(h))**(nu/sigma)
+    mu_l_fc=p2_fc**(1.0_sp/sigma)*(mu(h)/delta_h(h))**(-1.0_sp/sigma)*(l_fc_g+omega*l_i+kappa_h(h))**(nu/sigma)
     if (abs(mu_c-mu_l_fc)/mu_c>TINY .and. it<2000) then
         if (mu_c<mu_l_fc) then
             l_fc_max=l_fc_g
@@ -46,17 +46,17 @@ subroutine solve_intratemporal(p2_fc,cts,h,z,l_i,u,l_fc,c)
     end if
 1   l_fc=l_fc_g
     
-    if (mu(h,z)<=0.0_sp)then
+    if (mu(h)<=0.0_sp)then
         u=delta_h(h)*c**(1.0_sp-sigma)/(1.0_sp-sigma)
     elseif (cts/p2_fc+omega*l_i+kappa_h(h)<0.0_sp) then
         u=-1.0_sp/0.0_sp
     else
-        u=delta_h(h)*c**(1.0_sp-sigma)/(1.0_sp-sigma)+mu(h,z)*(l_fc+omega*l_i+kappa_h(h))**(1.0_sp-nu)/(1.0_sp-nu)
+        u=delta_h(h)*c**(1.0_sp-sigma)/(1.0_sp-sigma)+mu(h)*(l_fc+omega*l_i+kappa_h(h))**(1.0_sp-nu)/(1.0_sp-nu)
     end if
     
     if (isnan(u))then
         print*,'problem in intratemporal'
-        print*,delta_h(h),c,sigma,mu(h,z),l_fc,omega*l_i,kappa_h(h),nu
+        print*,delta_h(h),c,sigma,mu(h),l_fc,omega*l_i,kappa_h(h),nu
         !read*,end_k
     end if
 end subroutine

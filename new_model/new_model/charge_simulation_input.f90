@@ -28,7 +28,7 @@ subroutine charge_simulation_input_moments(data_NW_PI1,data_NW_PI,&
     !hours of care variables
     real(SP),dimension(L_PI,clusters,6500)::fc_pi_h
     real(SP),dimension(f_t,clusters,15000)::fc_ic_h,ic_ic_h
-    integer,dimension(f_t,6500)::beq100_ic
+    integer,dimension(f_t,20000)::beq100_ic
     !Store vector variables    
     real(SP),dimension(L_PI,obs,groups,1500)::assets_pi_age_group,assets_pi_age_group_b !1500: maximum number of individuals in a group
     real(SP),dimension(2,obs,8000)::assets_ut
@@ -75,6 +75,7 @@ subroutine charge_simulation_input_moments(data_NW_PI1,data_NW_PI,&
         ic_ic_h=0.0_sp
         beq100_ic=0
         counter_ic_nw=0
+        counter_beq100=0
         h_i=-9.0
         !Store vector with all: 
         !       - Formal care hours across PI quartiles and health status
@@ -132,7 +133,7 @@ subroutine charge_simulation_input_moments(data_NW_PI1,data_NW_PI,&
                 end if
                 if (beq100(i_l,t_l)/=-9) then
                     counter_beq100(f_l)=counter_beq100(f_l)+1
-                    beq100_ic(f_l,counter_beq100(f_l))=counter_beq100(f_l)
+                    beq100_ic(f_l,counter_beq100(f_l))=beq100(i_l,t_l)
                 end if
                 if (fc_h(i_l,t_l)/=-9.0_sp .and. IC_q(i_l,t_l)/=-9 .and. ic_h(i_l,t_l)/=-9.0_sp) then
                     counter_ic_h(IC_q(i_l,t_l),h_i(i_l,t_l,1))=counter_ic_h(IC_q(i_l,t_l),h_i(i_l,t_l,1))+1
@@ -207,7 +208,7 @@ subroutine charge_simulation_input_moments(data_NW_PI1,data_NW_PI,&
     end do
     data_lfc_PI=sum(data_lfc_PI_s,3)/real(samples_per_i)
     data_beq100_IC=sum(data_beq100_IC_s,2)/real(samples_per_i)
-    l_ic=sum(l_ic_s,3)/real(samples_per_i)
+    l_ic=sum(l_ic_s,3)/real(samples_per_i) !l_ic
     data_lfc_IC=sum(data_lfc_IC_s,3)/real(samples_per_i)
 
     !Wealth moments by PIq

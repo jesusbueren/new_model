@@ -6,11 +6,11 @@ subroutine simulate_HRS_70(parameters,p50_75_assets_ic_age,p50_75_assets_all_age
     integer,intent(in)::ind_h
     real(SP),dimension(L_PI+1),intent(out)::EDP,CV
     integer,parameter::indv_c=150000
-    real(SP),dimension(nkk,clusters,nzz,nzz2,L_gender,L_PI2,f_t,generations)::g_policy
-    integer,dimension(nkk,clusters,nzz,nzz2,L_gender,L_PI2,f_t,generations)::a_policy
-    real(SP),dimension(nkk,clusters,nzz2,f_t,L_PI2)::u_x
-    real(SP),dimension(nkk,clusters,nzz2,f_t,L_PI2)::lfc_x
-    integer::i_l,xi_l,i_l2,t_l,ind,k2_l,pos_x,xi_l2,f_l,ts_l2,pi_l,nwq_l,z_l,h_l,pos_x2,k2_l2
+    real(SP),dimension(nkk,clusters,nzz,L_gender,L_PI2,f_t,generations)::beq100_policy
+    integer,dimension(nkk,clusters,nzz,L_gender,L_PI2,f_t,generations)::a_policy,g_policy
+    real(SP),dimension(nkk,clusters,f_t,L_PI2)::u_x
+    real(SP),dimension(nkk,clusters,f_t,L_PI2)::lfc_x
+    integer::i_l,xi_l,i_l2,t_l,ind,k2_l,pos_x,xi_l2,f_l,ts_l2,pi_l,nwq_l,h_l,pos_x2,k2_l2
     real(SP)::u,x_pr_md,sum_t,sum_t_md
     real(SP),dimension(indv_c)::tr_i
     integer,dimension(indv_c)::pi_i2
@@ -45,13 +45,10 @@ subroutine simulate_HRS_70(parameters,p50_75_assets_ic_age,p50_75_assets_all_age
     alpha_mu(1:3)=parameters(3:5)
     delta(1:f_t)=parameters(6)
     nu=parameters(7)
-    lambda(1:3)=exp(parameters(8))   
-    
+    lambda(1:2)=exp(parameters(8:9))   
     sigma_beq=sigma
     beta=0.95_sp
     omega=1.0_sp 
-    sigma_varep(1:4)=0.0000001_sp
-    sigma2_varep(1:3)=0.0_sp
     kappa_h=0.0_sp
     delta_h=1.0_sp
     
@@ -60,63 +57,53 @@ subroutine simulate_HRS_70(parameters,p50_75_assets_ic_age,p50_75_assets_all_age
         if (h_l==1) then
             mu_av=0.0_sp
         elseif (h_l==2) then
-            mu_av=exp(alpha_mu(1)+sigma2_varep(1)/2.0_sp)
+            mu_av=exp(alpha_mu(1))
         elseif (h_l==3) then
-            mu_av=exp(alpha_mu(2)+sigma2_varep(2)/2.0_sp)
+            mu_av=exp(alpha_mu(2))
         elseif (h_l==4) then
-            mu_av=exp(alpha_mu(3)+sigma2_varep(3)/2.0_sp)
+            mu_av=exp(alpha_mu(3))
         end if
         call solve_intratemporal_av(p_fc,x_bar(h_l),h_l,mu_av,0.0_sp,u_bar_no_f(h_l),l_fc,c)
     end do
     u_bar_no_f=u_bar_no_f(1)
     
     print*,beta,sigma,nu,delta(1),x_bar(1), &
-           lambda,alpha_mu,omega,sigma_varep
+           lambda,alpha_mu,omega
     
-    !Discretize var_ep and compute preference shifter for care
-    if (nzz2>1) then
-        do h_l=2,clusters
-            call discretize_var_ep(sigma2_varep(h_l-1),nzz2,varep_grid(:,h_l-1),pr_varep)
-            !print*,exp(alpha_mu(h_l-1)+sigma2_varep(h_l-1)/2)
-        end do
-    else
-        varep_grid=0.0_sp
-        pr_varep=1.0_sp
-    end if
     mu=0.0_sp
-    do z_l=1,nzz2; do h_l=2,clusters
-        mu(h_l,z_l)=exp(alpha_mu(h_l-1)+varep_grid(z_l,h_l-1))
-    end do;end do
+    do h_l=2,clusters
+        mu(h_l)=exp(alpha_mu(h_l-1))
+    end do
     
     !Change price of formal care
     sub_per_h=p_fc-p_fc*(1.0_sp-p_sub)
     p_fc=p_fc*(1.0_sp-p_sub)
     
     !Solve the model given a set of parameters
-    call solve_model(a_policy,g_policy,lfc_x,u_x)
+    call solve_model(a_policy,g_policy,lfc_x,u_x,beq100_policy)
 
     !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-    !print*,'Just for simulation of moments'
-    !call simulate_model(a_policy,g_policy,lfc_x, &
-    !                    model_moments1,model_moments)
-    !print*,'got here2'
-    !do i_l=1,moment_conditions
-    !    if (data_moments(i_l,1)==-9.0_sp) then
-    !        model_moments(i_l,1)=-9.0_sp
-    !        model_moments1(i_l,1)=-9.0_sp
-    !    end if
-    !end do
-    !call empty_missing(model_moments,model_moments_new ,int(moment_conditions),real_moments)
-    !
-    !print*,'obj fct',real(indv)/(1.0_dp+1.0_dp/real(samples_per_i))*matmul(matmul(transpose(model_moments_new(1:real_moments,1:1)), & 
-    !                                W_opt(1:real_moments,1:real_moments)), &
-    !                                model_moments_new(1:real_moments,1:1))
-    !print*,'got here3'
-    !open(unit=9,file='model_moments.txt')
-    !    write(9,*) model_moments1
-    !close(9)
-    !print*,'close window, just for simulation of moments'
-    !read*,pause_k
+    print*,'Just for simulation of moments'
+    call simulate_model(a_policy,g_policy,lfc_x,beq100_policy, &
+                        model_moments1,model_moments)
+    print*,'got here2'
+    do i_l=1,moment_conditions
+        if (data_moments(i_l,1)==-9.0_sp) then
+            model_moments(i_l,1)=-9.0_sp
+            model_moments1(i_l,1)=-9.0_sp
+        end if
+    end do
+    call empty_missing(model_moments,model_moments_new ,int(moment_conditions),real_moments)
+    
+    print*,'obj fct',real(indv)/(1.0_dp+1.0_dp/real(samples_per_i))*matmul(matmul(transpose(model_moments_new(1:real_moments,1:1)), & 
+                                    W_opt(1:real_moments,1:real_moments)), &
+                                    model_moments_new(1:real_moments,1:1))
+    print*,'got here3'
+    open(unit=9,file='model_moments.txt')
+        write(9,*) model_moments1
+    close(9)
+    print*,'close window, just for simulation of moments'
+    read*,pause_k
     !!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     if (ind_or==1) then
         V_70_or=V_70
@@ -214,17 +201,7 @@ subroutine simulate_HRS_70(parameters,p50_75_assets_ic_age,p50_75_assets_all_age
                         ind=ind+1
                     end if
                 end do
-                !Sample LTC need shifter shock
-                z_l=-9
-                ind=1
-                call RANDOM_NUMBER(u)
-                do while (z_l==-9)
-                    if (u<sum(pr_varep(1:ind,1)) .or. ind==nzz2) then
-                        z_l=ind
-                    else
-                        ind=ind+1
-                    end if
-                end do
+                
                 !Cash on hand
                 x_it(t_l)=(1+r)*a_it(t_l)-m_exp_all(t_l,gender_i(i_l),PI_q_i2(i_l),h_s(t_l),xi_l2,ts_l2)+b(PI_q_i2(i_l),gender_i(i_l))
                 obs_m_av(PI_q_i(i_l),t_l)=obs_m_av(PI_q_i(i_l),t_l)+1.0_sp
@@ -233,30 +210,30 @@ subroutine simulate_HRS_70(parameters,p50_75_assets_ic_age,p50_75_assets_all_age
                 pos_x=int(max(min(x_it(t_l),coh_grid(nkk)),0.0_sp)/(coh_grid(2)-coh_grid(1))+1.00000001_sp)
                 !Draw on the discrete choice
                 call RANDOM_NUMBER(u)
-                if (u<g_policy(pos_x,h_s(t_l),xi_l,z_l,gender_i(i_l),PI_q_i2(i_l),f_l,t_l)) then
+                if (g_policy(pos_x,h_s(t_l),xi_l,gender_i(i_l),PI_q_i2(i_l),f_l,t_l)==1) then
                     g_it(t_l)=1
                     k2_l=1
                 else
                     g_it(t_l)=0
-                    k2_l=a_policy(pos_x,h_s(t_l),xi_l,z_l,gender_i(i_l),PI_q_i2(i_l),f_l,t_l)
+                    k2_l=a_policy(pos_x,h_s(t_l),xi_l,gender_i(i_l),PI_q_i2(i_l),f_l,t_l)
                 end if 
                 a_it(t_l+1)=coh_grid(k2_l)
                 if (g_it(t_l)==1) then
-                    tr_it(t_l)=max(c_bar(h_s(t_l),z_l)+p_or*l_bar(h_s(t_l),z_l)- &
+                    tr_it(t_l)=max(c_bar(h_s(t_l))+p_or*l_bar(h_s(t_l))- &
                                 x_it(t_l),0.0_sp)
                     x_it(t_l)=0.0_sp
                 else
-                    tr_it(t_l)=lfc_x(pos_x-k2_l+1,h_s(t_l),z_l,f_l,PI_q_i2(i_l))*(p_or-p_fc)
+                    tr_it(t_l)=lfc_x(pos_x-k2_l+1,h_s(t_l),f_l,PI_q_i2(i_l))*(p_or-p_fc)
                 end if
                 tr_it(t_l)=tr_it(t_l)/(1.0_sp+r)**(t_l-1)
+                
                 !Store assets
-                if (h_s(t_l)<=ind_h)then
                 counter_pi_age(PI_q_i(i_l),t_l)=counter_pi_age(PI_q_i(i_l),t_l)+1
                 assets_pi_age(PI_q_i(i_l),t_l,counter_pi_age(PI_q_i(i_l),t_l))=a_it(t_l)
                 if (g_it(t_l)==0) then
-                    c_pi_age(PI_q_i(i_l),t_l,counter_pi_age(PI_q_i(i_l),t_l))=coh_grid(pos_x)-coh_grid(k2_l)-lfc_x(pos_x-k2_l+1,h_s(t_l),z_l,f_l,PI_q_i2(i_l))*p_fc
+                    c_pi_age(PI_q_i(i_l),t_l,counter_pi_age(PI_q_i(i_l),t_l))=coh_grid(pos_x)-coh_grid(k2_l)-lfc_x(pos_x-k2_l+1,h_s(t_l),f_l,PI_q_i2(i_l))*p_fc
                 else
-                    c_pi_age(PI_q_i(i_l),t_l,counter_pi_age(PI_q_i(i_l),t_l))=c_bar(h_s(t_l),z_l)
+                    c_pi_age(PI_q_i(i_l),t_l,counter_pi_age(PI_q_i(i_l),t_l))=c_bar(h_s(t_l))
                 end if
                 if (PI_q_i(i_l)==4) then
                     counter_ic_age(f_l,t_l)=counter_ic_age(f_l,t_l)+1
@@ -264,18 +241,17 @@ subroutine simulate_HRS_70(parameters,p50_75_assets_ic_age,p50_75_assets_all_age
                 end if
                 counter_all_age(t_l)=counter_all_age(t_l)+1
                 assets_all_age(t_l,counter_all_age(t_l))=a_it(t_l)
-                end if
                 
                 !Compute Compensating Variation
                 if (ind_or==0 .and. t_l==1) then
-                    if (V_70_or(pos_x,h_s(t_l),xi_l,z_l,gender_i(i_l),PI_q_i2(i_l),f_l)==V_70_new(pos_x,h_s(t_l),xi_l,z_l,gender_i(i_l),PI_q_i2(i_l),f_l)) then
+                    if (V_70_or(pos_x,h_s(t_l),xi_l,gender_i(i_l),PI_q_i2(i_l),f_l)==V_70_new(pos_x,h_s(t_l),xi_l,gender_i(i_l),PI_q_i2(i_l),f_l)) then
                         lambda_pi(PI_q_i(i_l),counter_pi_age(PI_q_i(i_l),t_l))=0.0_sp
                         ltci_pi(PI_q_i(i_l),counter_pi_age(PI_q_i(i_l),t_l))=0.0_sp
-                    elseif (V_70_or(pos_x,h_s(t_l),xi_l,z_l,gender_i(i_l),PI_q_i2(i_l),f_l)<V_70_new(1,h_s(t_l),xi_l,z_l,gender_i(i_l),PI_q_i2(i_l),f_l)) then
+                    elseif (V_70_or(pos_x,h_s(t_l),xi_l,gender_i(i_l),PI_q_i2(i_l),f_l)<V_70_new(1,h_s(t_l),xi_l,gender_i(i_l),PI_q_i2(i_l),f_l)) then
                         lambda_pi(PI_q_i(i_l),counter_pi_age(PI_q_i(i_l),t_l))=-coh_grid(pos_x) 
                     else
                         lambda_pi(PI_q_i(i_l),counter_pi_age(PI_q_i(i_l),t_l))=&
-                        coh_grid(minloc(abs(V_70_new(:,h_s(t_l),xi_l,z_l,gender_i(i_l),PI_q_i2(i_l),f_l)-V_70_or(pos_x,h_s(t_l),xi_l,z_l,gender_i(i_l),PI_q_i2(i_l),f_l)),1))- &
+                        coh_grid(minloc(abs(V_70_new(:,h_s(t_l),xi_l,gender_i(i_l),PI_q_i2(i_l),f_l)-V_70_or(pos_x,h_s(t_l),xi_l,gender_i(i_l),PI_q_i2(i_l),f_l)),1))- &
                         coh_grid(pos_x)
                     end if
                 end if

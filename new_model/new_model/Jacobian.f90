@@ -21,7 +21,7 @@ subroutine Jacobian(parameters,J)
     call empty_missing(moments,moments_nom,int(moment_conditions),real_moments)
     call empty_missing(densities,densities_nom,int(moment_conditions),real_moments)
     
-    eps=0.001_sp
+    eps=0.0001_sp
     do p_l=1,parameters_to_est
         if (p_l==3) then
             eps(p_l)=0.01_sp
