@@ -3,7 +3,7 @@ clear all
 clc   
 cd('C:\Users\jbueren\Google Drive\JMP\Code\Structural Model\new_model\new_model\new_model');
 % Data moments
-fileID = fopen('parameters_p18.txt');
+fileID = fopen('parameters_prelim.txt');
 parameters=textscan(fileID,'%f');
 fclose(fileID);
 parameters=parameters{1};

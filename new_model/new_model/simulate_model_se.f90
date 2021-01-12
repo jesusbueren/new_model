@@ -34,7 +34,7 @@ subroutine simulate_model_se(a_policy,g_policy,lfc_x,beq100_policy, &
     !Moment variables variables
     real(SP),dimension(f_t,obs,groups)::nw_ic_it
     real(SP),dimension(L_PI,clusters)::fc_pi_h_it
-    real(SP),dimension(f_t)::beq100_it
+    real(SP),dimension(L_PI,f_t)::beq100_it
     real(SP),dimension(f_t,clusters)::fc_ic_h_it 
     real(SP),dimension(L_PI,obs,groups)::assets_pi_age_group_it,assets_pi_age_group_it_b
     real(SP),dimension(moment_conditions,obs,indv)::moments_it
@@ -242,14 +242,14 @@ subroutine simulate_model_se(a_policy,g_policy,lfc_x,beq100_policy, &
  
                     fc_pi_h_it(PI_q_i(i_l),h_i(i_l,t_l,2))=lfc_pi_h(PI_q_i(i_l),h_i(i_l,t_l,2),counter_pi_h(PI_q_i(i_l),h_i(i_l,t_l,2)))-data_lfc_PI(PI_q_i(i_l),h_i(i_l,t_l,2))
                     fc_ic_h_it(f_l(1),h_i(i_l,t_l,2))=lfc_ic_h(f_l(1),h_i(i_l,t_l,2),counter_ic_h(f_l(1),h_i(i_l,t_l,2)))-data_lfc_IC(f_l(1),h_i(i_l,t_l,2))
-                    beq100_it(f_l(2))=beq100_policy(pos_x,h_i(i_l,t_l,1),xi_l,gender_i(i_l),PI_q_i2(i_l),f_l(1),generation_i(i_l)+t_l-1)-data_beq100_IC(f_l(2))
+                    beq100_it(PI_q_i(i_l),f_l(2))=beq100_policy(pos_x,h_i(i_l,t_l,1),xi_l,gender_i(i_l),PI_q_i2(i_l),f_l(1),generation_i(i_l)+t_l-1)-data_beq100_IC(PI_q_i(i_l),f_l(2))
                 else 
                     x_it(t_l+1)=-9.0_sp
                     a_it(t_l+1)=-9.0_sp
                 end if
                 moments_it(:,t_l,i_l)=(/reshape(assets_pi_age_group_it,(/L_PI*obs*groups,1/)),&
                                         reshape(assets_pi_age_group_it_b,(/L_PI*obs*groups,1/)),&
-                                        reshape(beq100_it,(/f_t,1/)), &
+                                        reshape(beq100_it,(/L_PI*f_t,1/)), &
                                         reshape(nw_ic_it,(/f_t*obs*groups,1/)), &
                                         reshape(fc_pi_h_it,(/L_PI*clusters,1/)), &
                                         reshape(fc_ic_h_it,(/f_t*clusters,1/))/)

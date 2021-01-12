@@ -15,7 +15,7 @@ subroutine ECV_V_k_l2(u_x,V,ge_l,i_l,f_l,t_l,h_l,ps_l,x_l,k_l2,V_k2,ECV_k2,beq_a
         if (h_l2<clusters+1) then
             x2=min(max((1.0_sp+r)*coh_grid(k_l2)-m_exp_all(t_l,ge_l,int(real(i_l+1)/2.0_sp),h_l2,ps_l2,ts_l2)+b(i_l,ge_l),0.0_sp),coh_grid(nkk)-0.1_sp)
         else
-            x2=coh_grid(k_l2)
+            x2=max(coh_grid(k_l2)-10.0_sp,coh_min)
         end if
             pos_x2=int(x2/(coh_grid(2)-coh_grid(1))+1.0000001_sp)
             alpha=1.0_sp-(x2-coh_grid(pos_x2))/(coh_grid(2)-coh_grid(1))

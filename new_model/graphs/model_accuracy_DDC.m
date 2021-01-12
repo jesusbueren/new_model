@@ -34,25 +34,27 @@ model_moments(model_moments<0) = 0;
 model_NW_PI=model_moments(1:waves*groups*PI_l*2);
 model_NW_PI=reshape(model_NW_PI,PI_l,waves,groups,2);
 
-data_beq_ic=data_moments(waves*groups*PI_l*2+1:waves*groups*PI_l*2+f_t);
-model_beq_ic=model_moments(waves*groups*PI_l*2+1:waves*groups*PI_l*2+f_t);
+data_beq_ic=data_moments(waves*groups*PI_l*2+1:waves*groups*PI_l*2+f_t*PI_l);
+data_beq_ic=reshape(data_beq_ic,PI_l,f_t);
+model_beq_ic=model_moments(waves*groups*PI_l*2+1:waves*groups*PI_l*2+f_t*PI_l);
+model_beq_ic=reshape(model_beq_ic,PI_l,f_t);
 
-data_NW_IC=data_moments(waves*groups*PI_l*2+f_t+1:waves*groups*PI_l*2+f_t+f_t*waves*groups);
+data_NW_IC=data_moments(waves*groups*PI_l*2+f_t*PI_l+1:waves*groups*PI_l*2+f_t*PI_l+f_t*waves*groups);
 data_NW_IC=reshape(data_NW_IC,f_t,waves,groups);
 
-model_NW_IC=model_moments(waves*groups*PI_l*2+f_t+1:waves*groups*PI_l*2+f_t+f_t*waves*groups);
+model_NW_IC=model_moments(waves*groups*PI_l*2+f_t*PI_l+1:waves*groups*PI_l*2+f_t*PI_l+f_t*waves*groups);
 model_NW_IC=reshape(model_NW_IC,f_t,waves,groups);
 
-data_hr_PI=data_moments(waves*groups*PI_l*2+f_t+f_t*waves*groups+1:waves*groups*PI_l*2+f_t+f_t*waves*groups+groups*PI_l);
+data_hr_PI=data_moments(waves*groups*PI_l*2+f_t*PI_l+f_t*waves*groups+1:waves*groups*PI_l*2+f_t*PI_l+f_t*waves*groups+groups*PI_l);
 data_hr_PI=reshape(data_hr_PI,PI_l,groups)
 
-model_hr_PI=model_moments(waves*groups*PI_l*2+f_t+f_t*waves*groups+1:waves*groups*PI_l*2+f_t+f_t*waves*groups+groups*PI_l);
+model_hr_PI=model_moments(waves*groups*PI_l*2+f_t*PI_l+f_t*waves*groups+1:waves*groups*PI_l*2+f_t*PI_l+f_t*waves*groups+groups*PI_l);
 model_hr_PI=reshape(model_hr_PI,PI_l,groups)
 
-data_hr_IC=data_moments(waves*groups*PI_l*2+f_t+f_t*waves*groups+groups*PI_l+1:waves*groups*PI_l*2+f_t+f_t*waves*groups+groups*PI_l+groups*f_t);
+data_hr_IC=data_moments(waves*groups*PI_l*2+f_t*PI_l+f_t*waves*groups+groups*PI_l+1:waves*groups*PI_l*2+f_t*PI_l+f_t*waves*groups+groups*PI_l+groups*f_t);
 data_hr_IC=reshape(data_hr_IC,f_t,groups)
 
-model_hr_IC=model_moments(waves*groups*PI_l*2+f_t+f_t*waves*groups+groups*PI_l+1:waves*groups*PI_l*2+f_t+f_t*waves*groups+groups*PI_l+groups*f_t);
+model_hr_IC=model_moments(waves*groups*PI_l*2+f_t*PI_l+f_t*waves*groups+groups*PI_l+1:waves*groups*PI_l*2+f_t*PI_l+f_t*waves*groups+groups*PI_l+groups*f_t);
 model_hr_IC=reshape(model_hr_IC,f_t,groups)
 
 
@@ -136,7 +138,7 @@ end
 end
 xticks([1:1:5])
 xticklabels({'Bottom','Second','Third','Fourth','Top'})
-ylim([0 9])
+ylim([0 11])
 xlim([0.8 5.2])
 I2=legend('Physically Frail','Mentally Frail','Impaired','orientation','horizontal');
 legend('boxoff')
@@ -177,21 +179,36 @@ xlabel('Family Type','FontSize',FS)
 ylabel('Formal Care Hours per Day','FontSize',FS)
 
 figure(2)
-set(2,'position',[450    400    500    250])
-clrs = [0 0 0; 0.9 0.9 0.9];
-hB=bar([data_beq_ic model_beq_ic])
+set(2,'position',[450    400    700    250])
+clrs = [0 0 0; 0.9 0.9 0.9 ];
+for m=1:2
+    subplot(1,2,m)
+    if m==1
+        hB=bar(data_beq_ic)
+    else
+        hB=bar(model_beq_ic)
+    end
 set(hB,{'FaceColor'},{clrs(1,:),clrs(2,:)}.')
-I=legend('Data','Model','orientation','horizontal')
-legend('boxoff')
-I.FontSize=FS
+
+    I=legend('Distant','Close','Location','NorthWest')
+    legend('boxoff')
+    I.FontSize=FS
+%     newPosition = [0.5 0.925 0.08 0.08];
+%     newUnits = 'normalized';
+%     set(I,'Position', newPosition,'Units', newUnits);
+if m==1
+    title('Data')
+else
+    title('Model')
+end
 set(gca,'FontName','Times New Roman','Fontsize',FS);
 set(gcf,'color','w')
-xticks([1 2 ])
-xticklabels({'On your own','Close'})
+ylim([0 100])
+xticks([1 2 3 4 5])
+xticklabels({'Bottom','2nd','3rd','4th','Top'})
 ylabel('Pr. of leaving bequest > 100k (%)','FontSize',FS)
-newPosition = [0.48 0.915 0.1 0.1];
-newUnits = 'normalized';
-set(I,'Position', newPosition,'Units', newUnits);
+xlabel('Permanent Income Quintile','FontSize',FS)
+end
 
 
 

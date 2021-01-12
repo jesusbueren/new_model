@@ -29,7 +29,7 @@ subroutine data_moments_W()
 
     data_moments1(:,1)=(/reshape(data_NW_PI1,(/L_PI*obs*groups,1/)),& 
                          reshape(data_NW_PI1b,(/L_PI*obs*groups,1/)),& 
-                         reshape(data_beq100_IC,(/f_t,1/)), &
+                         reshape(data_beq100_IC,(/L_PI*f_t,1/)), &
                          reshape(data_NW_IC1,(/f_t*obs*groups,1/)), &
                          reshape(data_lfc_PI,(/L_PI*clusters,1/)), &
                          reshape(data_lfc_IC,(/f_t*clusters,1/))/)
@@ -48,7 +48,7 @@ subroutine data_moments_W()
     
     data_moments(:,1)=(/reshape(data_NW_PI,(/L_PI*obs*groups,1/)),&
                         reshape(data_NW_PIb,(/L_PI*obs*groups,1/)),&
-                        reshape(data_beq100_IC,(/f_t,1/)),&
+                        reshape(data_beq100_IC,(/L_PI*f_t,1/)),&
                         reshape(data_NW_IC,(/f_t*obs*groups,1/)),&
                         reshape(data_lfc_PI,(/L_PI*clusters,1/)),&
                         reshape(data_lfc_IC,(/f_t*clusters,1/))/)

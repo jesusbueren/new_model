@@ -37,7 +37,7 @@ program jmp
     !call create_tables_draft(parameters)
     
     !Compute the counterfactuals to identify key mechanisms
-    open(unit=9,file='parameters_p18.txt')
+    open(unit=9,file='parameters_prelim.txt')
         read(9,*) parameters
     close(9)
     call counterfactuals(parameters)

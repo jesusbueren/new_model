@@ -39,7 +39,7 @@ use nrtype
     !PI_t: permanent income type                                                     
     integer,parameter::nkk=300,f_t=2,clusters=4,L_gender=2,L_PI=5,generations=21,nzz=3,variables=12,groups=4,parameters_to_est=9,obs=9, &
                         wealth_q=3,L_PI2=10,samples_per_i=500,min_obs=39
-    integer,parameter:: moment_conditions=L_PI*obs*groups*2+f_t+f_t*obs*groups+L_PI*clusters+f_t*clusters
+    integer,parameter:: moment_conditions=L_PI*obs*groups*2+L_PI*f_t+f_t*obs*groups+L_PI*clusters+f_t*clusters
 end module dimensions
         
 module grids
@@ -58,7 +58,7 @@ module targets
     implicit none
     real(SP),dimension(L_PI,obs,groups)::data_NW_PI,data_NW_PI1,data_NW_PIb,data_NW_PI1b
     real(SP),dimension(2,obs)::data_NW_h_ut
-    real(SP),dimension(f_t)::data_beq100_IC
+    real(SP),dimension(L_PI,f_t)::data_beq100_IC
     real(SP),dimension(L_PI,clusters)::data_lfc_PI
     real(SP),dimension(f_t,clusters)::data_lfc_IC
     real(SP),dimension(f_t,obs,groups)::data_NW_IC,data_NW_IC1
@@ -77,8 +77,8 @@ module structural_p2
     real(SP),dimension(clusters):: mu
     real(SP),dimension(moment_conditions,moment_conditions):: W_opt,Phi
     real(SP),dimension(parameters_to_est)::se
-end module structural_p2
-    
+    end module structural_p2
+        
 module structural_p1
     use dimensions; use nrtype
     implicit none
@@ -143,5 +143,12 @@ real(SP),dimension(nkk,clusters+1,nzz,L_gender,L_PI2,f_t)::V_70_or,V_70_new,V_70
 integer::ind_or=1
 real(SP)::p_sub=0.0_sp
 end module
+    
+module HRS_data
+    use dimensions; use nrtype; use simulation_input
+    implicit none
+    integer,dimension(indv,obs):: IC_q,beq100 
+    real(SP),dimension(indv,obs):: fc_h,NW,ic_h
+end module HRS_data
 
     

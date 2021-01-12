@@ -34,10 +34,11 @@ model_moments(model_moments<0) = 0;
 model_NW_PI=model_moments(1:waves*groups*PI_l*2);
 model_NW_PI=reshape(model_NW_PI,PI_l,waves,groups,2);
 
-data_beq_ic=data_moments(waves*groups*PI_l*2+1:waves*groups*PI_l*2+f_t);
-model_beq_ic=model_moments(waves*groups*PI_l*2+1:waves*groups*PI_l*2+f_t);
+data_beq_ic=data_moments(waves*groups*PI_l*2+1:waves*groups*PI_l*2+f_t*PI_l);
+data_beq_ic=reshape(data_beq_ic,PI_l,f_t);
+model_beq_ic=model_moments(waves*groups*PI_l*2+1:waves*groups*PI_l*2+f_t*PI_l);
 
-data_NW_IC=data_moments(waves*groups*PI_l*2+f_t+1:waves*groups*PI_l*2+f_t+f_t*waves*groups);
+data_NW_IC=data_moments(waves*groups*PI_l*2+f_t*PI_l+1:waves*groups*PI_l*2+f_t*PI_l+f_t*waves*groups);
 data_NW_IC=reshape(data_NW_IC,f_t,waves,groups);
 
 model_NW_IC=model_moments(waves*groups*PI_l*2+f_t+1:waves*groups*PI_l*2+f_t+f_t*waves*groups);
@@ -177,11 +178,11 @@ xlabel('Family Type','FontSize',FS)
 ylabel('Formal Care Hours per Day','FontSize',FS)
 
 figure(2)
-set(2,'position',[50    20    500    250])
+set(2,'position',[450    400    500    250])
 clrs = [0 0 0; 0.9 0.9 0.9];
 hB=bar([data_beq_ic model_beq_ic])
 set(hB,{'FaceColor'},{clrs(1,:),clrs(2,:)}.')
-I=legend('Data','Model')
+I=legend('Data','Model','orientation','horizontal')
 legend('boxoff')
 I.FontSize=FS
 set(gca,'FontName','Times New Roman','Fontsize',FS);
@@ -189,9 +190,9 @@ set(gcf,'color','w')
 xticks([1 2 ])
 xticklabels({'On your own','Close'})
 ylabel('Pr. of leaving bequest > 100k (%)','FontSize',FS)
-newPosition = [0.4 0.25 0.2 0.2];
+newPosition = [0.48 0.915 0.1 0.1];
 newUnits = 'normalized';
-set(I3,'Position', newPosition,'Units', newUnits);
+set(I,'Position', newPosition,'Units', newUnits);
 
 
 
@@ -250,7 +251,7 @@ ldash = {'-' '--' ':'  '*'};
 figure(6)
 set(6,'position',[50    100    600    250])    
 for i=1:2
-cd('C:\Users\jbueren\Google Drive\JMP\Code\Structural Model\DDC');
+cd('C:\Users\jbueren\Google Drive\JMP\Code\Structural Model\new_model\new_model\new_model');
 fileID = fopen('benchmark.txt');
 benchmark=textscan(fileID,'%f  %f %f %f %f %f ');
 fclose(fileID);
