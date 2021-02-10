@@ -16,8 +16,10 @@ mu(2:4,1)=exp(parameters(3:5));
 lambda(1:2,1)=exp(parameters(8:9))*2;
 kappa(1)=parameters(6);
 om=1;
+share_p=parameters(10);
+subs_p=parameters(11);
 
-p_fc(1)=18/1000;
+p_fc(1)=8/1000;
 theta(1:4,1)=1;
 
 % DFJ
@@ -75,9 +77,9 @@ N_x=500;
 a_max=500
 x_grid=linspace(0,a_max,N_x);
 
+l_IC(1:3,1:4)=zeros(3,4);
 for m_l=1:4
     m_l
-    l_IC(1:3,1:4)=0;
     if m_l==1
         %Informal care on their own
         l_IC(1,2:4)=[0.5*365*2+68 0.5*365*2+521 0.5*365*2]; 
@@ -85,6 +87,7 @@ for m_l=1:4
         l_IC(2,2:4)=[3.6*365*2+68 8.9*365*2+521 13.6*365*2];
     end
 for h_l=1:4;
+    h_l
 for IC_l=1:2;
 for i=1:N_x;
     i;
@@ -98,24 +101,21 @@ for i=1:N_x;
         if mu(h_l,m_l)==0 
             c_try=c_max;
             fc_try=0;
-        elseif mu(h_l,m_l)*(om*l_IC(IC_l,h_l))^(-nu(m_l))<p_fc(m_l)*c_max^(-sigma(m_l))
-            %check corner solution
-            c_try=c_max;
-            fc_try=0;
         else
             %Interior solution
-            c_min=0;
-            c_max=cts;
+            l_fc_min=0;
+            l_fc_max=cts/p_fc(m_l);
             crit=2;
             while abs(crit)>0.0000001
-                c_try=(c_max+c_min)/2;
-                fc_try=(mu(h_l,m_l)/p_fc(m_l))^(1/nu(m_l))*c_try^(sigma(m_l)/nu(m_l))-om*l_IC(IC_l,h_l);
+                fc_try=(l_fc_min+l_fc_max)/2;
+                c_try=(mu(h_l,m_l)/p_fc(m_l))^(-1/sigma(m_l))*share_p^(-1/sigma(m_l))*fc_try^((1-subs_p)/sigma(m_l))*...
+                      (share_p*fc_try^subs_p+(1-share_p)*l_IC(IC_l,h_l)^subs_p)^((nu(m_l)+subs_p-1)/(subs_p*sigma(m_l)));
                 LHS=c_try+p_fc(m_l)*fc_try;
                 crit=LHS-cts;
                 if cts>LHS
-                    c_min=c_try;
+                    l_fc_min=fc_try;
                 else
-                    c_max=c_try;
+                    l_fc_max=fc_try;
                 end 
             end
         end
@@ -127,6 +127,8 @@ for i=1:N_x;
             u_j(j)=-999999;
         elseif mu(h_l,m_l)==0
             u_j(j)=theta(h_l,m_l)*c_try^(1-sigma(m_l))/(1-sigma(m_l))+lambda(IC_l,m_l)*(a2+kappa(m_l))^(1-sigma_2(m_l))/(1-sigma_2(m_l));
+        elseif m_l==1
+            u_j(j)=theta(h_l,m_l)*c_try^(1-sigma(m_l))/(1-sigma(m_l))+mu(h_l,m_l)*(share_p*fc_try^subs_p+(1-share_p)*l_IC(IC_l,h_l)^subs_p)^((1-nu(m_l))/subs_p)/(1-nu(m_l))+lambda(IC_l,m_l)*(a2+kappa(m_l))^(1-sigma_2(m_l))/(1-sigma_2(m_l));
         else
             u_j(j)=theta(h_l,m_l)*c_try^(1-sigma(m_l))/(1-sigma(m_l))+mu(h_l,m_l)*(fc_try+om*l_IC(IC_l,h_l))^(1-nu(m_l))/(1-nu(m_l))+lambda(IC_l,m_l)*(a2+kappa(m_l))^(1-sigma_2(m_l))/(1-sigma_2(m_l));
         end            
@@ -153,7 +155,7 @@ m_l=1
 gap=20
 figure(1)
 for h_l=[1 4]
-    for IC_l=[  1 2 ]
+    for IC_l=[   1 2 ]
         pos=1
         if h_l==4
             pos=2
@@ -240,7 +242,7 @@ FS=11
 
 m_l=1
 
-cts=20; %cash to spend
+cts=100000; %cash to spend
 for h_l=1:4
     c_max=cts;
 if mu(h_l,m_l)==0 
@@ -248,20 +250,21 @@ if mu(h_l,m_l)==0
     fc_try=0;
 else
     %Interior solution
-    c_min=0;
-    c_max=cts;
-    crit=2;
-    while abs(crit)>0.0000001
-        c_try=(c_max+c_min)/2;
-        fc_try=(mu(h_l,m_l)/p_fc(m_l))^(1/nu(m_l))*c_try^(sigma(m_l)/nu(m_l));
-        LHS=c_try+p_fc(m_l)*fc_try;
-        crit=LHS-cts;
-        if cts>LHS
-            c_min=c_try;
-        else
-            c_max=c_try;
-        end 
-    end
+        l_fc_min=0;
+        l_fc_max=cts/p_fc(m_l);
+        crit=2;
+        while abs(crit)>0.0000001
+            fc_try=(l_fc_min+l_fc_max)/2;
+            c_try=(mu(h_l,m_l)/p_fc(m_l))^(-1/sigma(m_l))*share_p^(-1/sigma(m_l))*fc_try^((1-subs_p)/sigma(m_l))*...
+                  (share_p*fc_try^subs_p+(1-share_p)*l_IC(IC_l,h_l)^subs_p)^((nu(m_l)+subs_p-1)/(subs_p*sigma(m_l)));
+            LHS=c_try+p_fc(m_l)*fc_try;
+            crit=LHS-cts;
+            if cts>LHS
+                l_fc_min=fc_try;
+            else
+                l_fc_max=fc_try;
+            end 
+        end
 end
 c_j(h_l)=c_try;
 fc_j(h_l)=fc_try*p_fc(m_l);

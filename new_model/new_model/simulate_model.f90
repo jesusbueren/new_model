@@ -215,7 +215,7 @@ subroutine simulate_model(a_policy,g_policy,lfc_x,beq100_policy, &
                     counter_pi_h2(PI_q_i(i_l),h_i(i_l,t_l,2))=counter_pi_h2(PI_q_i(i_l),h_i(i_l,t_l,2))+1
                     
                     counter_ic(f_l(2))=counter_ic(f_l(2))+1
-                    if (beq100(i_l,t_l)/=-9) then
+                    if (beq100(i_l,t_l)/=-9.0_sp) then
                         counter_beq100(PI_q_i(i_l),f_l(2))=counter_beq100(PI_q_i(i_l),f_l(2))+1
                         beq100_ic(PI_q_i(i_l),f_l(2),counter_beq100(PI_q_i(i_l),f_l(2)))=beq100_policy(pos_x,h_i(i_l,t_l,1),xi_l,gender_i(i_l),PI_q_i2(i_l),f_l(1),generation_i(i_l)+t_l-1)
                         beq100_it(PI_q_i(i_l),f_l(2))=beq100_ic(PI_q_i(i_l),f_l(2),counter_beq100(PI_q_i(i_l),f_l(2)))-data_beq100_IC(PI_q_i(i_l),f_l(2))

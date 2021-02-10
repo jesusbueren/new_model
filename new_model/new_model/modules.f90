@@ -37,9 +37,10 @@ use nrtype
     !h_t:health type
     !g_t: gender type
     !PI_t: permanent income type                                                     
-    integer,parameter::nkk=300,f_t=2,clusters=4,L_gender=2,L_PI=5,generations=21,nzz=3,variables=12,groups=4,parameters_to_est=9,obs=9, &
-                        wealth_q=3,L_PI2=10,samples_per_i=500,min_obs=39
+    integer,parameter::f_t=2,clusters=4,L_gender=2,L_PI=5,generations=21,nzz=3,variables=12,groups=4,parameters_to_est=11,obs=9, &
+                        wealth_q=3,L_PI2=10,min_obs=39
     integer,parameter:: moment_conditions=L_PI*obs*groups*2+L_PI*f_t+f_t*obs*groups+L_PI*clusters+f_t*clusters
+    integer,parameter::nkk=300,samples_per_i=300
 end module dimensions
         
 module grids
@@ -68,7 +69,7 @@ end module targets
 module structural_p2
     use dimensions; use nrtype
     implicit none
-    real(SP):: sigma,sigma_beq,nu,beta,omega
+    real(SP):: sigma,sigma_beq,nu,beta,omega,share_p,subs_p
     real(SP),dimension(clusters):: kappa_h,delta_h,u_bar_no_f,x_bar
     real(SP),dimension(clusters,f_t)::u_bar
     real(SP),dimension(clusters-1)::alpha_mu
@@ -86,14 +87,15 @@ module structural_p1
     real(SP),dimension(DIM,1)::med_coef
     real(SP)::rho,sigma2_ep,sigma2_ze
     real(SP),parameter::r=1.02_sp**2_sp-1.0_sp
-    real(SP)::p_fc=18.0_sp/1000.0_sp
-    real(SP),parameter::p_or=18.0_sp/1000.0_sp
+    real(SP)::p_fc=12.0_sp/1000.0_sp
+    real(SP),parameter::p_or=12.0_sp/1000.0_sp
     real(SP),dimension(L_PI2,L_gender)::b
     real(SP),dimension(f_t,clusters)::l_ic,l_ic_or
     real(SP),dimension(generations,L_gender,L_PI2,clusters,nzz,nzz)::m_exp_all,m_exp_all_or
     real(SP),dimension(clusters+1,clusters+1,generations,L_PI2,L_gender)::H_av
     real(SP)::load_ltci=0.32_sp,benefit_LTCI=5.0_sp !hours of care per day provided by insurance
     real(SP),dimension(L_PI,2,clusters)::price_ltci
+    
 end module structural_p1
     
 module files_savings
@@ -147,8 +149,8 @@ end module
 module HRS_data
     use dimensions; use nrtype; use simulation_input
     implicit none
-    integer,dimension(indv,obs):: IC_q,beq100 
-    real(SP),dimension(indv,obs):: fc_h,NW,ic_h
+    integer,dimension(indv,obs):: IC_q
+    real(SP),dimension(indv,obs):: fc_h,NW,ic_h,beq100 
 end module HRS_data
 
     

@@ -22,10 +22,10 @@ subroutine solve_model(a_policy,g_policy,lfc_x,u_x,beq100_policy)
     !print*,'computing medicaid provision'
     call medicaid_provision()
     
-    
     !Solve for the intratemporal formal care/consumption decision given a cash to spend coh_grid(x_l)
     !print*,'Solving intratemporal'
-    do i_l=1,L_PI2;do f_l=1,f_t;do h_l=1,clusters; do x_l=1,nkk;
+    do i_l=1,L_PI2;do f_l=1,f_t;do h_l=1,clusters;
+        do x_l=1,nkk;
         if (x_l==1) then
             u_x(x_l,h_l,f_l,i_l)=-1.0_sp/0.0_sp
             lfc_x(x_l,h_l,f_l,i_l)=0.0_sp
@@ -34,7 +34,7 @@ subroutine solve_model(a_policy,g_policy,lfc_x,u_x,beq100_policy)
             call solve_intratemporal(p_fc,coh_grid(x_l),h_l,l_ic(f_l,h_l),u_x(x_l,h_l,f_l,i_l),lfc_x(x_l,h_l,f_l,i_l),c_x(x_l,h_l,f_l,i_l))
         end if
     end do; end do; end do; end do
-    
+
     print*,'vfi'
     !Solve intertemporal problem by standard VFI
     a_policy=-9
@@ -51,7 +51,7 @@ subroutine solve_model(a_policy,g_policy,lfc_x,u_x,beq100_policy)
         V=-9.0_sp
         do x_l=1,nkk
             V(x_l,clusters+1,:,1:2)=lambda(f_l)*(coh_grid(x_l)+delta(f_l))**(1.0_sp-sigma_beq)/(1.0_sp-sigma_beq)
-            if (coh_grid(x_l)>100.0d0) then
+            if (coh_grid(x_l)>0.0d0) then
                 beq_aux(x_l,clusters+1,:,1:2)=1.0d0
             else
                 beq_aux(x_l,clusters+1,:,1:2)=0.0d0
@@ -108,7 +108,7 @@ subroutine solve_model(a_policy,g_policy,lfc_x,u_x,beq100_policy)
     print *,'Timing summary'
     print *,'Calc: ', calctime
     
-    beq100_policy=beq100_policy*100
+    beq100_policy=beq100_policy
 end subroutine
     
     

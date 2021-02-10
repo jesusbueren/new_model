@@ -22,8 +22,8 @@ subroutine create_tables_draft(parameters)
     strings_h(2)="Physically frail"
     strings_h(3)="Mentally frail "
     strings_h(4)="Impaired"
-    strings_f(1)="\textit{On your own}"
-    strings_f(2)="\textit{Distant}"
+    strings_f(1)="\textit{Distant}"
+    strings_f(2)="\textit{Close}"
 
     !meeting LTC needs across PI
     open(unit=9,file='C:\Users\jbueren\Google Drive\JMP\Draft\tables\data_LTC_PI.txt')
@@ -46,7 +46,7 @@ subroutine create_tables_draft(parameters)
     close(9)
     
     !Parameters
-    open(unit=9,file='C:\Users\jbueren\Google Drive\JMP\Draft\tables\parameters2.txt')
+    open(unit=9,file='C:\Users\jbueren\Google Drive\JMP\Draft\tables\parameters.txt')
         write(9,'(A50 )') 'Risk Aversion & & \\'
         write(9,'(A50, F6.2, A3, F5.2,A10 )') '$\sigma$: Consumption &', parameters(1),"& (",se(1),")\\"
         write(9,'(A50, F6.2, A3, F5.2,A10 )') '$\nu$: Care hours &', parameters(7),"& (",se(7),")\\ [5pt]"

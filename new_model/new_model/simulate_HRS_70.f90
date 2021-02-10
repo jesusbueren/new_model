@@ -45,30 +45,24 @@ subroutine simulate_HRS_70(parameters,p50_75_assets_ic_age,p50_75_assets_all_age
     alpha_mu(1:3)=parameters(3:5)
     delta(1:f_t)=parameters(6)
     nu=parameters(7)
-    lambda(1:2)=exp(parameters(8:9))   
+    lambda(1:2)=exp(parameters(8:9))  
+    share_p=parameters(10)
+    subs_p=parameters(11)
     sigma_beq=sigma
     beta=0.95_sp
     omega=1.0_sp 
     kappa_h=0.0_sp
     delta_h=1.0_sp
     
+    
     !Utility at the floor when healthy
     do h_l=1,1
-        if (h_l==1) then
-            mu_av=0.0_sp
-        elseif (h_l==2) then
-            mu_av=exp(alpha_mu(1))
-        elseif (h_l==3) then
-            mu_av=exp(alpha_mu(2))
-        elseif (h_l==4) then
-            mu_av=exp(alpha_mu(3))
-        end if
-        call solve_intratemporal_av(p_fc,x_bar(h_l),h_l,mu_av,0.0_sp,u_bar_no_f(h_l),l_fc,c)
+        call solve_intratemporal(p_fc,x_bar(h_l),h_l,0.0_sp,u_bar_no_f(h_l),l_fc,c)
     end do
     u_bar_no_f=u_bar_no_f(1)
     
     print*,beta,sigma,nu,delta(1),x_bar(1), &
-           lambda,alpha_mu,omega
+           lambda,alpha_mu,omega,share_p,subs_p
     
     mu=0.0_sp
     do h_l=2,clusters
@@ -83,27 +77,27 @@ subroutine simulate_HRS_70(parameters,p50_75_assets_ic_age,p50_75_assets_all_age
     call solve_model(a_policy,g_policy,lfc_x,u_x,beq100_policy)
 
     !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-    print*,'Just for simulation of moments'
-    call simulate_model(a_policy,g_policy,lfc_x,beq100_policy, &
-                        model_moments1,model_moments)
-    print*,'got here2'
-    do i_l=1,moment_conditions
-        if (data_moments(i_l,1)==-9.0_sp) then
-            model_moments(i_l,1)=-9.0_sp
-            model_moments1(i_l,1)=-9.0_sp
-        end if
-    end do
-    call empty_missing(model_moments,model_moments_new ,int(moment_conditions),real_moments)
-    
-    print*,'obj fct',real(indv)/(1.0_dp+1.0_dp/real(samples_per_i))*matmul(matmul(transpose(model_moments_new(1:real_moments,1:1)), & 
-                                    W_opt(1:real_moments,1:real_moments)), &
-                                    model_moments_new(1:real_moments,1:1))
-    print*,'got here3'
-    open(unit=9,file='model_moments.txt')
-        write(9,*) model_moments1
-    close(9)
-    print*,'close window, just for simulation of moments'
-    read*,pause_k
+    !print*,'Just for simulation of moments'
+    !call simulate_model(a_policy,g_policy,lfc_x,beq100_policy, &
+    !                    model_moments1,model_moments)
+    !print*,'got here2'
+    !do i_l=1,moment_conditions
+    !    if (data_moments(i_l,1)==-9.0_sp) then
+    !        model_moments(i_l,1)=-9.0_sp
+    !        model_moments1(i_l,1)=-9.0_sp
+    !    end if
+    !end do
+    !call empty_missing(model_moments,model_moments_new ,int(moment_conditions),real_moments)
+    !
+    !print*,'obj fct',real(indv)/(1.0_dp+1.0_dp/real(samples_per_i))*matmul(matmul(transpose(model_moments_new(1:real_moments,1:1)), & 
+    !                                W_opt(1:real_moments,1:real_moments)), &
+    !                                model_moments_new(1:real_moments,1:1))
+    !print*,'got here3'
+    !open(unit=9,file='model_moments.txt')
+    !    write(9,*) model_moments1
+    !close(9)
+    !print*,'close window, just for simulation of moments'
+    !read*,pause_k
     !!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     if (ind_or==1) then
         V_70_or=V_70

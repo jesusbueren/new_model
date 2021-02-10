@@ -19,6 +19,8 @@ subroutine SMM_se(parameters,moments,densities)
     delta(1:f_t)=parameters(6)
     nu=parameters(7)
     lambda(1:f_t)=exp(parameters(8:9)) 
+    share_p=parameters(10)
+    subs_p=parameters(11)
         
     sigma_beq=sigma
     beta=0.95_sp
@@ -28,16 +30,7 @@ subroutine SMM_se(parameters,moments,densities)
     
     !Utility at the floor when healthy
     do h_l=1,1
-        if (h_l==1) then
-            mu_av=0.0_sp
-        elseif (h_l==2) then
-            mu_av=exp(alpha_mu(1))
-        elseif (h_l==3) then
-            mu_av=exp(alpha_mu(2))
-        elseif (h_l==4) then
-            mu_av=exp(alpha_mu(3))
-        end if
-        call solve_intratemporal_av(p_fc,x_bar(h_l),h_l,mu_av,0.0_sp,u_bar_no_f(h_l),l_fc,c)
+        call solve_intratemporal(p_fc,x_bar(h_l),h_l,0.0_sp,u_bar_no_f(h_l),l_fc,c)
     end do
     u_bar_no_f=u_bar_no_f(1)
     

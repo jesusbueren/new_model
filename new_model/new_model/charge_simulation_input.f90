@@ -28,7 +28,7 @@ subroutine charge_simulation_input_moments(data_NW_PI1,data_NW_PI,&
     !hours of care variables
     real(SP),dimension(L_PI,clusters,6500)::fc_pi_h
     real(SP),dimension(f_t,clusters,15000)::fc_ic_h,ic_ic_h
-    integer,dimension(L_PI,f_t,10000)::beq100_ic
+    real(SP),dimension(L_PI,f_t,10000)::beq100_ic
     !Store vector variables    
     real(SP),dimension(L_PI,obs,groups,1500)::assets_pi_age_group,assets_pi_age_group_b !1500: maximum number of individuals in a group
     real(SP),dimension(2,obs,8000)::assets_ut
@@ -55,6 +55,7 @@ subroutine charge_simulation_input_moments(data_NW_PI1,data_NW_PI,&
     NW=reshape(data_moments(3,:,:), (/indv, obs/), order = (/ 2, 1 /))
     NW=NW/1000.0_sp
     beq100=reshape(data_moments(4,:,:), (/indv, obs/), order = (/ 2, 1 /))
+    beq100=beq100/100.0_sp
     ic_h=reshape(data_moments(5,:,:), (/indv, obs/), order = (/ 2, 1 /))
     
     !Compute data moments from original data
@@ -128,7 +129,7 @@ subroutine charge_simulation_input_moments(data_NW_PI1,data_NW_PI,&
                     counter_pi_h(PI_q_i(i_l),h_i(i_l,t_l,1))=counter_pi_h(PI_q_i(i_l),h_i(i_l,t_l,1))+1
                     fc_pi_h(PI_q_i(i_l),h_i(i_l,t_l,1),counter_pi_h(PI_q_i(i_l),h_i(i_l,t_l,1)))=fc_h(i_l,t_l)
                 end if
-                if (beq100(i_l,t_l)/=-9) then
+                if (beq100(i_l,t_l)/=-9.0_sp) then
                     counter_beq100(PI_q_i(i_l),f_l)=counter_beq100(PI_q_i(i_l),f_l)+1
                     beq100_ic(PI_q_i(i_l),f_l,counter_beq100(PI_q_i(i_l),f_l))=beq100(i_l,t_l)
                 end if
@@ -163,7 +164,7 @@ subroutine charge_simulation_input_moments(data_NW_PI1,data_NW_PI,&
     
         data_lfc_PI_s(:,:,s_l)=sum(fc_pi_h,3)/counter_pi_h
         data_lfc_PI_s(:,1,s_l)=-9.0_sp
-        data_beq100_IC_s(:,:,s_l)=real(sum(beq100_ic,3))/counter_beq100
+        data_beq100_IC_s(:,:,s_l)=real(sum(beq100_ic,3))/counter_beq100 !beq100_ic(:,:,1)
         data_lfc_IC_s(:,:,s_l)=sum(fc_ic_h,3)/counter_ic_h
         data_lfc_IC_s(:,1,s_l)=-9.0_sp
     

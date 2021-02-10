@@ -1,6 +1,6 @@
 subroutine simulate_model_se(a_policy,g_policy,lfc_x,beq100_policy, &
                              model_moments,densities)
-    use dimensions;use grids; use nrtype; use simulation_input; use structural_p1; use pdfs; use structural_p2;use targets
+    use dimensions;use grids; use nrtype; use simulation_input; use structural_p1; use pdfs; use structural_p2;use targets; use HRS_data
     implicit none
     integer,dimension(nkk,clusters,nzz,L_gender,L_PI2,f_t,generations),intent(in)::a_policy,g_policy
     real(SP),dimension(nkk,clusters,nzz,L_gender,L_PI2,f_t,generations),intent(in)::beq100_policy
@@ -212,7 +212,7 @@ subroutine simulate_model_se(a_policy,g_policy,lfc_x,beq100_policy, &
                     end if
                     !Moments
                     !Store Assets for computing moments
-                    !if (iwendy_i(i_l)==1998 .or. iwendy_i(i_l)==1999) then
+                    if (NW(i_l,t_l)/=-9.0_sp ) then
                         counter_pi_age_group(PI_q_i(i_l),t_l,group_i(i_l))=counter_pi_age_group(PI_q_i(i_l),t_l,group_i(i_l))+1
                         assets_pi_age_group(PI_q_i(i_l),t_l,group_i(i_l),counter_pi_age_group(PI_q_i(i_l),t_l,group_i(i_l)))=a_it(t_l)    
                         if (a_it(t_l)<=data_NW_PI1(PI_q_i(i_l),t_l,group_i(i_l))) then
@@ -221,16 +221,9 @@ subroutine simulate_model_se(a_policy,g_policy,lfc_x,beq100_policy, &
                         else
                             assets_pi_age_group_it(PI_q_i(i_l),t_l,group_i(i_l))=-0.5_sp
                         end if
-                    !else
-                    !    counter_pi_age_group_b(PI_q_i(i_l),t_l,group_i(i_l))=counter_pi_age_group_b(PI_q_i(i_l),t_l,group_i(i_l))+1
-                    !    assets_pi_age_group_b(PI_q_i(i_l),t_l,group_i(i_l),counter_pi_age_group_b(PI_q_i(i_l),t_l,group_i(i_l)))=a_it(t_l)    
-                    !    if (a_it(t_l)<=data_NW_PI1b(PI_q_i(i_l),t_l,group_i(i_l))) then
-                    !        fraction_below_pi_age_group_b(PI_q_i(i_l),t_l,group_i(i_l),ns)=fraction_below_pi_age_group_b(PI_q_i(i_l),t_l,group_i(i_l),ns)+1.0_sp
-                    !        assets_pi_age_group_it_b(PI_q_i(i_l),t_l,group_i(i_l))=0.5_sp
-                    !    else
-                    !        assets_pi_age_group_it_b(PI_q_i(i_l),t_l,group_i(i_l))=-0.5_sp
-                    !    end if
-                    !end if
+                    end if
+                    
+
    
                     counter_ic_nw(f_l(2),t_l,group_i(i_l))=counter_ic_nw(f_l(2),t_l,group_i(i_l))+1
                     assets_ic(f_l(2),t_l,group_i(i_l),counter_ic_nw(f_l(2),t_l,group_i(i_l)))=a_it(t_l)
@@ -239,9 +232,11 @@ subroutine simulate_model_se(a_policy,g_policy,lfc_x,beq100_policy, &
                     else
                         nw_ic_it(f_l(2),t_l,group_i(i_l))=-0.75_sp
                     end if 
- 
-                    fc_pi_h_it(PI_q_i(i_l),h_i(i_l,t_l,2))=lfc_pi_h(PI_q_i(i_l),h_i(i_l,t_l,2),counter_pi_h(PI_q_i(i_l),h_i(i_l,t_l,2)))-data_lfc_PI(PI_q_i(i_l),h_i(i_l,t_l,2))
-                    fc_ic_h_it(f_l(1),h_i(i_l,t_l,2))=lfc_ic_h(f_l(1),h_i(i_l,t_l,2),counter_ic_h(f_l(1),h_i(i_l,t_l,2)))-data_lfc_IC(f_l(1),h_i(i_l,t_l,2))
+                    
+                    if (fc_h(i_l,t_l)/=-9.0_sp .and. IC_q(i_l,t_l)/=-9 .and. ic_h(i_l,t_l)/=-9.0_sp) then
+                        fc_pi_h_it(PI_q_i(i_l),h_i(i_l,t_l,2))=lfc_pi_h(PI_q_i(i_l),h_i(i_l,t_l,2),counter_pi_h(PI_q_i(i_l),h_i(i_l,t_l,2)))-data_lfc_PI(PI_q_i(i_l),h_i(i_l,t_l,2))
+                        fc_ic_h_it(f_l(1),h_i(i_l,t_l,2))=lfc_ic_h(f_l(1),h_i(i_l,t_l,2),counter_ic_h(f_l(1),h_i(i_l,t_l,2)))-data_lfc_IC(f_l(1),h_i(i_l,t_l,2))
+                    end if
                     beq100_it(PI_q_i(i_l),f_l(2))=beq100_policy(pos_x,h_i(i_l,t_l,1),xi_l,gender_i(i_l),PI_q_i2(i_l),f_l(1),generation_i(i_l)+t_l-1)-data_beq100_IC(PI_q_i(i_l),f_l(2))
                 else 
                     x_it(t_l+1)=-9.0_sp
@@ -265,25 +260,15 @@ subroutine simulate_model_se(a_policy,g_policy,lfc_x,beq100_policy, &
                                         med_assets_pi_age_group(pi_l,t_l,g_l,ns))
                 if (data_NW_PI1(pi_l,t_l,g_l)/=-9.0_sp)then
                     call compute_pdf(assets_pi_age_group(pi_l,t_l,g_l,1:counter_pi_age_group(pi_l,t_l,g_l)),counter_pi_age_group(pi_l,t_l,g_l),med_assets_pi_age_group(pi_l,t_l,g_l,ns),pdf_assets_pi_age_group(pi_l,t_l,g_l,ns))
+                    if (isnan(pdf_assets_pi_age_group(pi_l,t_l,g_l,ns))) then
+                        print*,'something bad in simuluate model se'
+                        read*,pause_k
+                    end  if
                 end if
                 med_assets_pi_age_group(pi_l,t_l,g_l,ns)=med_assets_pi_age_group(pi_l,t_l,g_l,ns)*counter_pi_age_group(pi_l,t_l,g_l)/real(obs)/real(indv)
             end if
-            !if (counter_pi_age_group_b(pi_l,t_l,g_l)>1) then
-            !    call compute_percentile(assets_pi_age_group_b(pi_l,t_l,g_l,1:counter_pi_age_group_b(pi_l,t_l,g_l)), &
-            !                            counter_pi_age_group_b(pi_l,t_l,g_l),50, & 
-            !                            med_assets_pi_age_group_b(pi_l,t_l,g_l,ns))
-            !    if (data_NW_PI1b(pi_l,t_l,g_l)/=-9.0_sp)then
-            !        call compute_pdf(assets_pi_age_group_b(pi_l,t_l,g_l,1:counter_pi_age_group_b(pi_l,t_l,g_l)),counter_pi_age_group_b(pi_l,t_l,g_l),med_assets_pi_age_group_b(pi_l,t_l,g_l,ns),pdf_assets_pi_age_group_b(pi_l,t_l,g_l,ns))
-            !    end if
-            !    med_assets_pi_age_group_b(pi_l,t_l,g_l,ns)=med_assets_pi_age_group_b(pi_l,t_l,g_l,ns)*counter_pi_age_group_b(pi_l,t_l,g_l)/real(obs)/real(indv)
-            !end if
         end do; end do; end do
-        !do f_ll=1,f_t;do t_l=1,7;do g_l=1,4
-        !    call compute_percentile(assets_ic(f_ll,t_l,g_l,1:counter_ic_nw(f_ll,t_l,g_l)), &
-        !                                counter_ic_nw(f_ll,t_l,g_l),75, & 
-        !                                assets_ic_ns(f_ll,t_l,g_l,ns))
-        !    call compute_pdf(assets_ic(f_ll,t_l,g_l,1:counter_ic_nw(f_ll,t_l,g_l)),counter_ic_nw(f_ll,t_l,g_l),assets_ic_ns(f_ll,t_l,g_l,ns),pdf_assets_ic_ns(f_ll,t_l,g_l,ns))
-        !end do;end do;end do
+
         do pi_l=1,L_PI; do h_l=1,clusters
             if (counter_pi_h(pi_l,h_l)>1) then
                 av_lfc_pi_h(pi_l,h_l,ns)=real(sum(lfc_pi_h(pi_l,h_l,1:counter_pi_h(pi_l,h_l))))/real(counter_pi_h(pi_l,h_l))
@@ -313,7 +298,7 @@ subroutine simulate_model_se(a_policy,g_policy,lfc_x,beq100_policy, &
     densities(1:L_PI*obs*groups*2,1)=(/reshape(sum(pdf_assets_pi_age_group,4)/real(samples_per_i),(/L_PI*obs*groups,1/)),&
                                        reshape(sum(pdf_assets_pi_age_group_b,4)/real(samples_per_i),(/L_PI*obs*groups,1/)) /)  
     
-    densities(L_PI*obs*groups*2+f_t+1:L_PI*obs*groups*2+f_t+f_t*obs*groups,1)=(/reshape(sum(pdf_assets_ic_ns,4)/real(samples_per_i),(/f_t*obs*groups,1/))/)
+    densities(L_PI*obs*groups*2+f_t*L_PI+1:L_PI*obs*groups*2+f_t*L_PI+f_t*obs*groups,1)=(/reshape(sum(pdf_assets_ic_ns,4)/real(samples_per_i),(/f_t*obs*groups,1/))/)
     
     
 end subroutine

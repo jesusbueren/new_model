@@ -66,8 +66,8 @@ waves2=7
 
 % Graph by PI
 
-final_f=figure(1)
-set(1,'position',[50    20    500    750])
+final_f=figure(3)
+set(3,'position',[50    20    500    750])
 j=1
 h1=subplot(3,1,1)
 for m=1:2
@@ -138,7 +138,7 @@ end
 end
 xticks([1:1:5])
 xticklabels({'Bottom','Second','Third','Fourth','Top'})
-ylim([0 11])
+ylim([0 9])
 xlim([0.8 5.2])
 I2=legend('Physically Frail','Mentally Frail','Impaired','orientation','horizontal');
 legend('boxoff')
@@ -178,15 +178,15 @@ set(gca,'FontName','Times New Roman','Fontsize',FS);
 xlabel('Family Type','FontSize',FS)
 ylabel('Formal Care Hours per Day','FontSize',FS)
 
-figure(2)
-set(2,'position',[450    400    700    250])
+figure(4)
+set(4,'position',[450    400    700    250])
 clrs = [0 0 0; 0.9 0.9 0.9 ];
 for m=1:2
     subplot(1,2,m)
     if m==1
-        hB=bar(data_beq_ic)
+        hB=bar(data_beq_ic*100)
     else
-        hB=bar(model_beq_ic)
+        hB=bar(model_beq_ic*100)
     end
 set(hB,{'FaceColor'},{clrs(1,:),clrs(2,:)}.')
 
@@ -206,7 +206,7 @@ set(gcf,'color','w')
 ylim([0 100])
 xticks([1 2 3 4 5])
 xticklabels({'Bottom','2nd','3rd','4th','Top'})
-ylabel('Pr. of leaving bequest > 100k (%)','FontSize',FS)
+ylabel('Pr. of leaving any bequest (%)','FontSize',FS)
 xlabel('Permanent Income Quintile','FontSize',FS)
 end
 

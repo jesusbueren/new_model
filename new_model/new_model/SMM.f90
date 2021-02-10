@@ -20,7 +20,7 @@ function SMM(parameters)
 
     !print*,'new parameter values'
     print*,beta,sigma,nu,delta(1),x_bar(1), &
-           lambda,alpha_mu
+           lambda,alpha_mu,share_p,subs_p
 
     mu=0.0_sp
     do h_l=2,clusters
