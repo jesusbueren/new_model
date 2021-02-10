@@ -12,7 +12,7 @@ subroutine counterfactuals(parameters_original)
     real(SP),dimension(L_PI+1)::EDP_bnk,CV_bnk
     
     !Select all individuals
-    ind_h=0
+    ind_h=clusters
     
     !Benchmark model
     print*,'++++++++++++++++++++++++++++++++++++++'
@@ -52,7 +52,7 @@ subroutine counterfactuals(parameters_original)
     print*,'++++++++++++++++++++++++++++++++++++++'
     print*,'Simulating no bequests'
     parameters=parameters_original
-    parameters(8)=-1.0_sp/0.0_sp
+    parameters(8:9)=-1.0_sp/0.0_sp
     call simulate_HRS_70(parameters,p50_75_assets_ic_age,p50_75_assets_all_age,med_c_pi_age,EDP_bnk,CV_bnk,ind_h)
     open(unit=9,file='noBeq.txt')
     do t_l=1,generations-1

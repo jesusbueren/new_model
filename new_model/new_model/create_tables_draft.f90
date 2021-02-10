@@ -22,8 +22,8 @@ subroutine create_tables_draft(parameters)
     strings_h(2)="Physically frail"
     strings_h(3)="Mentally frail "
     strings_h(4)="Impaired"
-    strings_f(1)="\textit{On your own}"
-    strings_f(2)="\textit{Distant}"
+    strings_f(1)="\textit{Distant}"
+    strings_f(2)="\textit{Close}"
 
     !meeting LTC needs across PI
     open(unit=9,file='C:\Users\jbueren\Google Drive\JMP\Draft\tables\data_LTC_PI.txt')
@@ -56,7 +56,8 @@ subroutine create_tables_draft(parameters)
         write(9,'(A50, F6.2, A3, F5.2,A10 )') '$\alpha(h=4)$: Impaired &', parameters(5),"& (",se(5),")\\ [5pt]"
         write(9,'(A50 )') 'Bequest & & \\'
         write(9,'(A50, F9.2, A3, F9.2,A10 )') '$\delta$: curvature &', parameters(6),"& (",se(6),")\\"
-        write(9,'(A50, F6.2, A3, F5.2,A10 )') '$\lambda$: marginal utility &', parameters(8),"& (",se(8),")\\ [5pt]"
+        write(9,'(A50, F6.2, A3, F5.2,A10 )') '$\lambda$($F$=\textit{Distant}): marginal utility &', parameters(8),"& (",se(8),")\\ "
+        write(9,'(A50, F6.2, A3, F5.2,A10 )') '$\lambda$($F$=\textit{Close}): marginal utility &', parameters(9),"& (",se(9),")\\ [5pt]"
         write(9,'(A70 )') 'Maximum transfer to achieve utility floor $\times 10^3 $ & & \\'
         write(9,'(A50, F6.2, A3, F5.2,A10 )') '\underline{x}\textit{(h=1)}: Healthy &', parameters(2),"& (",se(2),")\\"
     close(9)

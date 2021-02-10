@@ -37,9 +37,10 @@ use nrtype
     !h_t:health type
     !g_t: gender type
     !PI_t: permanent income type                                                     
-    integer,parameter::nkk=300,f_t=2,clusters=4,L_gender=2,L_PI=5,generations=21,nzz=3,nzz2=1,variables=12,groups=4,parameters_to_est=8,obs=9, &
-                        wealth_q=3,L_PI2=10,samples_per_i=50,min_obs=39
-    integer,parameter:: moment_conditions=L_PI*obs*groups*2+L_PI*clusters+f_t*obs*groups+L_PI*clusters+f_t*clusters
+    integer,parameter::f_t=2,clusters=4,L_gender=2,L_PI=5,generations=21,nzz=3,variables=12,groups=4,parameters_to_est=11,obs=9, &
+                        wealth_q=3,L_PI2=10,min_obs=39
+    integer,parameter:: moment_conditions=L_PI*obs*groups*2+L_PI*f_t+f_t*obs*groups+L_PI*clusters+f_t*clusters
+    integer,parameter::nkk=300,samples_per_i=300
 end module dimensions
         
 module grids
@@ -58,7 +59,7 @@ module targets
     implicit none
     real(SP),dimension(L_PI,obs,groups)::data_NW_PI,data_NW_PI1,data_NW_PIb,data_NW_PI1b
     real(SP),dimension(2,obs)::data_NW_h_ut
-    real(SP),dimension(L_PI,clusters)::data_MD_PI
+    real(SP),dimension(L_PI,f_t)::data_beq100_IC
     real(SP),dimension(L_PI,clusters)::data_lfc_PI
     real(SP),dimension(f_t,clusters)::data_lfc_IC
     real(SP),dimension(f_t,obs,groups)::data_NW_IC,data_NW_IC1
@@ -68,20 +69,17 @@ end module targets
 module structural_p2
     use dimensions; use nrtype
     implicit none
-    real(SP),dimension(nzz2,1)::pr_varep
-    real(SP),dimension(nzz2,clusters-1)::varep_grid
-    real(SP):: sigma,sigma_beq,nu,beta,omega
-    real(SP),dimension(clusters)::sigma_varep
+    real(SP):: sigma,sigma_beq,nu,beta,omega,share_p,subs_p
     real(SP),dimension(clusters):: kappa_h,delta_h,u_bar_no_f,x_bar
-    real(SP),dimension(clusters,f_t,nzz2)::u_bar
-    real(SP),dimension(clusters-1)::alpha_mu,sigma2_varep
-    real(SP),dimension(clusters,nzz2)::c_bar,l_bar
+    real(SP),dimension(clusters,f_t)::u_bar
+    real(SP),dimension(clusters-1)::alpha_mu
+    real(SP),dimension(clusters)::c_bar,l_bar
     real(SP),dimension(f_t):: lambda,delta
-    real(SP),dimension(clusters,nzz2):: mu
+    real(SP),dimension(clusters):: mu
     real(SP),dimension(moment_conditions,moment_conditions):: W_opt,Phi
     real(SP),dimension(parameters_to_est)::se
-end module structural_p2
-    
+    end module structural_p2
+        
 module structural_p1
     use dimensions; use nrtype
     implicit none
@@ -89,14 +87,15 @@ module structural_p1
     real(SP),dimension(DIM,1)::med_coef
     real(SP)::rho,sigma2_ep,sigma2_ze
     real(SP),parameter::r=1.02_sp**2_sp-1.0_sp
-    real(SP)::p_fc=18.0_sp/1000.0_sp
-    real(SP),parameter::p_or=18.0_sp/1000.0_sp
+    real(SP)::p_fc=12.0_sp/1000.0_sp
+    real(SP),parameter::p_or=12.0_sp/1000.0_sp
     real(SP),dimension(L_PI2,L_gender)::b
     real(SP),dimension(f_t,clusters)::l_ic,l_ic_or
     real(SP),dimension(generations,L_gender,L_PI2,clusters,nzz,nzz)::m_exp_all,m_exp_all_or
     real(SP),dimension(clusters+1,clusters+1,generations,L_PI2,L_gender)::H_av
     real(SP)::load_ltci=0.32_sp,benefit_LTCI=5.0_sp !hours of care per day provided by insurance
     real(SP),dimension(L_PI,2,clusters)::price_ltci
+    
 end module structural_p1
     
 module files_savings
@@ -142,9 +141,16 @@ end module
 module MD_reform
 use dimensions;use nrtype
 implicit none
-real(SP),dimension(nkk,clusters+1,nzz,nzz2,L_gender,L_PI2,f_t)::V_70_or,V_70_new,V_70
+real(SP),dimension(nkk,clusters+1,nzz,L_gender,L_PI2,f_t)::V_70_or,V_70_new,V_70
 integer::ind_or=1
 real(SP)::p_sub=0.0_sp
 end module
+    
+module HRS_data
+    use dimensions; use nrtype; use simulation_input
+    implicit none
+    integer,dimension(indv,obs):: IC_q
+    real(SP),dimension(indv,obs):: fc_h,NW,ic_h,beq100 
+end module HRS_data
 
     

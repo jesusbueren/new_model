@@ -23,5 +23,7 @@ subroutine first_step_p
     open(unit=9,file=path_h//'H_av.txt')
         read(9,*)  H_av
     close(9)
+    H_av(:,clusters+1,generations,:,:)=1.0_sp
+    H_av(:,1:clusters,generations,:,:)=0.0_sp
     
 end subroutine
