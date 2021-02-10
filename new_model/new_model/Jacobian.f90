@@ -16,25 +16,29 @@ subroutine Jacobian(parameters,J)
             moments(i_l,1)=-9.0_sp
             densities(i_l,1)=-9.0_sp
         end if
+        if (isnan(densities(i_l,1))) then
+            print*,'something bad in jacobian',i_l
+            read*,pause_k            
+        end if
     end do
     
     call empty_missing(moments,moments_nom,int(moment_conditions),real_moments)
     call empty_missing(densities,densities_nom,int(moment_conditions),real_moments)
     
-    eps=0.001_sp
-    do p_l=1,parameters_to_est
-        if (p_l==3) then
-            eps(p_l)=0.01_sp
-        end if
-    end do
+    eps=0.01_sp
+    !do p_l=1,parameters_to_est
+    !    if (p_l==3) then
+    !        eps(p_l)=0.01_sp
+    !    end if
+    !end do
     
     do p_l=1,parameters_to_est
         do m_l=1,2
             parameters_new(:,m_l)=parameters
             if (m_l==1)then
-                parameters_new(p_l,m_l)=parameters_new(p_l,m_l)+eps(p_l)*abs(parameters(p_l))
+                parameters_new(p_l,m_l)=parameters_new(p_l,m_l)+eps(p_l) !*abs(parameters(p_l))
             else
-                parameters_new(p_l,m_l)=parameters_new(p_l,m_l)-eps(p_l)*abs(parameters(p_l))
+                parameters_new(p_l,m_l)=parameters_new(p_l,m_l)-eps(p_l) !*abs(parameters(p_l))
             end if
             call SMM_se(parameters_new(:,m_l),moments_new(:,m_l),densities_new(:,m_l))
             do i_l=1,moment_conditions
@@ -45,6 +49,8 @@ subroutine Jacobian(parameters,J)
             call empty_missing(moments_new(:,m_l),moments_new_nom(:,m_l),int(moment_conditions),real_moments)
         end do
         J(1:real_moments,p_l)=(moments_new_nom(1:real_moments,1)-moments_new_nom(1:real_moments,2))/(parameters_new(p_l,1)-parameters_new(p_l,2))*densities_nom(1:real_moments,1)
+        print*,'p_l',p_l
+        print*,'J(:,p_l)',J(1:real_moments,p_l)
     end do        
       
 end subroutine

@@ -8,7 +8,7 @@ subroutine data_moments_W()
     data_NW_PI1b=-9.0_sp
     data_NW_PI=-9.0_sp
     data_NW_PIb=-9.0_sp
-    data_MD_PI=-9.0_sp
+    data_beq100_IC=-9.0_sp
     data_NW_IC1=-9.0_sp
     data_NW_IC=-9.0_sp
     data_lfc_PI=-9.0_sp
@@ -21,7 +21,7 @@ subroutine data_moments_W()
     print*,'main sample'
     call charge_simulation_input_moments(data_NW_PI1,data_NW_PI, & !networth by PI  for cohorts obs in 1998
                                          data_NW_PI1b,data_NW_PIb,& !networth by PI for cohorts after 1998
-                                         data_MD_PI,& !Medicaid recipiency rates by PI
+                                         data_beq100_IC,& ! pr of large beq by IC
                                          data_NW_IC1,data_NW_IC,& ! Networth before death by IC
                                          data_lfc_PI,& !Formal care by PI
                                          data_lfc_IC,& !Formal care by informal groups
@@ -29,7 +29,7 @@ subroutine data_moments_W()
 
     data_moments1(:,1)=(/reshape(data_NW_PI1,(/L_PI*obs*groups,1/)),& 
                          reshape(data_NW_PI1b,(/L_PI*obs*groups,1/)),& 
-                         reshape(data_MD_PI,(/L_PI*clusters,1/)), &
+                         reshape(data_beq100_IC,(/L_PI*f_t,1/)), &
                          reshape(data_NW_IC1,(/f_t*obs*groups,1/)), &
                          reshape(data_lfc_PI,(/L_PI*clusters,1/)), &
                          reshape(data_lfc_IC,(/f_t*clusters,1/))/)
@@ -45,11 +45,10 @@ subroutine data_moments_W()
     !select moments to untarget
     data_NW_PIb=-9.0_sp
     data_NW_IC=-9.0_sp
-    data_MD_PI=-9.0_sp
     
     data_moments(:,1)=(/reshape(data_NW_PI,(/L_PI*obs*groups,1/)),&
                         reshape(data_NW_PIb,(/L_PI*obs*groups,1/)),&
-                        reshape(data_MD_PI,(/L_PI*clusters,1/)),&
+                        reshape(data_beq100_IC,(/L_PI*f_t,1/)),&
                         reshape(data_NW_IC,(/f_t*obs*groups,1/)),&
                         reshape(data_lfc_PI,(/L_PI*clusters,1/)),&
                         reshape(data_lfc_IC,(/f_t*clusters,1/))/)
@@ -61,8 +60,8 @@ subroutine data_moments_W()
         end if
     end do
     call empty_missing(data_moments,data_moments_new,int(moment_conditions),real_moments)
-    
-    !Compute optimal weighting matrix using bootstrap
+        
+    !Compute optimal weighting matrix using bootstrap   
     call optimal_W()
     open(unit=9,file='W_opt.txt')
         write(9,*) W_opt

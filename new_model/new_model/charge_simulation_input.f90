@@ -1,13 +1,13 @@
 subroutine charge_simulation_input_moments(data_NW_PI1,data_NW_PI,&
                                             data_NW_PI1b,data_NW_PIb,&
-                                            data_MD_PI,&
+                                            data_beq100_IC,&
                                             data_NW_IC1,data_NW_IC,&
                                             data_lfc_PI,&
                                             data_lfc_IC,&
                                             data_NW_h_ut)
-    use simulation_input; use nrtype; use files_savings; use dimensions; use structural_p1; use pdfs
+    use simulation_input; use nrtype; use files_savings; use dimensions; use structural_p1; use pdfs; use HRS_data
     implicit none
-    real(SP),dimension(L_PI,clusters),intent(inout)::data_MD_PI
+    real(SP),dimension(L_PI,f_t),intent(inout)::data_beq100_IC
     real(SP),dimension(L_PI,clusters),intent(inout)::data_lfc_PI
     real(SP),dimension(f_t,clusters),intent(inout)::data_lfc_IC
     real(SP),dimension(f_t,obs,groups),intent(inout)::data_NW_IC,data_NW_IC1
@@ -23,18 +23,16 @@ subroutine charge_simulation_input_moments(data_NW_PI1,data_NW_PI,&
     integer,dimension(L_PI,clusters)::counter_pi_h2
     integer,dimension(f_t,clusters)::counter_ic_h
     integer,dimension(f_t,obs,groups)::counter_ic_nw
+    integer,dimension(L_PI,f_t)::counter_beq100
     integer,dimension(L_PI,obs,groups)::counter_pi_age_group,counter_pi_age_group_b
     !hours of care variables
     real(SP),dimension(L_PI,clusters,6500)::fc_pi_h
     real(SP),dimension(f_t,clusters,15000)::fc_ic_h,ic_ic_h
-    integer,dimension(L_PI,clusters,6500)::govmd_pi_h
+    real(SP),dimension(L_PI,f_t,10000)::beq100_ic
     !Store vector variables    
     real(SP),dimension(L_PI,obs,groups,1500)::assets_pi_age_group,assets_pi_age_group_b !1500: maximum number of individuals in a group
     real(SP),dimension(2,obs,8000)::assets_ut
-    real(SP),dimension(f_t,obs,groups,4000)::assets_ic
-    !Individual data from HRS variables
-    real(SP),dimension(indv,obs):: fc_h,NW,ic_h
-    integer,dimension(indv,obs):: IC_q,govmd
+    real(SP),dimension(f_t,obs,groups,4000)::assets_ic    
     !Across latent health types
     real(SP),dimension(L_PI,clusters,samples_per_i)::data_NW_PI_s
     real(SP),dimension(L_PI,clusters,samples_per_i)::data_lfc_PI_s
@@ -42,7 +40,7 @@ subroutine charge_simulation_input_moments(data_NW_PI1,data_NW_PI,&
     real(SP),dimension(L_PI,clusters,samples_per_i)::pr_pi_h_s,pr_pi_h2_s
     real(SP),dimension(f_t,clusters,samples_per_i)::pr_ic_h_s,pr_ic_h2_s
     real(SP),dimension(f_t,obs,groups,samples_per_i)::assets_ic_ns
-    real(SP),dimension(L_PI,clusters,samples_per_i)::data_MD_PI_s
+    real(SP),dimension(L_PI,f_t,samples_per_i)::data_beq100_IC_s
     !Random draw
     real(SP)::u
     !Moments
@@ -56,7 +54,8 @@ subroutine charge_simulation_input_moments(data_NW_PI1,data_NW_PI,&
     IC_q=reshape(data_moments(2,:,:), (/indv, obs/), order = (/ 2, 1 /))
     NW=reshape(data_moments(3,:,:), (/indv, obs/), order = (/ 2, 1 /))
     NW=NW/1000.0_sp
-    govmd=reshape(data_moments(4,:,:), (/indv, obs/), order = (/ 2, 1 /))
+    beq100=reshape(data_moments(4,:,:), (/indv, obs/), order = (/ 2, 1 /))
+    beq100=beq100/100.0_sp
     ic_h=reshape(data_moments(5,:,:), (/indv, obs/), order = (/ 2, 1 /))
     
     !Compute data moments from original data
@@ -72,8 +71,9 @@ subroutine charge_simulation_input_moments(data_NW_PI1,data_NW_PI,&
         fc_pi_h=0.0_sp
         fc_ic_h=0.0_sp
         ic_ic_h=0.0_sp
-        govmd_pi_h=0
+        beq100_ic=0
         counter_ic_nw=0
+        counter_beq100=0
         h_i=-9.0
         !Store vector with all: 
         !       - Formal care hours across PI quartiles and health status
@@ -129,9 +129,9 @@ subroutine charge_simulation_input_moments(data_NW_PI1,data_NW_PI,&
                     counter_pi_h(PI_q_i(i_l),h_i(i_l,t_l,1))=counter_pi_h(PI_q_i(i_l),h_i(i_l,t_l,1))+1
                     fc_pi_h(PI_q_i(i_l),h_i(i_l,t_l,1),counter_pi_h(PI_q_i(i_l),h_i(i_l,t_l,1)))=fc_h(i_l,t_l)
                 end if
-                if (govmd(i_l,t_l)/=-9) then
-                    counter_pi_h2(PI_q_i(i_l),h_i(i_l,t_l,1))=counter_pi_h2(PI_q_i(i_l),h_i(i_l,t_l,1))+1
-                    govmd_pi_h(PI_q_i(i_l),h_i(i_l,t_l,1),counter_pi_h2(PI_q_i(i_l),h_i(i_l,t_l,1)))=govmd(i_l,t_l)
+                if (beq100(i_l,t_l)/=-9.0_sp) then
+                    counter_beq100(PI_q_i(i_l),f_l)=counter_beq100(PI_q_i(i_l),f_l)+1
+                    beq100_ic(PI_q_i(i_l),f_l,counter_beq100(PI_q_i(i_l),f_l))=beq100(i_l,t_l)
                 end if
                 if (fc_h(i_l,t_l)/=-9.0_sp .and. IC_q(i_l,t_l)/=-9 .and. ic_h(i_l,t_l)/=-9.0_sp) then
                     counter_ic_h(IC_q(i_l,t_l),h_i(i_l,t_l,1))=counter_ic_h(IC_q(i_l,t_l),h_i(i_l,t_l,1))+1
@@ -164,7 +164,7 @@ subroutine charge_simulation_input_moments(data_NW_PI1,data_NW_PI,&
     
         data_lfc_PI_s(:,:,s_l)=sum(fc_pi_h,3)/counter_pi_h
         data_lfc_PI_s(:,1,s_l)=-9.0_sp
-        data_MD_PI_s(:,:,s_l)=real(sum(govmd_pi_h,3))/counter_pi_h2
+        data_beq100_IC_s(:,:,s_l)=real(sum(beq100_ic,3))/counter_beq100 !beq100_ic(:,:,1)
         data_lfc_IC_s(:,:,s_l)=sum(fc_ic_h,3)/counter_ic_h
         data_lfc_IC_s(:,1,s_l)=-9.0_sp
     
@@ -205,8 +205,8 @@ subroutine charge_simulation_input_moments(data_NW_PI1,data_NW_PI,&
         
     end do
     data_lfc_PI=sum(data_lfc_PI_s,3)/real(samples_per_i)
-    data_MD_PI=sum(data_MD_PI_s,3)/real(samples_per_i)
-    l_ic=sum(l_ic_s,3)/real(samples_per_i)
+    data_beq100_IC=sum(data_beq100_IC_s,3)/real(samples_per_i)
+    l_ic=sum(l_ic_s,3)/real(samples_per_i) !l_ic
     data_lfc_IC=sum(data_lfc_IC_s,3)/real(samples_per_i)
 
     !Wealth moments by PIq

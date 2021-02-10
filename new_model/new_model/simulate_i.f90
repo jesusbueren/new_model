@@ -1,16 +1,15 @@
 subroutine simulate_i(a_policy,g_policy,lfc_x,samples,h_ini,x_ini,f_l,PI_q_ii,PI_q_ii2,gender_ii,mean_fc_age,mean_assets,mean_c)
     use dimensions; use nrtype;use structural_p1;use grids; use structural_p2; use simulation_input
     implicit none
-    integer,dimension(nkk,clusters,nzz,nzz2,L_gender,L_PI2,f_t,generations),intent(in)::a_policy
-    real(SP),dimension(nkk,clusters,nzz,nzz2,L_gender,L_PI2,f_t,generations),intent(in)::g_policy
-    real(SP),dimension(nkk,clusters,nzz2,f_t,L_PI2),intent(in)::lfc_x
+    integer,dimension(nkk,clusters,nzz,L_gender,L_PI2,f_t,generations),intent(in)::a_policy,g_policy
+    real(SP),dimension(nkk,clusters,f_t,L_PI2),intent(in)::lfc_x
     integer,intent(in)::samples,h_ini,f_l,PI_q_ii,PI_q_ii2,gender_ii
     real(SP),intent(in)::x_ini
     real(SP),dimension(generations),intent(out)::mean_assets,mean_c
     real(SP),dimension(samples,generations)::assets,cons
     real(SP),dimension(generations)::fc_age,x_it,median_assets,counter_impaired,a_it
     integer,dimension(generations)::counter_age,h_s,g_it,counter_fc_age
-    integer::h_l,z_l,s_l,ind,t_l,xi_l,xi_l2,ts_l2,pos_x,k2_l
+    integer::h_l,s_l,ind,t_l,xi_l,xi_l2,ts_l2,pos_x,k2_l
     real(SP)::u
     real(SP),dimension(generations),intent(out)::mean_fc_age
     character::pause_k
@@ -80,17 +79,6 @@ subroutine simulate_i(a_policy,g_policy,lfc_x,samples,h_ini,x_ini,f_l,PI_q_ii,PI
                         ind=ind+1
                     end if
                 end do
-                !Sample LTC need shifter shock
-                z_l=-9
-                ind=1
-                call RANDOM_NUMBER(u)
-                do while (z_l==-9)
-                    if (u<sum(pr_varep(1:ind,1)) .or. ind==nzz2) then
-                        z_l=ind
-                    else
-                        ind=ind+1
-                    end if
-                end do
                 !Store assets
                 counter_age(t_l)=counter_age(t_l)+1
                 assets(counter_age(t_l),t_l)=a_it(t_l)
@@ -99,20 +87,20 @@ subroutine simulate_i(a_policy,g_policy,lfc_x,samples,h_ini,x_ini,f_l,PI_q_ii,PI
                 pos_x=int(max(min(x_it(t_l),coh_grid(nkk)),0.0_sp)/(coh_grid(2)-coh_grid(1))+1.00000001_sp)
                 !Draw on the discrete choice
                 call RANDOM_NUMBER(u)
-                if (u<g_policy(pos_x,h_s(t_l),xi_l,z_l,gender_ii,PI_q_ii2,f_l,t_l)) then
+                if (g_policy(pos_x,h_s(t_l),xi_l,gender_ii,PI_q_ii2,f_l,t_l)==1) then
                     g_it(t_l)=1
                     k2_l=1
-                    cons(counter_age(t_l),t_l)=c_bar(h_s(t_l),z_l)
+                    cons(counter_age(t_l),t_l)=c_bar(h_s(t_l))
                 else
                     g_it(t_l)=0
-                    k2_l=a_policy(pos_x,h_s(t_l),xi_l,z_l,gender_ii,PI_q_ii2,f_l,t_l)
-                    cons(counter_age(t_l),t_l)=coh_grid(pos_x)-coh_grid(k2_l)-lfc_x(pos_x-k2_l+1,h_s(t_l),z_l,f_l,PI_q_ii2)*p_fc
+                    k2_l=a_policy(pos_x,h_s(t_l),xi_l,gender_ii,PI_q_ii2,f_l,t_l)
+                    cons(counter_age(t_l),t_l)=coh_grid(pos_x)-coh_grid(k2_l)-lfc_x(pos_x-k2_l+1,h_s(t_l),f_l,PI_q_ii2)*p_fc
                 end if
                 a_it(t_l+1)=coh_grid(k2_l)
                 !Formal care decision
                 if (g_it(t_l)==0) then
                     counter_fc_age(t_l)=counter_fc_age(t_l)+1
-                    fc_age(t_l)=fc_age(t_l)+lfc_x(pos_x-k2_l+1,h_s(t_l),z_l,f_l,PI_q_ii2)
+                    fc_age(t_l)=fc_age(t_l)+lfc_x(pos_x-k2_l+1,h_s(t_l),f_l,PI_q_ii2)
                 end if
                 !counter impaired
                 if (h_s(t_l)==4)then
