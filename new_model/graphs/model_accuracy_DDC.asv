@@ -29,7 +29,6 @@ fileID = fopen('model_moments.txt');
 model_moments=textscan(fileID,'%f');
 fclose(fileID);
 model_moments=model_moments{1};
-model_moments(isnan(data_moments)) = -9;
 model_moments=standardizeMissing(model_moments,-9);
 model_moments(model_moments<0) = 0;
 model_NW_PI=model_moments(1:waves*groups*PI_l*2);
@@ -165,7 +164,7 @@ for p=2:clusters
 end
 end
 xticks([1:1:2])
-xticklabels({'Distant','Close'})
+xticklabels({'On your own','Close'})
 ylim([0 9])
 xlim([0.8 2.2])
 I3=legend('Physically Frail','Mentally Frail','Impaired','orientation','horizontal');
@@ -348,6 +347,8 @@ print(gcf,'-depsc', 'C:\Users\jbueren\Google Drive\JMP\Slides\figures\counterfac
 %% Identification
 clear all
 
+%  clc
+
 waves=9;
 groups=4;
 wealth_q=3
@@ -403,11 +404,11 @@ waves2=7
 clrs = [0 0 0; 0.5 0.5 0.5 ; 0.9 0.9 0.9 ];
 
 figure(7)
-set(7,'position',[450    400    700    250])
+set(7,'position',[450    400    700    50])
 p=clusters
 hb=bar([model_hr_IC(:,p) model_hr_IC_high_beq(:,p) model_hr_IC_high_ltc(:,p)])  
 set(hb,{'FaceColor'},{clrs(1,:),clrs(2,:),clrs(3,:)}.')
-xticklabels({'Distant','Close'})
+xticklabels({'On your own','Close'})
 I=legend('Benchmark','High bequest','High LTC','Location','NorthEast')
 legend('boxoff')
 I.FontSize=FS
@@ -476,7 +477,7 @@ counterfactual(:,3,:)=noBeq;
 
 if i==1
     subplot(1,2,1)
-    title('Distant')
+    title('On your own')
 else
     subplot(1,2,2)
     title('Close Families')

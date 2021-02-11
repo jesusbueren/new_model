@@ -22,7 +22,7 @@ subroutine data_moments_W()
     call charge_simulation_input_moments(data_NW_PI1,data_NW_PI, & !networth by PI  for cohorts obs in 1998
                                          data_NW_PI1b,data_NW_PIb,& !networth by PI for cohorts after 1998
                                          data_beq100_IC,& ! pr of large beq by IC
-                                         data_NW_IC1,data_NW_IC,& ! Networth before death by IC
+                                         data_NW_IC1,data_NW_IC,& ! Networth by IC
                                          data_lfc_PI,& !Formal care by PI
                                          data_lfc_IC,& !Formal care by informal groups
                                          data_NW_h_ut) !NW by health
@@ -39,7 +39,7 @@ subroutine data_moments_W()
     close(9)
 
     open(unit=9,file='data_moments_ut.txt')
-        write(9,*) data_NW_h_ut
+        write(9,*) data_NW_IC1
     close(9)
     
     !select moments to untarget

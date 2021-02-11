@@ -62,7 +62,7 @@ subroutine simulate_HRS_70(parameters,p50_75_assets_ic_age,p50_75_assets_all_age
     u_bar_no_f=u_bar_no_f(1)
     
     print*,beta,sigma,nu,delta(1),x_bar(1), &
-           lambda,alpha_mu,omega,share_p,subs_p
+           lambda,alpha_mu,share_p,subs_p
     
     mu=0.0_sp
     do h_l=2,clusters
@@ -76,29 +76,6 @@ subroutine simulate_HRS_70(parameters,p50_75_assets_ic_age,p50_75_assets_all_age
     !Solve the model given a set of parameters
     call solve_model(a_policy,g_policy,lfc_x,u_x,beq100_policy)
 
-    !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-    !print*,'Just for simulation of moments'
-    !call simulate_model(a_policy,g_policy,lfc_x,beq100_policy, &
-    !                    model_moments1,model_moments)
-    !print*,'got here2'
-    !do i_l=1,moment_conditions
-    !    if (data_moments(i_l,1)==-9.0_sp) then
-    !        model_moments(i_l,1)=-9.0_sp
-    !        model_moments1(i_l,1)=-9.0_sp
-    !    end if
-    !end do
-    !call empty_missing(model_moments,model_moments_new ,int(moment_conditions),real_moments)
-    !
-    !print*,'obj fct',real(indv)/(1.0_dp+1.0_dp/real(samples_per_i))*matmul(matmul(transpose(model_moments_new(1:real_moments,1:1)), & 
-    !                                W_opt(1:real_moments,1:real_moments)), &
-    !                                model_moments_new(1:real_moments,1:1))
-    !print*,'got here3'
-    !open(unit=9,file='model_moments.txt')
-    !    write(9,*) model_moments1
-    !close(9)
-    !print*,'close window, just for simulation of moments'
-    !read*,pause_k
-    !!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     if (ind_or==1) then
         V_70_or=V_70
     else

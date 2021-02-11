@@ -344,13 +344,12 @@ subroutine simulate_model(a_policy,g_policy,lfc_x,beq100_policy, &
                           reshape(moments_lfc_PI,(/L_PI*clusters,1/)), &
                           reshape(moments_lfc_IC,(/f_t*clusters,1/))/)
     
-
-    
     model_NW_h_ut=sum(model_NW_h_ut_ns,3)/real(samples_per_i)
     
-    open(unit=9,file='model_NW_h_ut.txt')
-        write(9,*) model_NW_h_ut
+    open(unit=9,file='moments_NW_IC1.txt')
+        write(9,*) moments_NW_IC1
     close(9)
+    
     
 end subroutine
     

@@ -19,7 +19,7 @@ om=1;
 share_p=parameters(10);
 subs_p=parameters(11);
 
-p_fc(1)=8/1000;
+p_fc(1)=12/1000;
 theta(1:4,1)=1;
 
 % DFJ

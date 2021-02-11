@@ -33,7 +33,7 @@ subroutine R2p(parameters,parameters_n)
     parameters_n(6)=exp(parameters(6))  !beq curvature 
     parameters_n(7)=exp(parameters(7))+1.0_sp !RRA LTC 
     parameters_n(8:9)=parameters(8:9)  !bequest intensity
-    parameters_n(10)=1.0_sp/(1.0_sp+exp(parameters(10))) !share parameter
+    parameters_n(10)=1.0_sp/(1.0_sp+exp(-parameters(10))) !share parameter
     parameters_n(11)=1.0_sp-exp(parameters(11))!share parameter
     
     !Set parameters
