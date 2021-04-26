@@ -50,13 +50,15 @@ subroutine create_tables_draft(parameters)
         write(9,'(A50 )') 'Risk Aversion & & \\'
         write(9,'(A50, F6.2, A3, F5.2,A10 )') '$\sigma$: Consumption &', parameters(1),"& (",se(1),")\\"
         write(9,'(A50, F6.2, A3, F5.2,A10 )') '$\nu$: Care hours &', parameters(7),"& (",se(7),")\\ [5pt]"
-        write(9,'(A50 )') 'LTC Needs & & \\'
+        write(9,'(A50 )') 'LTC & & \\'
         write(9,'(A50, F6.2, A3, F5.2,A10 )') '$\alpha(h=2)$: Physically frail &', parameters(3),"& (",se(3),")\\"
         write(9,'(A50, F6.2, A3, F5.2,A10 )') '$\alpha(h=3)$: Mentally frail &', parameters(4),"& (",se(4),")\\"
-        write(9,'(A50, F6.2, A3, F5.2,A10 )') '$\alpha(h=4)$: Impaired &', parameters(5),"& (",se(5),")\\ [5pt]"
+        write(9,'(A50, F6.2, A3, F5.2,A10 )') '$\alpha(h=4)$: Impaired &', parameters(5),"& (",se(5),")\\"
+        write(9,'(A50, F6.2, A3, F5.2,A10 )') '$\tau$: Share formal care &', parameters(10),"& (",se(10),")\\"
+        write(9,'(A50, F6.2, A3, F5.2,A10 )') '$\omega$: substitution formal/informal care &', parameters(11),"& (",se(11),")\\ [5pt]"
         write(9,'(A50 )') 'Bequest & & \\'
         write(9,'(A50, F9.2, A3, F9.2,A10 )') '$\delta$: curvature &', parameters(6),"& (",se(6),")\\"
-        write(9,'(A50, F6.2, A3, F5.2,A10 )') '$\lambda$($F$=\textit{Distant}): marginal utility &', parameters(8),"& (",se(8),")\\ "
+        write(9,'(A55, F6.2, A3, F5.2,A10 )') '$\lambda$($F$=\textit{Distant}): marginal utility &', parameters(8),"& (",se(8),")\\ "
         write(9,'(A50, F6.2, A3, F5.2,A10 )') '$\lambda$($F$=\textit{Close}): marginal utility &', parameters(9),"& (",se(9),")\\ [5pt]"
         write(9,'(A70 )') 'Maximum transfer to achieve utility floor $\times 10^3 $ & & \\'
         write(9,'(A50, F6.2, A3, F5.2,A10 )') '\underline{x}\textit{(h=1)}: Healthy &', parameters(2),"& (",se(2),")\\"

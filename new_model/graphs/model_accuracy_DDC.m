@@ -178,6 +178,7 @@ hold off
 set(gca,'FontName','Times New Roman','Fontsize',FS);
 xlabel('Family Type','FontSize',FS)
 ylabel('Formal Care Hours per Day','FontSize',FS)
+print(gcf,'-depsc', 'C:\Users\jbueren\Google Drive\JMP\Draft\figures\model_fit1.eps')
 
 figure(4)
 set(4,'position',[450    400    700    250])
@@ -210,7 +211,7 @@ xticklabels({'Bottom','2nd','3rd','4th','Top'})
 ylabel('Pr. of leaving any bequest (%)','FontSize',FS)
 xlabel('Permanent Income Quintile','FontSize',FS)
 end
-
+print(gcf,'-depsc', 'C:\Users\jbueren\Google Drive\JMP\Draft\figures\model_fit2.eps')
 
 
 %% Untargetted moments
@@ -416,6 +417,7 @@ set(gca,'FontName','Times New Roman','Fontsize',FS);
 xlabel('Family Type','FontSize',FS)
 ylabel('Formal Care Hours per Day','FontSize',FS)
 set(gcf,'color','w')
+print(gcf,'-depsc', 'C:\Users\jbueren\Google Drive\JMP\Draft\figures\identification1.eps')
 
 figure(8)
 set(8,'position',[450    400    700    250])
@@ -428,9 +430,9 @@ for m=1:2
     legend('boxoff')
     I.FontSize=FS
 if m==1
-    title('Distant')
+    title('Distant Family')
 else
-    title('Close')
+    title('Close Family')
 end
 set(gca,'FontName','Times New Roman','Fontsize',FS);
 set(gcf,'color','w')
@@ -440,7 +442,7 @@ xticklabels({'Bottom','2nd','3rd','4th','Top'})
 ylabel('Pr. of leaving any bequest (%)','FontSize',FS)
 xlabel('Permanent Income Quintile','FontSize',FS)
 end
-
+print(gcf,'-depsc', 'C:\Users\jbueren\Google Drive\JMP\Draft\figures\identification2.eps')
 
 
 %% Counterfactuals by IC

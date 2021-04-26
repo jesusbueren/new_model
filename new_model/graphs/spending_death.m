@@ -12,15 +12,15 @@ sigma(1)=parameters(1);
 nu(1)=parameters(7);
 sigma_2(1)=sigma(1);
 mu(1,1)=0;
-mu(2:4,1)=exp(parameters(3:5));
-lambda(1:2,1)=exp(parameters(8:9))*2;
+mu(2:4,1)=exp(parameters(3:5))*2^(-nu(1));
+lambda(1:2,1)=exp(parameters(8:9));
 kappa(1)=parameters(6);
 om=1;
 share_p=parameters(10);
 subs_p=parameters(11);
 
 p_fc(1)=12/1000;
-theta(1:4,1)=1;
+theta(1:4,1)=2^(-sigma(1));
 
 % DFJ
     %2010
@@ -108,7 +108,7 @@ for i=1:N_x;
             crit=2;
             while abs(crit)>0.0000001
                 fc_try=(l_fc_min+l_fc_max)/2;
-                c_try=(mu(h_l,m_l)/p_fc(m_l))^(-1/sigma(m_l))*share_p^(-1/sigma(m_l))*fc_try^((1-subs_p)/sigma(m_l))*...
+                c_try=(mu(h_l,m_l)/p_fc(m_l)/theta(h_l,m_l))^(-1/sigma(m_l))*share_p^(-1/sigma(m_l))*fc_try^((1-subs_p)/sigma(m_l))*...
                       (share_p*fc_try^subs_p+(1-share_p)*l_IC(IC_l,h_l)^subs_p)^((nu(m_l)+subs_p-1)/(subs_p*sigma(m_l)));
                 LHS=c_try+p_fc(m_l)*fc_try;
                 crit=LHS-cts;
@@ -189,20 +189,21 @@ FS=11
     figure(h_l+3)
     set(h_l+3,'position',[600    500    650    400*0.75])
     g=subplot(1,2,1)
-    % DFJ (2016) & Ameriks et al. (WP) & Lockwood (WP)
+    % Mine healthy & Ameriks et al. (WP) & Lockwood (WP)
     IC_l=1
-    p1=plot(x_grid(1:end),squeeze(beq(2,h_l,IC_l,1:end))./x_grid(1:end)','Color',colors{1},'LineWidth',width{3},'LineStyle',pattern2{3})
-    p2=plot(x_grid(1:end),squeeze(beq(4,h_l,IC_l,1:end))./x_grid(1:end)','Color',colors{1},'LineWidth',width{3},'LineStyle',pattern2{4})
+    p1=plot(x_grid(1:end),squeeze(beq(1,h_l,1,1:end))./x_grid(1:end)','Color',colors{1},'LineWidth',width{3},'LineStyle',pattern2{1})
     hold on
-    p3=plot(x_grid(1:end),squeeze(beq(3,h_l,IC_l,1:end))./x_grid(1:end)','-o','Color',colors{1},'LineWidth',width{3},'LineStyle',pattern2{1},'MarkerIndices',1:50:N_x)
-    p4=plot(x_grid(1:end),squeeze(beq(3,2,IC_l,1:end))./x_grid(1:end)',':','Color',colors{1},'LineWidth',width{3},'LineStyle',pattern2{1},'MarkerIndices',1:50:N_x)
+    p2=scatter(x_grid(1:30:end),squeeze(beq(1,h_l,2,1:30:end))./x_grid(1:30:end)','filled','d','MarkerEdgeColor',colors{1},'MarkerFaceColor',colors{1})
+    p3=plot(x_grid(1:end),squeeze(beq(4,h_l,IC_l,1:end))./x_grid(1:end)','Color',colors{1},'LineWidth',width{3},'LineStyle',pattern2{4})
+    p4=plot(x_grid(1:end),squeeze(beq(3,h_l,IC_l,1:end))./x_grid(1:end)','-o','Color',colors{1},'LineWidth',width{3},'LineStyle',pattern2{1},'MarkerIndices',1:50:N_x)
+%     p4=plot(x_grid(1:end),squeeze(beq(3,2,IC_l,1:end))./x_grid(1:end)',':','Color',colors{1},'LineWidth',width{3},'LineStyle',pattern2{1},'MarkerIndices',1:50:N_x)
     
     ylim([-0.03 1.38])
     xlim([0 a_max])
-    I=legend([p2,p3,p4],'Lockwood','SSQ, healthty','SSQ, LTC','location','NorthWest');
+    I=legend([p1,p2,p3,p4],'Healthy, Distant Family','Healthy, Close Family','Lockwood','SSQ, Healthy','location','NorthWest');
     legend('boxoff');
     set(I,'FontName','Times New Roman','FontSize',FS);
-    ylabel('Allocation','FontSize',FS)
+    ylabel('Bequest Allocation','FontSize',FS)
     xlabel('Wealth')
     set(gca,'FontName','Times New Roman','FontSize',FS);
 %     newPosition = [0.13 0.87 0.2 0.2];
@@ -210,19 +211,16 @@ FS=11
 %     set(I,'Position', newPosition,'Units', newUnits);
     g=subplot(1,2,2)
     % My model
-    IC_l=1
-    p1=plot(x_grid(1:10:end),squeeze(beq(1,1,IC_l,1:10:end))./x_grid(1:10:end)','Color',colors{1},'LineWidth',width{3},'LineStyle',pattern2{1})
+    p1=plot(x_grid(1:10:end),squeeze(beq(1,4,1,1:10:end))./x_grid(1:10:end)','Color',colors{1},'LineWidth',width{3},'LineStyle',pattern2{1})
     hold on
-%     plot(x_grid(1:end),squeeze(beq(1,2,IC_l,1:end))./x_grid(1:end)','Color',colors{1},'LineWidth',width{3},'LineStyle',pattern2{1})
-    p2=scatter(x_grid(1:step:end),squeeze(beq(1,2,IC_l,1:step:end))./x_grid(1:step:end)',ms-60,pattern{2},'MarkerEdgeColor',colors{1},'MarkerFaceColor',colors{1})
-    p3=plot(x_grid(1:end),squeeze(beq(1,3,IC_l,1:end))./x_grid(1:end)','Color',colors{1},'LineWidth',width{3},'LineStyle',pattern2{4})
-    p4=plot(x_grid(1:end),squeeze(beq(1,4,IC_l,1:end))./x_grid(1:end)','Color',colors{1},'LineWidth',width{3},'LineStyle',pattern2{2})
+    p2=scatter(x_grid(1:30:end),squeeze(beq(1,4,2,1:30:end))./x_grid(1:30:end)','filled','d','MarkerEdgeColor',colors{1},'MarkerFaceColor',colors{1})
+    p3=plot(x_grid(1:end),squeeze(beq(3,2,IC_l,1:end))./x_grid(1:end)','-o','Color',colors{1},'LineWidth',width{3},'LineStyle',pattern2{1},'MarkerIndices',1:50:N_x)
 %     plot(100,0.0,'ro')
 %     plot(150,0.0,'ro')
 %     plot(200,0.5,'ro')
     ylim([-0.03 1.38])
     xlim([0 a_max])
-    I=legend([p1,p2,p3,p4],'Healthy','Physically Frail','Mentally Frail','Impaired','location','NorthWest');
+    I=legend([p1,p2,p3],'Impaired, Distant Family','Impaired, Close Family','SSQ, LTC','location','NorthWest');
     legend('boxoff');
     set(I,'FontName','Times New Roman','FontSize',FS);
 %     newPosition = [0.63 0.87 0.2 0.2];
@@ -242,7 +240,7 @@ FS=11
 
 m_l=1
 
-cts=100000; %cash to spend
+cts=20000; %cash to spend
 for h_l=1:4
     c_max=cts;
 if mu(h_l,m_l)==0 
@@ -255,7 +253,7 @@ else
         crit=2;
         while abs(crit)>0.0000001
             fc_try=(l_fc_min+l_fc_max)/2;
-            c_try=(mu(h_l,m_l)/p_fc(m_l))^(-1/sigma(m_l))*share_p^(-1/sigma(m_l))*fc_try^((1-subs_p)/sigma(m_l))*...
+            c_try=(mu(h_l,m_l)/p_fc(m_l)/theta(h_l,m_l))^(-1/sigma(m_l))*share_p^(-1/sigma(m_l))*fc_try^((1-subs_p)/sigma(m_l))*...
                   (share_p*fc_try^subs_p+(1-share_p)*l_IC(IC_l,h_l)^subs_p)^((nu(m_l)+subs_p-1)/(subs_p*sigma(m_l)));
             LHS=c_try+p_fc(m_l)*fc_try;
             crit=LHS-cts;

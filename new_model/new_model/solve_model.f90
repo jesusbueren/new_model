@@ -108,7 +108,6 @@ subroutine solve_model(a_policy,g_policy,lfc_x,u_x,beq100_policy)
     print *,'Timing summary'
     print *,'Calc: ', calctime
     
-    beq100_policy=beq100_policy
 end subroutine
     
     
