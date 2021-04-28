@@ -39,7 +39,7 @@ use nrtype
     !PI_t: permanent income type                                                     
     integer,parameter::f_t=2,clusters=4,L_gender=2,L_PI=5,generations=21,nzz=3,variables=12,groups=4,parameters_to_est=11,obs=9, &
                         wealth_q=3,L_PI2=10,min_obs=39
-    integer,parameter:: moment_conditions=L_PI*obs*groups*2+L_PI*f_t+f_t*obs*groups+L_PI*clusters+f_t*clusters
+    integer,parameter:: moment_conditions=L_PI*obs*groups+L_PI*f_t+f_t*obs*groups+L_PI*clusters+2*f_t*clusters
     integer,parameter::nkk=300,samples_per_i=300
 end module dimensions
         
@@ -61,7 +61,7 @@ module targets
     real(SP),dimension(2,obs)::data_NW_h_ut
     real(SP),dimension(L_PI,f_t)::data_beq100_IC
     real(SP),dimension(L_PI,clusters)::data_lfc_PI
-    real(SP),dimension(f_t,clusters)::data_lfc_IC
+    real(SP),dimension(f_t,clusters)::data_lfc_IC,data_govmd_IC
     real(SP),dimension(f_t,obs,groups)::data_NW_IC,data_NW_IC1
     real(SP),dimension(moment_conditions,1)::data_moments_new,data_moments1,data_moments
 end module targets
@@ -150,7 +150,7 @@ module HRS_data
     use dimensions; use nrtype; use simulation_input
     implicit none
     integer,dimension(indv,obs):: IC_q
-    real(SP),dimension(indv,obs):: fc_h,NW,ic_h,beq100 
+    real(SP),dimension(indv,obs):: fc_h,NW,ic_h,beq100,govmd
 end module HRS_data
 
     
