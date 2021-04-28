@@ -23,7 +23,7 @@ program jmp
     !open(unit=9,file='parameters.txt')
     !    write(9,*) parameters
     !close(9)
-    !
+    
     !Compute standard errors of estimated parameters
     !open(unit=9,file='parameters.txt')
     !    read(9,*) parameters
@@ -43,7 +43,7 @@ program jmp
     !call counterfactuals(parameters)
     !
     !Identification bequest from LTC
-    open(unit=9,file='parameters.txt')
+    open(unit=9,file='parameters_prelim.txt')
         read(9,*) parameters
     close(9)
     call identification(parameters)

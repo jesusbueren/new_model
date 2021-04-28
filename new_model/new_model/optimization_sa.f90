@@ -91,7 +91,7 @@ subroutine optimization_sa(parameters_end)
     !    write(12,*) value_SMM(it)
     !end do
     !parameters_end=final_p(minloc(value_SMM,1),:)
-    
+    print*,'Optimization started'
     open(unit=11,file='initial_simplex.txt')
         read(11,*) parameters_v
     close(11)

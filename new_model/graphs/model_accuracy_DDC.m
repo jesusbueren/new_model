@@ -180,8 +180,8 @@ xlabel('Family Type','FontSize',FS)
 ylabel('Formal Care Hours per Day','FontSize',FS)
 print(gcf,'-depsc', 'C:\Users\jbueren\Google Drive\JMP\Draft\figures\model_fit1.eps')
 
-figure(4)
-set(4,'position',[450    400    700    500])
+figure(5)
+set(5,'position',[450    400    700    500])
 clrs = [0 0 0; 0.9 0.9 0.9 ];
 for m=1:2
     subplot(2,2,m)

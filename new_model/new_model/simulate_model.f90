@@ -141,6 +141,7 @@ subroutine simulate_model(a_policy,g_policy,lfc_x,beq100_policy, &
             assets_pi_age_group_it_b=0.0_sp
             govmd_pi_h_it=0.0_sp
             nw_ic_it=0.0_sp
+            beq100_it=0.0_sp
             fc_pi_h_it=0.0_sp
             fc_ic_h_it=0.0_sp
             md_ic_h_it=0.0_sp
@@ -281,6 +282,11 @@ subroutine simulate_model(a_policy,g_policy,lfc_x,beq100_policy, &
                                         reshape(fc_pi_h_it,(/L_PI*clusters,1/)), &
                                         reshape(fc_ic_h_it,(/f_t*clusters,1/)), &
                                         reshape(md_ic_h_it,(/f_t*clusters,1/))/)
+                if (isnan(sum(moments_it(:,t_l,i_l)))) then
+                    print*,beq100_it
+                    print*,'problem'
+                    read*,pause_k
+                end if
             end do
         end do
         
@@ -356,7 +362,6 @@ subroutine simulate_model(a_policy,g_policy,lfc_x,beq100_policy, &
     open(unit=9,file='moments_NW_IC1.txt')
         write(9,*) moments_NW_IC1
     close(9)
-    
     
 end subroutine
     
