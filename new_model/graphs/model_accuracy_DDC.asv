@@ -35,30 +35,29 @@ model_moments(model_moments<0) = 0;
 model_NW_PI=model_moments(1:waves*groups*PI_l);
 model_NW_PI=reshape(model_NW_PI,PI_l,waves,groups);
 
-data_beq_ic=data_moments(waves*groups*PI_l+1:waves*groups*PI_l+f_t*PI_l);
+data_beq_ic=data_moments(waves*groups*PI_l*2+1:waves*groups*PI_l*2+f_t*PI_l);
 data_beq_ic=reshape(data_beq_ic,PI_l,f_t);
-model_beq_ic=model_moments(waves*groups*PI_l+1:waves*groups*PI_l+f_t*PI_l);
+model_beq_ic=model_moments(waves*groups*PI_l*2+1:waves*groups*PI_l*2+f_t*PI_l);
 model_beq_ic=reshape(model_beq_ic,PI_l,f_t);
 
-data_NW_IC=data_moments(waves*groups*PI_l+f_t*PI_l+1:waves*groups*PI_l+f_t*PI_l+f_t*waves*groups);
+data_NW_IC=data_moments(waves*groups*PI_l*2+f_t*PI_l+1:waves*groups*PI_l*2+f_t*PI_l+f_t*waves*groups);
 data_NW_IC=reshape(data_NW_IC,f_t,waves,groups);
-model_NW_IC=model_moments(waves*groups*PI_l+f_t*PI_l+1:waves*groups*PI_l+f_t*PI_l+f_t*waves*groups);
+
+model_NW_IC=model_moments(waves*groups*PI_l*2+f_t*PI_l+1:waves*groups*PI_l*2+f_t*PI_l+f_t*waves*groups);
 model_NW_IC=reshape(model_NW_IC,f_t,waves,groups);
 
-data_hr_PI=data_moments(waves*groups*PI_l+f_t*PI_l+f_t*waves*groups+1:waves*groups*PI_l+f_t*PI_l+f_t*waves*groups+groups*PI_l);
+data_hr_PI=data_moments(waves*groups*PI_l*2+f_t*PI_l+f_t*waves*groups+1:waves*groups*PI_l*2+f_t*PI_l+f_t*waves*groups+groups*PI_l);
 data_hr_PI=reshape(data_hr_PI,PI_l,groups)
-model_hr_PI=model_moments(waves*groups*PI_l+f_t*PI_l+f_t*waves*groups+1:waves*groups*PI_l+f_t*PI_l+f_t*waves*groups+groups*PI_l);
+
+model_hr_PI=model_moments(waves*groups*PI_l*2+f_t*PI_l+f_t*waves*groups+1:waves*groups*PI_l*2+f_t*PI_l+f_t*waves*groups+groups*PI_l);
 model_hr_PI=reshape(model_hr_PI,PI_l,groups)
 
-data_hr_IC=data_moments(waves*groups*PI_l+f_t*PI_l+f_t*waves*groups+groups*PI_l+1:waves*groups*PI_l+f_t*PI_l+f_t*waves*groups+groups*PI_l+groups*f_t);
+data_hr_IC=data_moments(waves*groups*PI_l*2+f_t*PI_l+f_t*waves*groups+groups*PI_l+1:waves*groups*PI_l*2+f_t*PI_l+f_t*waves*groups+groups*PI_l+groups*f_t);
 data_hr_IC=reshape(data_hr_IC,f_t,groups)
-model_hr_IC=model_moments(waves*groups*PI_l+f_t*PI_l+f_t*waves*groups+groups*PI_l+1:waves*groups*PI_l+f_t*PI_l+f_t*waves*groups+groups*PI_l+groups*f_t);
+
+model_hr_IC=model_moments(waves*groups*PI_l*2+f_t*PI_l+f_t*waves*groups+groups*PI_l+1:waves*groups*PI_l*2+f_t*PI_l+f_t*waves*groups+groups*PI_l+groups*f_t);
 model_hr_IC=reshape(model_hr_IC,f_t,groups)
 
-data_md_IC=data_moments(waves*groups*PI_l+f_t*PI_l+f_t*waves*groups+groups*PI_l+groups*f_t+1:waves*groups*PI_l+f_t*PI_l+f_t*waves*groups+groups*PI_l+groups*f_t+clusters*f_t);
-data_md_IC=reshape(data_md_IC,f_t,groups)
-model_md_IC=model_moments(waves*groups*PI_l+f_t*PI_l+f_t*waves*groups+groups*PI_l+groups*f_t+1:waves*groups*PI_l+f_t*PI_l+f_t*waves*groups+groups*PI_l+groups*f_t+clusters*f_t);
-model_md_IC=reshape(model_md_IC,f_t,groups)
 
 
 colors = {[0   0.4470    0.7410]  [0.9290    0.6940    0.1250] [0.4660    0.6740    0.1880] [0.8500    0.3250    0.0980] [0.6350, 0.0780, 0.1840]};
@@ -181,10 +180,10 @@ ylabel('Formal Care Hours per Day','FontSize',FS)
 print(gcf,'-depsc', 'C:\Users\jbueren\Google Drive\JMP\Draft\figures\model_fit1.eps')
 
 figure(4)
-set(4,'position',[450    400    700    500])
+set(4,'position',[450    400    700    250])
 clrs = [0 0 0; 0.9 0.9 0.9 ];
 for m=1:2
-    subplot(2,2,m)
+    subplot(1,2,m)
     if m==1
         hB=bar(data_beq_ic*100)
     else
@@ -210,34 +209,6 @@ xticks([1 2 3 4 5])
 xticklabels({'Bottom','2nd','3rd','4th','Top'})
 ylabel('Pr. of leaving any bequest (%)','FontSize',FS)
 xlabel('Permanent Income Quintile','FontSize',FS)
-end
-for m=1:2
-    subplot(2,2,m+2)
-    if m==1
-        hB=bar((data_md_IC*100)')
-    else
-        hB=bar((model_md_IC*100)')
-    end
-set(hB,{'FaceColor'},{clrs(1,:),clrs(2,:)}.')
-
-    I=legend('Distant','Close','Location','NorthWest')
-    legend('boxoff')
-    I.FontSize=FS
-%     newPosition = [0.5 0.925 0.08 0.08];
-%     newUnits = 'normalized';
-%     set(I,'Position', newPosition,'Units', newUnits);
-if m==1
-    title('Data')
-else
-    title('Model')
-end
-set(gca,'FontName','Times New Roman','Fontsize',FS);
-set(gcf,'color','w')
-ylim([0 60])
-xticks([1 2 3 4])
-xticklabels({'Healthy','Physical','Mental','Impaired'})
-ylabel('Pr. of being in Medicaid (%)','FontSize',FS)
-xlabel('LTC need','FontSize',FS)
 end
 print(gcf,'-depsc', 'C:\Users\jbueren\Google Drive\JMP\Draft\figures\model_fit2.eps')
 
