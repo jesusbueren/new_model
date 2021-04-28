@@ -5,13 +5,13 @@ subroutine identification(parameters_original)
     real(SP),dimension(parameters_to_est)::parameters
     real(SP),dimension(moment_conditions,1)::model_moments1
     
-    !!Benchmark
-    !parameters=parameters_original
-    !call p2R(parameters)
-    !call get_moments(parameters,model_moments1)
-    !open(unit=9,file='model_moments.txt')
-    !    write(9,*) model_moments1
-    !close(9)
+    !Benchmark
+    parameters=parameters_original
+    call p2R(parameters)
+    call get_moments(parameters,model_moments1)
+    open(unit=9,file='model_moments.txt')
+        write(9,*) model_moments1
+    close(9)
     !
     !!Stronger bequest motives
     !parameters=parameters_original
@@ -22,14 +22,14 @@ subroutine identification(parameters_original)
     !    write(9,*) model_moments1
     !close(9)
     
-    !Larger LTC needs
-    parameters=parameters_original
-    parameters(5)=parameters(5)*1.05d0
-    call p2R(parameters)
-    call get_moments(parameters,model_moments1)
-    open(unit=9,file='moments_high_LTC.txt')
-        write(9,*) model_moments1
-    close(9)
+    !!Larger LTC needs
+    !parameters=parameters_original
+    !parameters(5)=parameters(5)*1.05d0
+    !call p2R(parameters)
+    !call get_moments(parameters,model_moments1)
+    !open(unit=9,file='moments_high_LTC.txt')
+    !    write(9,*) model_moments1
+    !close(9)
     
 end subroutine
     

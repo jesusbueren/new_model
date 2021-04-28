@@ -16,7 +16,7 @@ subroutine simulate_model(a_policy,g_policy,lfc_x,beq100_policy, &
     integer,dimension(obs,groups)::counter_all_age_group
     integer,dimension(L_PI,clusters)::counter_pi_h
     integer,dimension(L_PI,clusters)::counter_pi_h2
-    integer,dimension(f_t,clusters)::counter_ic_h
+    integer,dimension(f_t,clusters)::counter_ic_h,counter_md_h
     integer,dimension(f_t)::counter_ic
     integer,dimension(2,obs)::counter_ut
     integer,dimension(f_t,obs,groups)::counter_ic_nw
@@ -24,10 +24,10 @@ subroutine simulate_model(a_policy,g_policy,lfc_x,beq100_policy, &
     !Hours of care variables and medicaid variables
     real(SP),dimension(L_PI,clusters,indv)::lfc_pi_h
     real(SP),dimension(L_PI,clusters,indv)::MD_pi_h
-    real(SP),dimension(f_t,clusters,indv*2)::lfc_ic_h,MD_ic_h
+    real(SP),dimension(f_t,clusters,indv*2)::lfc_ic_h,md_ic_h
     real(SP),dimension(L_PI,f_t,samples_per_i)::av_beq100_ic
     real(SP),dimension(L_PI,clusters,samples_per_i)::av_lfc_pi_h
-    real(SP),dimension(f_t,clusters,samples_per_i)::av_lfc_ic_h
+    real(SP),dimension(f_t,clusters,samples_per_i)::av_lfc_ic_h,av_md_ic_h
     real(SP),dimension(2,obs,samples_per_i)::model_NW_h_ut_ns
     real(SP),dimension(f_t,obs,groups,samples_per_i)::assets_ic_ns
     !Store vector variables for assets
@@ -40,14 +40,14 @@ subroutine simulate_model(a_policy,g_policy,lfc_x,beq100_policy, &
     real(SP),dimension(L_PI,f_t)::moments_beq100_IC
     real(SP),dimension(L_PI,clusters)::moments_MD_PI
     real(SP),dimension(L_PI,clusters)::moments_lfc_PI
-    real(SP),dimension(f_t,clusters)::moments_lfc_IC
+    real(SP),dimension(f_t,clusters)::moments_lfc_IC,moments_md_IC
     real(SP),dimension(f_t,obs,groups)::moments_NW_IC1
-    real(SP),dimension(L_PI,obs,groups,samples_per_i)::med_assets_pi_age_group,med_assets_pi_age_group_b
+    real(SP),dimension(L_PI,obs,groups,samples_per_i)::med_assets_pi_age_group
     !Moment variables variables
     real(SP),dimension(L_PI,clusters)::fc_pi_h_it
     real(SP),dimension(L_PI,clusters)::govmd_pi_h_it
     real(SP),dimension(f_t,obs,groups)::nw_ic_it
-    real(SP),dimension(f_t,clusters)::fc_ic_h_it
+    real(SP),dimension(f_t,clusters)::fc_ic_h_it,md_ic_h_it
     real(SP),dimension(L_PI,f_t)::beq100_it
     real(SP),dimension(L_PI,obs,groups)::assets_pi_age_group_it,assets_pi_age_group_it_b
     real(SP),dimension(moment_conditions,obs,indv)::moments_it
@@ -64,15 +64,17 @@ subroutine simulate_model(a_policy,g_policy,lfc_x,beq100_policy, &
     !Initialize value for moments
     moments_s=0.0_sp
     med_assets_pi_age_group=-9.0_sp
-    med_assets_pi_age_group_b=-9.0_sp
     av_beq100_ic=-9.0_sp
-    av_lfc_pi_h=-9_sp
-    av_lfc_ic_h=-9_sp
+    av_lfc_pi_h=-9.0_sp
+    av_lfc_ic_h=-9.0_sp
+    av_md_ic_h=-9.0_sp
+    av_md_ic_h=-9.0_sp
     do ns=1,samples_per_i
         !Initialize value for moments in each simulation
         counter_pi_age_group=0
         counter_pi_age_group_b=0
         counter_ic_h=0
+        counter_md_h=0
         counter_ic=0
         counter_pi_h=0
         counter_pi_h2=0
@@ -80,10 +82,10 @@ subroutine simulate_model(a_policy,g_policy,lfc_x,beq100_policy, &
         counter_ic_nw=0
         counter_beq100=0
         assets_pi_age_group=-9.0_sp
-        assets_pi_age_group_b=-9.0_sp
         assets_ic=-9.0_sp
         lfc_pi_h=-9.0_sp
         lfc_ic_h=0.0_sp
+        md_ic_h=0.0_sp
         moments_it=0.0_sp
         MD_pi_h=-9
         MD_ic_h=-9
@@ -141,6 +143,7 @@ subroutine simulate_model(a_policy,g_policy,lfc_x,beq100_policy, &
             nw_ic_it=0.0_sp
             fc_pi_h_it=0.0_sp
             fc_ic_h_it=0.0_sp
+            md_ic_h_it=0.0_sp
             do t_l=1,obs
                 if (h_i(i_l,t_l,1) /= -9) then
                     !Sample initial medical persistent shock to characterize the state variable
@@ -255,6 +258,12 @@ subroutine simulate_model(a_policy,g_policy,lfc_x,beq100_policy, &
                         fc_ic_h_it(f_l(1),h_i(i_l,t_l,2))=lfc_ic_h(f_l(1),h_i(i_l,t_l,2),counter_ic_h(f_l(1),h_i(i_l,t_l,2)))-data_lfc_IC(f_l(1),h_i(i_l,t_l,2))
                     end if
                     
+                    if (govmd(i_l,t_l)/=-9.0_sp .and. IC_q(i_l,t_l)/=-9) then
+                        counter_md_h(f_l(1),h_i(i_l,t_l,2))=counter_md_h(f_l(1),h_i(i_l,t_l,2))+1
+                        md_ic_h(f_l(1),h_i(i_l,t_l,2),counter_md_h(f_l(1),h_i(i_l,t_l,2)))=g_it(t_l)
+                        md_ic_h_it(f_l(1),h_i(i_l,t_l,2))=g_it(t_l)-data_govmd_IC(f_l(1),h_i(i_l,t_l,2))
+                    end if
+                    
                     if (h_i(i_l,t_l,2)==1) then
                         counter_ut(1,t_l)=counter_ut(1,t_l)+1
                         assets_ut(1,t_l,counter_ut(1,t_l))=a_it(t_l)
@@ -267,11 +276,11 @@ subroutine simulate_model(a_policy,g_policy,lfc_x,beq100_policy, &
                     a_it(t_l+1)=-9.0_sp
                 end if
                 moments_it(:,t_l,i_l)=(/reshape(assets_pi_age_group_it,(/L_PI*obs*groups,1/)),&
-                                        reshape(assets_pi_age_group_it_b,(/L_PI*obs*groups,1/)),&
                                         reshape(beq100_it,(/L_PI*f_t,1/)), &
                                         reshape(nw_ic_it,(/f_t*obs*groups,1/)), &
                                         reshape(fc_pi_h_it,(/L_PI*clusters,1/)), &
-                                        reshape(fc_ic_h_it,(/f_t*clusters,1/))/)
+                                        reshape(fc_ic_h_it,(/f_t*clusters,1/)), &
+                                        reshape(md_ic_h_it,(/f_t*clusters,1/))/)
             end do
         end do
         
@@ -281,11 +290,6 @@ subroutine simulate_model(a_policy,g_policy,lfc_x,beq100_policy, &
                 call compute_percentile(assets_pi_age_group(pi_l,t_l,g_l,1:counter_pi_age_group(pi_l,t_l,g_l)), &
                                     counter_pi_age_group(pi_l,t_l,g_l),50, & 
                                     med_assets_pi_age_group(pi_l,t_l,g_l,ns))
-            end if
-            if (counter_pi_age_group_b(pi_l,t_l,g_l)>1) then
-                call compute_percentile(assets_pi_age_group_b(pi_l,t_l,g_l,1:counter_pi_age_group_b(pi_l,t_l,g_l)), &
-                                    counter_pi_age_group_b(pi_l,t_l,g_l),50, & 
-                                    med_assets_pi_age_group_b(pi_l,t_l,g_l,ns))
             end if
         end do; end do; end do
         do pi_l=1,L_PI; do h_l=1,clusters
@@ -302,6 +306,9 @@ subroutine simulate_model(a_policy,g_policy,lfc_x,beq100_policy, &
         do f_l2=1,f_t; do h_l=1,clusters
             if (counter_ic_h(f_l2,h_l)>1) then
                 av_lfc_ic_h(f_l2,h_l,ns)=real(sum(lfc_ic_h(f_l2,h_l,1:counter_ic_h(f_l2,h_l))))/real(counter_ic_h(f_l2,h_l))
+            end if
+            if (counter_md_h(f_l2,h_l)>1) then
+                av_md_ic_h(f_l2,h_l,ns)=real(sum(md_ic_h(f_l2,h_l,1:counter_md_h(f_l2,h_l))))/real(counter_md_h(f_l2,h_l))
             end if
         end do; end do
         moments_s(:,ns)=sum(sum(moments_it,3),2)/real(indv)/real(obs)
@@ -327,7 +334,6 @@ subroutine simulate_model(a_policy,g_policy,lfc_x,beq100_policy, &
     end do
     close(9)
     moments_NW_PI1=sum(med_assets_pi_age_group,4)/real(samples_per_i)
-    moments_NW_PI1b=sum(med_assets_pi_age_group_b,4)/real(samples_per_i)
     moments_beq100_IC=sum(av_beq100_ic,3)/real(samples_per_i)
     print*,'moments_beq100_IC, f1',moments_beq100_IC(:,1)
     print*,'moments_beq100_IC, f2',moments_beq100_IC(:,2)
@@ -336,13 +342,14 @@ subroutine simulate_model(a_policy,g_policy,lfc_x,beq100_policy, &
     moments_lfc_IC=sum(av_lfc_ic_h,3)/real(samples_per_i)
     moments_lfc_IC(:,1)=-9.0_sp
     moments_NW_IC1=sum(assets_ic_ns,4)/real(samples_per_i)
+    moments_md_IC=sum(av_md_ic_h,3)/real(samples_per_i)
 
     model_moments1(:,1)=(/reshape(moments_NW_PI1,(/L_PI*obs*groups,1/)), &
-                          reshape(moments_NW_PI1b,(/L_PI*obs*groups,1/)), &
                           reshape(moments_beq100_IC,(/L_PI*f_t,1/)), &
                           reshape(moments_NW_IC1,(/f_t*obs*groups,1/)), &
                           reshape(moments_lfc_PI,(/L_PI*clusters,1/)), &
-                          reshape(moments_lfc_IC,(/f_t*clusters,1/))/)
+                          reshape(moments_lfc_IC,(/f_t*clusters,1/)), &
+                          reshape(moments_md_IC,(/f_t*clusters,1/)) /)
     
     model_NW_h_ut=sum(model_NW_h_ut_ns,3)/real(samples_per_i)
     

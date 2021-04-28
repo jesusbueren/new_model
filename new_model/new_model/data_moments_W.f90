@@ -15,24 +15,25 @@ subroutine data_moments_W()
     data_lfc_IC=-9.0_sp
     pdf_all_NW_PI=-9.0_sp
     data_NW_h_ut=-9.0_sp
+    data_govmd_IC=-9.0_sp
     
     call load_hrs_data()
     !Load input for simulation and compute vector of data moments
     print*,'main sample'
-    call charge_simulation_input_moments(data_NW_PI1,data_NW_PI, & !networth by PI  for cohorts obs in 1998
-                                         data_NW_PI1b,data_NW_PIb,& !networth by PI for cohorts after 1998
+    call charge_simulation_input_moments(data_NW_PI1,data_NW_PI, & !networth by PI  for cohorts
                                          data_beq100_IC,& ! pr of large beq by IC
                                          data_NW_IC1,data_NW_IC,& ! Networth by IC
                                          data_lfc_PI,& !Formal care by PI
                                          data_lfc_IC,& !Formal care by informal groups
+                                         data_govmd_IC,& !Medicaid recipiency rate by IC
                                          data_NW_h_ut) !NW by health
 
     data_moments1(:,1)=(/reshape(data_NW_PI1,(/L_PI*obs*groups,1/)),& 
-                         reshape(data_NW_PI1b,(/L_PI*obs*groups,1/)),& 
                          reshape(data_beq100_IC,(/L_PI*f_t,1/)), &
                          reshape(data_NW_IC1,(/f_t*obs*groups,1/)), &
                          reshape(data_lfc_PI,(/L_PI*clusters,1/)), &
-                         reshape(data_lfc_IC,(/f_t*clusters,1/))/)
+                         reshape(data_lfc_IC,(/f_t*clusters,1/)), &
+                         reshape(data_govmd_IC,(/f_t*clusters,1/))/)
 
     open(unit=9,file='data_moments1.txt')
         write(9,*) data_moments1
@@ -43,15 +44,14 @@ subroutine data_moments_W()
     close(9)
     
     !select moments to untarget
-    data_NW_PIb=-9.0_sp
     data_NW_IC=-9.0_sp
     
     data_moments(:,1)=(/reshape(data_NW_PI,(/L_PI*obs*groups,1/)),&
-                        reshape(data_NW_PIb,(/L_PI*obs*groups,1/)),&
                         reshape(data_beq100_IC,(/L_PI*f_t,1/)),&
                         reshape(data_NW_IC,(/f_t*obs*groups,1/)),&
                         reshape(data_lfc_PI,(/L_PI*clusters,1/)),&
-                        reshape(data_lfc_IC,(/f_t*clusters,1/))/)
+                        reshape(data_lfc_IC,(/f_t*clusters,1/)), &
+                         reshape(data_govmd_IC,(/f_t*clusters,1/))/)
     
 
     do i_l=1,moment_conditions

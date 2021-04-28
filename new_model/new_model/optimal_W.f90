@@ -5,14 +5,14 @@ subroutine optimal_W()
     !Loop variables
     integer::i_l,t_l,m_l,ind,real_moments,s_l,i_l2,f_l
     !Individual data from HRS variables
-    real(SP),dimension(indv,obs):: fc_h,NW,ic_h
-    integer,dimension(indv,obs):: IC_q,beq100
+    integer,dimension(indv,obs):: IC_q
+    real(SP),dimension(indv,obs):: fc_h,NW,ic_h,beq100,govmd
     !Random draw if computing uncertainty of data
     real(SP)::u
     !Moment variables variables
     real(SP),dimension(L_PI,clusters)::fc_pi_h_it
     real(SP),dimension(L_PI,f_t)::beq100_ic_it
-    real(SP),dimension(f_t,clusters)::fc_ic_h_it
+    real(SP),dimension(f_t,clusters)::fc_ic_h_it,md_ic_h_it
     real(SP),dimension(f_t,obs,groups)::nw_ic_it  
     real(SP),dimension(L_PI,obs,groups)::assets_pi_age_group_it,assets_pi_age_group_it_b
     real(SP),dimension(moment_conditions,obs)::moments_it
@@ -20,7 +20,7 @@ subroutine optimal_W()
     !Variance-covariance
     real(SP),dimension(moment_conditions,moment_conditions,samples_per_i)::Phi_s
     real(DP),dimension(moment_conditions,moment_conditions)::Phi_d
-    real(SP),dimension(5,obs,indv)::data_moments_HRS
+    real(SP),dimension(6,obs,indv)::data_moments_HRS
     !Charge individuals HRS data
     open(unit=9,file=fdir_inputs//'data_moments.txt')
         read(9,*) data_moments_HRS
@@ -30,6 +30,8 @@ subroutine optimal_W()
     NW=reshape(data_moments_HRS(3,:,:), (/indv, obs/), order = (/ 2, 1 /))
     NW=NW/1000.0_sp
     beq100=reshape(data_moments_HRS(4,:,:), (/indv, obs/), order = (/ 2, 1 /))
+    ic_h=reshape(data_moments_HRS(5,:,:), (/indv, obs/), order = (/ 2, 1 /))
+    govmd=reshape(data_moments_HRS(6,:,:), (/indv, obs/), order = (/ 2, 1 /))
     
     !Compute data moments from original data
     !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -55,6 +57,7 @@ subroutine optimal_W()
             nw_ic_it=0.0_sp
             fc_pi_h_it=0.0_sp
             fc_ic_h_it=0.0_sp
+            md_ic_h_it=0.0_sp
             do t_l=obs,1,-1; 
                 !Sample health status using Kim smoother
                 if (s_h_i(i_l,t_l,1)/=-9.0_sp) then
@@ -108,6 +111,9 @@ subroutine optimal_W()
                 if (fc_h(i_l,t_l)/=-9.0_sp .and. IC_q(i_l,t_l)/=-9 .and. ic_h(i_l,t_l)/=-9.0_sp) then
                     fc_ic_h_it(IC_q(i_l,t_l),h_i(i_l,t_l,1))=fc_h(i_l,t_l)-data_lfc_IC(IC_q(i_l,t_l),h_i(i_l,t_l,1))
                 end if
+                if (govmd(i_l,t_l)/=-9.0_sp .and. IC_q(i_l,t_l)/=-9) then
+                    md_ic_h_it(IC_q(i_l,t_l),h_i(i_l,t_l,1))=govmd(i_l,t_l)-data_govmd_IC(IC_q(i_l,t_l),h_i(i_l,t_l,1))
+                end if
                 if (NW(i_l,t_l)/=-9.0_sp ) then  !.and. (iwendy_i(i_l)==1998 .or. iwendy_i(i_l)==1999)
                     !By PIq
                     if (NW(i_l,t_l)<data_NW_PI1(PI_q_i(i_l),t_l,group_i(i_l))) then
@@ -115,21 +121,14 @@ subroutine optimal_W()
                     else
                         assets_pi_age_group_it(PI_q_i(i_l),t_l,group_i(i_l))=-0.5_sp
                     end if 
-                !elseif (NW(i_l,t_l)/=-9.0_sp) then
-                !    !By PIq
-                !    if (NW(i_l,t_l)<data_NW_PI1b(PI_q_i(i_l),t_l,group_i(i_l))) then
-                !        assets_pi_age_group_it_b(PI_q_i(i_l),t_l,group_i(i_l))=0.5_sp
-                !    else
-                !        assets_pi_age_group_it_b(PI_q_i(i_l),t_l,group_i(i_l))=-0.5_sp
-                !    end if 
                 end if
 
                 moments_it(:,t_l)=(/reshape(assets_pi_age_group_it,(/L_PI*obs*groups,1/)),&
-                                    reshape(assets_pi_age_group_it_b,(/L_PI*obs*groups,1/)),&
                                     reshape(beq100_ic_it,(/L_PI*f_t,1/)), &
                                     reshape(nw_ic_it,(/f_t*obs*groups,1/)), &
                                     reshape(fc_pi_h_it,(/L_PI*clusters,1/)), &
-                                    reshape(fc_ic_h_it,(/f_t*clusters,1/))/)
+                                    reshape(fc_ic_h_it,(/f_t*clusters,1/)), &
+                                    reshape(md_ic_h_it,(/f_t*clusters,1/))/)
             end do
             moments_i(:,i_l)=sum(moments_it,2)/real(obs)
             do m_l=1,moment_conditions
