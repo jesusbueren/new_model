@@ -38,8 +38,8 @@ subroutine get_moments(parameters,model_moments1)
     use dimensions;use nrtype; use simulation_input; use structural_p2; use optimization; use targets
     implicit none
     real(SP),dimension(parameters_to_est),intent(in)::parameters
-    integer,dimension(nkk,clusters,nzz,L_gender,L_PI2,f_t,generations)::a_policy,g_policy
-    real(SP),dimension(nkk,clusters,nzz,L_gender,L_PI2,f_t,generations)::beq100_policy
+    integer,dimension(nkk,clusters,nzz,L_gender,L_PI2,f_t,generations,nh_s)::a_policy,g_policy
+    real(SP),dimension(nkk,clusters,nzz,L_gender,L_PI2,f_t,generations,nh_s)::beq100_policy
     integer::i_l,h_l,z_l
     real(SP),dimension(nkk,clusters,f_t,L_PI2)::lfc_x
     real(SP),dimension(moment_conditions,1),intent(out)::model_moments1
@@ -49,7 +49,7 @@ subroutine get_moments(parameters,model_moments1)
     real(SP)::SMM,c,l_fc,mu_av
     real(SP),dimension(parameters_to_est)::parameters_n
     real(SP),dimension(f_t,2)::moments_IC_ut
-    real(SP),dimension(nkk,clusters,f_t,L_PI2)::u_x
+    real(SP),dimension(nkk,clusters,f_t,L_PI2,nh_s)::u_x
     character::pause_key
     
     !Transform real line into parameters
