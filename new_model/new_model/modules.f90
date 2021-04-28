@@ -38,7 +38,7 @@ use nrtype
     !g_t: gender type
     !PI_t: permanent income type                                                     
     integer,parameter::f_t=2,clusters=4,L_gender=2,L_PI=5,generations=21,nzz=3,variables=12,groups=4,parameters_to_est=11,obs=9, &
-                        wealth_q=3,L_PI2=10,min_obs=39
+                        wealth_q=3,L_PI2=10,min_obs=39,nh_s=2
     integer,parameter:: moment_conditions=L_PI*obs*groups+L_PI*f_t+f_t*obs*groups+L_PI*clusters+2*f_t*clusters
     integer,parameter::nkk=300,samples_per_i=300
 end module dimensions
@@ -73,7 +73,7 @@ module structural_p2
     real(SP),dimension(clusters):: kappa_h,delta_h,u_bar_no_f,x_bar
     real(SP),dimension(clusters,f_t)::u_bar
     real(SP),dimension(clusters-1)::alpha_mu
-    real(SP),dimension(clusters)::c_bar,l_bar
+    real(SP),dimension(clusters,nh_s)::c_bar,l_bar
     real(SP),dimension(f_t):: lambda,delta
     real(SP),dimension(clusters):: mu
     real(SP),dimension(moment_conditions,moment_conditions):: W_opt,Phi
@@ -87,12 +87,13 @@ module structural_p1
     real(SP),dimension(DIM,1)::med_coef
     real(SP)::rho,sigma2_ep,sigma2_ze
     real(SP),parameter::r=1.02_sp**2_sp-1.0_sp
-    real(SP)::p_fc=12.0_sp/1000.0_sp
+    real(SP),dimension(nh_s)::p_fc=(/12.0_sp/1000.0_sp,22.0_sp/)
     real(SP),parameter::p_or=12.0_sp/1000.0_sp
     real(SP),dimension(L_PI2,L_gender)::b
     real(SP),dimension(f_t,clusters)::l_ic,l_ic_or
     real(SP),dimension(generations,L_gender,L_PI2,clusters,nzz,nzz)::m_exp_all,m_exp_all_or
     real(SP),dimension(clusters+1,clusters+1,generations,L_PI2,L_gender)::H_av
+    real(SP),dimension(2,2)::Pr_nh=(/1.0_sp,0.0_sp,0.0_sp,1.0_sp/)
     real(SP)::load_ltci=0.32_sp,benefit_LTCI=5.0_sp !hours of care per day provided by insurance
     real(SP),dimension(L_PI,2,clusters)::price_ltci
     

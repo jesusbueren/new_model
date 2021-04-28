@@ -2,13 +2,13 @@ subroutine simulate_model(a_policy,g_policy,lfc_x,beq100_policy, &
                           model_moments1,model_moments)
     use dimensions;use grids; use nrtype; use simulation_input; use structural_p1; use pdfs; use structural_p2;use targets; use HRS_data
     implicit none
-    real(SP),dimension(nkk,clusters,nzz,L_gender,L_PI2,f_t,generations),intent(in)::beq100_policy
-    integer,dimension(nkk,clusters,nzz,L_gender,L_PI2,f_t,generations),intent(in)::a_policy,g_policy
-    real(SP),dimension(nkk,clusters,f_t,L_PI2),intent(in)::lfc_x
+    real(SP),dimension(nkk,clusters,nzz,L_gender,L_PI2,f_t,generations,nh_s),intent(in)::beq100_policy
+    integer,dimension(nkk,clusters,nzz,L_gender,L_PI2,f_t,generations,nh_s),intent(in)::a_policy,g_policy
+    real(SP),dimension(nkk,clusters,f_t,L_PI2,nh_s),intent(in)::lfc_x
     real(SP),dimension(moment_conditions,1),intent(out)::model_moments1,model_moments
     real(SP),dimension(2,obs)::model_NW_h_ut
     !Loop variables
-    integer::i_l,t_l,pos_x,xi_l,xi_l2,ts_l2,ind,k2_l,ns,g_l,pi_l,ic_l,h_l,f_l2,nwq_l,s_l,it,f_ll
+    integer::i_l,t_l,pos_x,xi_l,xi_l2,ts_l2,ind,k2_l,ns,g_l,pi_l,ic_l,h_l,f_l2,nwq_l,s_l,it,f_ll,nh_l
     integer,dimension(2)::f_l
     !Counter variables
     integer,dimension(L_PI,obs,groups)::counter_pi_age_group,counter_pi_age_group_b
@@ -61,6 +61,9 @@ subroutine simulate_model(a_policy,g_policy,lfc_x,beq100_policy, &
     real(SP),dimension(L_PI)::gvt_pi
     !Set the seed
     call random_seed(PUT=seed) 
+    
+    nh_l=1
+    
     !Initialize value for moments
     moments_s=0.0_sp
     med_assets_pi_age_group=-9.0_sp
@@ -203,12 +206,12 @@ subroutine simulate_model(a_policy,g_policy,lfc_x,beq100_policy, &
                     !Draw on the discrete choice
                     call RANDOM_NUMBER(u)
 
-                    if (u<g_policy(pos_x,h_i(i_l,t_l,1),xi_l,gender_i(i_l),PI_q_i2(i_l),f_l(1),generation_i(i_l)+t_l-1)) then
+                    if (u<g_policy(pos_x,h_i(i_l,t_l,1),xi_l,gender_i(i_l),PI_q_i2(i_l),f_l(1),generation_i(i_l)+t_l-1,nh_l)) then
                         g_it(t_l)=1.0_sp
                         k2_l=1
                     else
                         g_it(t_l)=0.0_sp
-                        k2_l=a_policy(pos_x,h_i(i_l,t_l,1),xi_l,gender_i(i_l),PI_q_i2(i_l),f_l(1),generation_i(i_l)+t_l-1)
+                        k2_l=a_policy(pos_x,h_i(i_l,t_l,1),xi_l,gender_i(i_l),PI_q_i2(i_l),f_l(1),generation_i(i_l)+t_l-1,nh_l)
                     end if
                     if (t_l<obs) then
                         a_it(t_l+1)=coh_grid(k2_l)
@@ -221,7 +224,7 @@ subroutine simulate_model(a_policy,g_policy,lfc_x,beq100_policy, &
                     counter_ic(f_l(2))=counter_ic(f_l(2))+1
                     if (beq100(i_l,t_l)/=-9.0_sp) then
                         counter_beq100(PI_q_i(i_l),f_l(2))=counter_beq100(PI_q_i(i_l),f_l(2))+1
-                        beq100_ic(PI_q_i(i_l),f_l(2),counter_beq100(PI_q_i(i_l),f_l(2)))=beq100_policy(pos_x,h_i(i_l,t_l,1),xi_l,gender_i(i_l),PI_q_i2(i_l),f_l(1),generation_i(i_l)+t_l-1)
+                        beq100_ic(PI_q_i(i_l),f_l(2),counter_beq100(PI_q_i(i_l),f_l(2)))=beq100_policy(pos_x,h_i(i_l,t_l,1),xi_l,gender_i(i_l),PI_q_i2(i_l),f_l(1),generation_i(i_l)+t_l-1,nh_l)
                         beq100_it(PI_q_i(i_l),f_l(2))=beq100_ic(PI_q_i(i_l),f_l(2),counter_beq100(PI_q_i(i_l),f_l(2)))-data_beq100_IC(PI_q_i(i_l),f_l(2))
                     end if
                     

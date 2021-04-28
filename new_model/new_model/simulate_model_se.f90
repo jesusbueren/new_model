@@ -2,12 +2,12 @@ subroutine simulate_model_se(a_policy,g_policy,lfc_x,beq100_policy, &
                              model_moments,densities)
     use dimensions;use grids; use nrtype; use simulation_input; use structural_p1; use pdfs; use structural_p2;use targets; use HRS_data
     implicit none
-    integer,dimension(nkk,clusters,nzz,L_gender,L_PI2,f_t,generations),intent(in)::a_policy,g_policy
-    real(SP),dimension(nkk,clusters,nzz,L_gender,L_PI2,f_t,generations),intent(in)::beq100_policy
-    real(SP),dimension(nkk,clusters,f_t,L_PI2),intent(in)::lfc_x
+    integer,dimension(nkk,clusters,nzz,L_gender,L_PI2,f_t,generations,nh_s),intent(in)::a_policy,g_policy
+    real(SP),dimension(nkk,clusters,nzz,L_gender,L_PI2,f_t,generation,nh_ss),intent(in)::beq100_policy
+    real(SP),dimension(nkk,clusters,f_t,L_PI2,nh_s),intent(in)::lfc_x
     real(SP),dimension(moment_conditions,1),intent(out)::densities,model_moments
     !Loop variables
-    integer::i_l,t_l,pos_x,xi_l,xi_l2,ts_l2,ind,k2_l,ns,g_l,pi_l,ic_l,h_l,f_l2,nwq_l,s_l,it,f_ll
+    integer::i_l,t_l,pos_x,xi_l,xi_l2,ts_l2,ind,k2_l,ns,g_l,pi_l,ic_l,h_l,f_l2,nwq_l,s_l,it,f_ll,nh_l
     integer,dimension(2)::f_l
     !Counter variables
     integer,dimension(L_PI,obs,groups)::counter_pi_age_group,counter_pi_age_group_b
@@ -46,6 +46,7 @@ subroutine simulate_model_se(a_policy,g_policy,lfc_x,beq100_policy, &
     !Set the seed
     call random_seed(PUT=seed) 
     
+    nh_l=1
     !Initialize value for moments
     moments_s=0.0_sp
     med_assets_pi_age_group=-9.0_sp
@@ -183,12 +184,12 @@ subroutine simulate_model_se(a_policy,g_policy,lfc_x,beq100_policy, &
                     pos_x=int(max(min(x_it(t_l),coh_grid(nkk)),0.0_sp)/(coh_grid(2)-coh_grid(1))+1.00000001_sp)
                     !Draw on the discrete choice
                     call RANDOM_NUMBER(u)
-                    if (u<g_policy(pos_x,h_i(i_l,t_l,1),xi_l,gender_i(i_l),PI_q_i2(i_l),f_l(1),generation_i(i_l)+t_l-1)) then
+                    if (u<g_policy(pos_x,h_i(i_l,t_l,1),xi_l,gender_i(i_l),PI_q_i2(i_l),f_l(1),generation_i(i_l)+t_l-1,nh_l)) then
                         g_it(t_l)=1
                         k2_l=1
                     else
                         g_it(t_l)=0
-                        k2_l=a_policy(pos_x,h_i(i_l,t_l,1),xi_l,gender_i(i_l),PI_q_i2(i_l),f_l(1),generation_i(i_l)+t_l-1)
+                        k2_l=a_policy(pos_x,h_i(i_l,t_l,1),xi_l,gender_i(i_l),PI_q_i2(i_l),f_l(1),generation_i(i_l)+t_l-1,nh_l)
                     end if
                     if (t_l<obs) then
                         a_it(t_l+1)=coh_grid(k2_l)
@@ -199,8 +200,8 @@ subroutine simulate_model_se(a_policy,g_policy,lfc_x,beq100_policy, &
                     counter_pi_h(PI_q_i(i_l),h_i(i_l,t_l,2))=counter_pi_h(PI_q_i(i_l),h_i(i_l,t_l,2))+1
                 
                     if (g_it(t_l)==0) then
-                        lfc_pi_h(PI_q_i(i_l),h_i(i_l,t_l,2),counter_pi_h(PI_q_i(i_l),h_i(i_l,t_l,2)))=lfc_x(pos_x-k2_l+1,h_i(i_l,t_l,1),f_l(1),PI_q_i2(i_l))/2.0_sp/365.0_sp
-                        lfc_ic_h(f_l(1),h_i(i_l,t_l,2),counter_ic_h(f_l(1),h_i(i_l,t_l,2)))=          lfc_x(pos_x-k2_l+1,h_i(i_l,t_l,1),f_l(1),PI_q_i2(i_l))/2.0_sp/365.0_sp
+                        lfc_pi_h(PI_q_i(i_l),h_i(i_l,t_l,2),counter_pi_h(PI_q_i(i_l),h_i(i_l,t_l,2)))=lfc_x(pos_x-k2_l+1,h_i(i_l,t_l,1),f_l(1),PI_q_i2(i_l),nh_l)/2.0_sp/365.0_sp
+                        lfc_ic_h(f_l(1),h_i(i_l,t_l,2),counter_ic_h(f_l(1),h_i(i_l,t_l,2)))=          lfc_x(pos_x-k2_l+1,h_i(i_l,t_l,1),f_l(1),PI_q_i2(i_l),nh_l)/2.0_sp/365.0_sp
                     else
                         lfc_pi_h(PI_q_i(i_l),h_i(i_l,t_l,2),counter_pi_h(PI_q_i(i_l),h_i(i_l,t_l,2)))=l_bar(h_i(i_l,t_l,1))/2.0_sp/365.0_sp
                         lfc_ic_h(f_l(1),h_i(i_l,t_l,2),counter_ic_h(f_l(1),h_i(i_l,t_l,2)))=          l_bar(h_i(i_l,t_l,1))/2.0_sp/365.0_sp
@@ -235,7 +236,7 @@ subroutine simulate_model_se(a_policy,g_policy,lfc_x,beq100_policy, &
                     if (govmd(i_l,t_l)/=-9.0_sp .and. IC_q(i_l,t_l)/=-9) then
                         md_ic_h_it(f_l(1),h_i(i_l,t_l,2))=g_it(t_l)-data_govmd_IC(f_l(1),h_i(i_l,t_l,2))
                     end if
-                    beq100_it(PI_q_i(i_l),f_l(2))=beq100_policy(pos_x,h_i(i_l,t_l,1),xi_l,gender_i(i_l),PI_q_i2(i_l),f_l(1),generation_i(i_l)+t_l-1)-data_beq100_IC(PI_q_i(i_l),f_l(2))
+                    beq100_it(PI_q_i(i_l),f_l(2))=beq100_policy(pos_x,h_i(i_l,t_l,1),xi_l,gender_i(i_l),PI_q_i2(i_l),f_l(1),generation_i(i_l)+t_l-1,nh_l)-data_beq100_IC(PI_q_i(i_l),f_l(2))
                 else 
                     x_it(t_l+1)=-9.0_sp
                     a_it(t_l+1)=-9.0_sp
