@@ -88,5 +88,6 @@ subroutine get_moments(parameters,model_moments1)
                                     model_moments_new(1:real_moments,1:1))
     
     print*,'objective fct: ',obj_fct
+    print*,'moment conditions', real_moments
 
 end subroutine
