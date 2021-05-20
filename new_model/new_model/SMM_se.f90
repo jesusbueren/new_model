@@ -35,7 +35,7 @@ subroutine SMM_se(parameters,moments,densities)
     u_bar_no_f=u_bar_no_f(1)
     
     print*,beta,sigma,nu,delta(1),x_bar(1), &
-           lambda,alpha_mu,omega
+           lambda,alpha_mu,share_p,subs_p
     
     mu=0.0_sp
     do h_l=2,clusters

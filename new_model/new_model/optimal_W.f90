@@ -20,7 +20,7 @@ subroutine optimal_W()
     !Variance-covariance
     real(SP),dimension(moment_conditions,moment_conditions,samples_per_i)::Phi_s
     real(DP),dimension(moment_conditions,moment_conditions)::Phi_d
-    real(SP),dimension(6,obs,indv)::data_moments_HRS
+    real(SP),dimension(7,obs,indv)::data_moments_HRS
     !Charge individuals HRS data
     open(unit=9,file=fdir_inputs//'data_moments.txt')
         read(9,*) data_moments_HRS

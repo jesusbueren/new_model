@@ -188,48 +188,53 @@ FS=11
     h_l=1
     figure(h_l+3)
     set(h_l+3,'position',[600    500    650    400*0.75])
-    g=subplot(1,2,1)
-    % Mine healthy & Ameriks et al. (WP) & Lockwood (WP)
+    g=subplot(1,3,1)
+    % Ameriks et al. (WP) & Lockwood (WP)
     IC_l=1
-    p1=plot(x_grid(1:end),squeeze(beq(1,h_l,1,1:end))./x_grid(1:end)','Color',colors{1},'LineWidth',width{3},'LineStyle',pattern2{1})
+    p3=plot(x_grid(1:end),squeeze(beq(4,h_l,IC_l,1:end))./x_grid(1:end)','Color',colors{1},'LineWidth',width{3},'LineStyle',pattern2{1})
     hold on
-    p2=scatter(x_grid(1:30:end),squeeze(beq(1,h_l,2,1:30:end))./x_grid(1:30:end)','filled','d','MarkerEdgeColor',colors{1},'MarkerFaceColor',colors{1})
-    p3=plot(x_grid(1:end),squeeze(beq(4,h_l,IC_l,1:end))./x_grid(1:end)','Color',colors{1},'LineWidth',width{3},'LineStyle',pattern2{4})
-    p4=plot(x_grid(1:end),squeeze(beq(3,h_l,IC_l,1:end))./x_grid(1:end)','-o','Color',colors{1},'LineWidth',width{3},'LineStyle',pattern2{1},'MarkerIndices',1:50:N_x)
-%     p4=plot(x_grid(1:end),squeeze(beq(3,2,IC_l,1:end))./x_grid(1:end)',':','Color',colors{1},'LineWidth',width{3},'LineStyle',pattern2{1},'MarkerIndices',1:50:N_x)
-    
+    p4=scatter(x_grid(1:30:end),squeeze(beq(3,h_l,IC_l,1:30:end))./x_grid(1:30:end)','filled','d','MarkerEdgeColor',colors{1},'MarkerFaceColor',colors{1})
+    p5=plot(x_grid(1:30:end),squeeze(beq(3,2,IC_l,1:30:end))./x_grid(1:30:end)','Color',colors{1},'LineWidth',width{3},'LineStyle',pattern2{2},'MarkerIndices',1:50:N_x)
     ylim([-0.03 1.38])
     xlim([0 a_max])
-    I=legend([p1,p2,p3,p4],'Healthy, Distant Family','Healthy, Close Family','Lockwood','SSQ, Healthy','location','NorthWest');
+    I=legend([p3,p4,p5],'Lockwood','SSQ, Healthy','SSQ, LTC','location','NorthWest');
     legend('boxoff');
     set(I,'FontName','Times New Roman','FontSize',FS);
     ylabel('Bequest Allocation','FontSize',FS)
     xlabel('Wealth')
     set(gca,'FontName','Times New Roman','FontSize',FS);
-%     newPosition = [0.13 0.87 0.2 0.2];
-%     newUnits = 'normalized';
-%     set(I,'Position', newPosition,'Units', newUnits);
-    g=subplot(1,2,2)
-    % My model
-    p1=plot(x_grid(1:10:end),squeeze(beq(1,4,1,1:10:end))./x_grid(1:10:end)','Color',colors{1},'LineWidth',width{3},'LineStyle',pattern2{1})
+    title('Previous Studies')
+    % Distant families
+    g=subplot(1,3,2)
+    IC_l=1
+    p1=plot(x_grid(1:end),squeeze(beq(1,1,1,1:end))./x_grid(1:end)','Color',colors{1},'LineWidth',width{3},'LineStyle',pattern2{1})
     hold on
-    p2=scatter(x_grid(1:30:end),squeeze(beq(1,4,2,1:30:end))./x_grid(1:30:end)','filled','d','MarkerEdgeColor',colors{1},'MarkerFaceColor',colors{1})
-    p3=plot(x_grid(1:end),squeeze(beq(3,2,IC_l,1:end))./x_grid(1:end)','-o','Color',colors{1},'LineWidth',width{3},'LineStyle',pattern2{1},'MarkerIndices',1:50:N_x)
-%     plot(100,0.0,'ro')
-%     plot(150,0.0,'ro')
-%     plot(200,0.5,'ro')
+    p2=scatter(x_grid(1:30:end),squeeze(beq(1,4,1,1:30:end))./x_grid(1:30:end)','filled','d','MarkerEdgeColor',colors{1},'MarkerFaceColor',colors{1})
     ylim([-0.03 1.38])
     xlim([0 a_max])
-    I=legend([p1,p2,p3],'Impaired, Distant Family','Impaired, Close Family','SSQ, LTC','location','NorthWest');
+    I=legend([p1,p2],'Healthy','Impaired','location','NorthWest');
     legend('boxoff');
     set(I,'FontName','Times New Roman','FontSize',FS);
-%     newPosition = [0.63 0.87 0.2 0.2];
-%     newUnits = 'normalized';
-%     set(I,'Position', newPosition,'Units', newUnits);
+%     ylabel('Bequest Allocation','FontSize',FS)
     xlabel('Wealth')
-    set(gcf,'color','w')
+    title('Distant Family')
     set(gca,'FontName','Times New Roman','FontSize',FS);
-
+    % Close families
+    g=subplot(1,3,3)
+    IC_l=1
+    p1=plot(x_grid(1:end),squeeze(beq(1,1,2,1:end))./x_grid(1:end)','Color',colors{1},'LineWidth',width{3},'LineStyle',pattern2{1})
+    hold on
+    p2=scatter(x_grid(1:30:end),squeeze(beq(1,4,2,1:30:end))./x_grid(1:30:end)','filled','d','MarkerEdgeColor',colors{1},'MarkerFaceColor',colors{1})
+    ylim([-0.03 1.38])
+    xlim([0 a_max])
+    I=legend([p1,p2],'Healthy','Impaired','location','NorthWest');
+    legend('boxoff');
+    set(I,'FontName','Times New Roman','FontSize',FS);
+%     ylabel('Bequest Allocation','FontSize',FS)
+    xlabel('Wealth')
+    set(gca,'FontName','Times New Roman','FontSize',FS);
+    set(gcf,'color','w')
+    title('Close Family')
     print(gcf,'-depsc', 'C:\Users\jbueren\Google Drive\JMP\Draft\figures\spending_death_others_gh.eps')
     print(gcf,'-depsc', 'C:\Users\jbueren\Google Drive\JMP\Slides\figures\spending_death_others_gh.eps')
 
@@ -240,7 +245,7 @@ FS=11
 
 m_l=1
 
-cts=20000; %cash to spend
+cts=100; %cash to spend
 for h_l=1:4
     c_max=cts;
 if mu(h_l,m_l)==0 

@@ -60,6 +60,24 @@ data_md_IC=reshape(data_md_IC,f_t,groups)
 model_md_IC=model_moments(waves*groups*PI_l+f_t*PI_l+f_t*waves*groups+groups*PI_l+groups*f_t+1:waves*groups*PI_l+f_t*PI_l+f_t*waves*groups+groups*PI_l+groups*f_t+clusters*f_t);
 model_md_IC=reshape(model_md_IC,f_t,groups)
 
+%Untargeted moments
+fileID = fopen('data_moments_ut.txt');
+data_moments_ut=textscan(fileID,'%f');
+fclose(fileID);
+data_moments_ut=data_moments_ut{1};
+data_moments_ut=standardizeMissing(data_moments_ut,-9);
+data_moments_ut(data_moments_ut<0) = 0;
+data_moments_ut=reshape(data_moments_ut,f_t,waves,groups)
+
+fileID = fopen('moments_NW_IC1.txt');
+model_moments_ut=textscan(fileID,'%f');
+fclose(fileID);
+model_moments_ut=model_moments_ut{1};
+model_moments_ut(isnan(data_moments_ut)) = -9
+model_moments_ut=standardizeMissing(model_moments_ut,-9);
+model_moments_ut(model_moments_ut<0) = 0;
+model_moments_ut=reshape(model_moments_ut,f_t,waves,groups)
+
 
 colors = {[0   0.4470    0.7410]  [0.9290    0.6940    0.1250] [0.4660    0.6740    0.1880] [0.8500    0.3250    0.0980] [0.6350, 0.0780, 0.1840]};
 pattern = {'none' 'o' 's' '^' '+'};
@@ -69,8 +87,8 @@ waves2=7
 % Graph by PI
 
 final_f=figure(3)
-set(3,'position',[50    20    500    750])
-h1=subplot(3,1,1)
+set(3,'position',[50    20    700    500])
+h1=subplot(2,1,1)
 for m=1:2
 for c=1:groups
 for p=1:PI_l
@@ -125,63 +143,60 @@ set(I1,'Position', newPosition,'Units', newUnits);
 hold off
 set(gca,'FontName','Times New Roman','Fontsize',FS);
 
-h2=subplot(3,1,2)
+subplot(2,1,2)
+j=1
 for m=1:2
-for p=2:clusters
+for c=1:groups
+for p=1:f_t
     if m==1
-        scatter(1:PI_l,data_hr_PI(:,p),pattern{p},'MarkerEdgeColor',colors{p},'MarkerFaceColor',colors{p})                
+        if p>1
+            scatter(1+(waves2+1)*(c-1):waves2+(waves2+1)*(c-1),data_moments_ut(p,1:1:waves2,c,j),pattern{p},'MarkerEdgeColor',colors{p},'MarkerFaceColor',colors{p})
+        end
+        plot(1+(waves2+1)*(c-1):waves2+(waves2+1)*(c-1),data_moments_ut(p,1:1:waves2,c,j),'Color',colors{p},'LineWidth',width{p})        
     else
-        plot(1:PI_l,data_hr_PI(:,p),'Color',colors{p},'LineWidth',width{p})
-        plot(1:PI_l,model_hr_PI(:,p),':','Color',colors{p},'LineWidth',width{p})
+        plot(1+(waves2+1)*(c-1):waves2+(waves2+1)*(c-1),model_moments_ut(p,1:1:waves2,c,j),':','Color',colors{p},'LineWidth',width{p})
     end
      hold on  
 end
 end
-xticks([1:1:5])
-xticklabels({'Bottom','Second','Third','Fourth','Top'})
-ylim([0 9])
-xlim([0.8 5.2])
-I2=legend('Physically Frail','Mentally Frail','Impaired','orientation','horizontal');
-legend('boxoff')
-I2.FontSize=FS;
-newPosition = [0.4 0.55 0.2 0.2];
-newUnits = 'normalized';
-set(I2,'Position', newPosition,'Units', newUnits);
-hold off
-set(gca,'FontName','Times New Roman','Fontsize',FS);
-xlabel('Permanent Income Quintile','FontSize',FS)
-ylabel('Formal Care Hours per Day','FontSize',FS)
+end
+c=1;
+p=1;
+p1=plot(1+waves2*(c-1):waves2+(waves2)*(c-1),data_moments_ut(p,1:1:waves2,c,j),'Color',colors{p},'LineWidth',width{p});
+p=2;
+p2=scatter(1+waves2*(c-1):waves2+(waves2)*(c-1),data_moments_ut(p,1:1:waves2,c,j),pattern{p},'MarkerEdgeColor',colors{p},'MarkerFaceColor',colors{p});
 
-h3=subplot(3,1,3)
-for m=1:2
-for p=2:clusters
-    if m==1
-        scatter(1:f_t,data_hr_IC(:,p),pattern{p},'MarkerEdgeColor',colors{p},'MarkerFaceColor',colors{p})                
-    else
-        plot(1:f_t,data_hr_IC(:,p),'Color',colors{p},'LineWidth',width{p})
-        plot(1:f_t,model_hr_IC(:,p),':','Color',colors{p},'LineWidth',width{p})
-    end
-     hold on  
-end
-end
-xticks([1:1:2])
-xticklabels({'Distant','Close'})
-ylim([0 9])
-xlim([0.8 2.2])
-I3=legend('Physically Frail','Mentally Frail','Impaired','orientation','horizontal');
+
+set(gcf,'color','w')
+xlabel('Age','FontSize',FS)
+ylabel('Assets (000s of 2018 dollars)','FontSize',FS)
+ylim([-9,ylim_pi])
+xticks([1:2:32])
+xticklabels({'72','76','80','84',...
+             '76','80','84','88',...
+             '82','86','90','94',...
+             '86','90','94','98'})
+xlim([0 32])
+alpha=0.6;
+line([8 8], [-9 ylim_pi], 'Color', [alpha alpha alpha]);
+line([16 16], [-9 ylim_pi], 'Color', [alpha alpha alpha]);
+line([24 24], [-9 ylim_pi], 'Color', [alpha alpha alpha]);
+text(2.4,ylim_pi-50,'Group 1','FontName','Times New Roman','Fontsize',FS)
+text(10.4,ylim_pi-50,'Group 2','FontName','Times New Roman','Fontsize',FS)
+text(18.4,ylim_pi-50,'Group 3','FontName','Times New Roman','Fontsize',FS)
+text(26.4,ylim_pi-50,'Group 4','FontName','Times New Roman','Fontsize',FS)
+I1=legend([p1 p2],'Distant','Close','orientation','horizontal');
 legend('boxoff')
-I3.FontSize=FS;
-newPosition = [0.4 0.25 0.2 0.2];
+I1.FontSize=FS;
+newPosition = [0.4 0.37 0.2 0.2];
 newUnits = 'normalized';
-set(I3,'Position', newPosition,'Units', newUnits);
+set(I1,'Position', newPosition,'Units', newUnits);
 hold off
 set(gca,'FontName','Times New Roman','Fontsize',FS);
-xlabel('Family Type','FontSize',FS)
-ylabel('Formal Care Hours per Day','FontSize',FS)
 print(gcf,'-depsc', 'C:\Users\jbueren\Google Drive\JMP\Draft\figures\model_fit1.eps')
 
-figure(5)
-set(5,'position',[450    400    700    500])
+figure(4)
+set(4,'position',[450    400    700    500])
 clrs = [0 0 0; 0.9 0.9 0.9 ];
 for m=1:2
     subplot(2,2,m)
@@ -233,146 +248,24 @@ else
 end
 set(gca,'FontName','Times New Roman','Fontsize',FS);
 set(gcf,'color','w')
-ylim([0 60])
+ylim([0 80])
 xticks([1 2 3 4])
 xticklabels({'Healthy','Physical','Mental','Impaired'})
-ylabel('Pr. of being in Medicaid (%)','FontSize',FS)
+ylabel('Fraction in Medicaid (%)','FontSize',FS)
 xlabel('LTC need','FontSize',FS)
 end
 print(gcf,'-depsc', 'C:\Users\jbueren\Google Drive\JMP\Draft\figures\model_fit2.eps')
 
-
-%% Untargetted moments
-
-fileID = fopen('data_moments_ut.txt');
-data_moments_ut=textscan(fileID,'%f');
-fclose(fileID);
-data_moments_ut=data_moments_ut{1};
-data_moments_ut=standardizeMissing(data_moments_ut,-9);
-data_moments_ut(data_moments_ut<0) = 0;
-data_moments_ut=reshape(data_moments_ut,f_t,waves,groups)
-
-fileID = fopen('moments_NW_IC1.txt');
-model_moments_ut=textscan(fileID,'%f');
-fclose(fileID);
-model_moments_ut=model_moments_ut{1};
-model_moments_ut(isnan(data_moments_ut)) = -9
-model_moments_ut=standardizeMissing(model_moments_ut,-9);
-model_moments_ut(model_moments_ut<0) = 0;
-model_moments_ut=reshape(model_moments_ut,f_t,waves,groups)
-
-final_f=figure(5)
-set(5,'position',[50    20    500    750/3])
-j=1
-for m=1:2
-for c=1:groups
-for p=1:f_t
-    if m==1
-        if p>1
-            scatter(1+(waves2+1)*(c-1):waves2+(waves2+1)*(c-1),data_moments_ut(p,1:1:waves2,c,j),pattern{p},'MarkerEdgeColor',colors{p},'MarkerFaceColor',colors{p})
-        end
-        plot(1+(waves2+1)*(c-1):waves2+(waves2+1)*(c-1),data_moments_ut(p,1:1:waves2,c,j),'Color',colors{p},'LineWidth',width{p})        
-    else
-        plot(1+(waves2+1)*(c-1):waves2+(waves2+1)*(c-1),model_moments_ut(p,1:1:waves2,c,j),':','Color',colors{p},'LineWidth',width{p})
-    end
-     hold on  
-end
-end
-end
-c=1;
-p=1;
-p1=plot(1+waves2*(c-1):waves2+(waves2)*(c-1),data_moments_ut(p,1:1:waves2,c,j),'Color',colors{p},'LineWidth',width{p});
-p=2;
-p2=scatter(1+waves2*(c-1):waves2+(waves2)*(c-1),data_moments_ut(p,1:1:waves2,c,j),pattern{p},'MarkerEdgeColor',colors{p},'MarkerFaceColor',colors{p});
+%Table hours matched by PI
+          [data_hr_PI([1 3 5],2)';model_hr_PI([1 3 5],2)'; ...
+           data_hr_PI([1 3 5],3)';model_hr_PI([1 3 5],3)'; ...
+           data_hr_PI([1 3 5],4)';model_hr_PI([1 3 5],4)']
+%Table hours matched by PI       
+        [data_hr_IC(:,2)';model_hr_IC(:,2)'; ...
+           data_hr_IC(:,3)';model_hr_IC(:,3)'; ...
+           data_hr_IC(:,4)';model_hr_IC(:,4)']
 
 
-set(gcf,'color','w')
-xlabel('Age','FontSize',FS)
-ylabel('Assets (000s of 2018 dollars)','FontSize',FS)
-ylim([-9,ylim_pi])
-xticks([1:2:32])
-xticklabels({'72','76','80','84',...
-             '76','80','84','88',...
-             '82','86','90','94',...
-             '86','90','94','98'})
-xlim([0 32])
-alpha=0.6;
-line([8 8], [-9 ylim_pi], 'Color', [alpha alpha alpha]);
-line([16 16], [-9 ylim_pi], 'Color', [alpha alpha alpha]);
-line([24 24], [-9 ylim_pi], 'Color', [alpha alpha alpha]);
-text(2.4,ylim_pi-50,'Group 1','FontName','Times New Roman','Fontsize',FS)
-text(10.4,ylim_pi-50,'Group 2','FontName','Times New Roman','Fontsize',FS)
-text(18.4,ylim_pi-50,'Group 3','FontName','Times New Roman','Fontsize',FS)
-text(26.4,ylim_pi-50,'Group 4','FontName','Times New Roman','Fontsize',FS)
-I1=legend([p1 p2],'Distant','Close','orientation','horizontal');
-legend('boxoff')
-I1.FontSize=FS;
-newPosition = [0.4 0.87 0.2 0.2];
-newUnits = 'normalized';
-set(I1,'Position', newPosition,'Units', newUnits);
-hold off
-set(gca,'FontName','Times New Roman','Fontsize',FS);
-
-print(gcf,'-depsc', 'C:\Users\jbueren\Google Drive\JMP\Draft\figures\model_fit_ut.eps')
-
-
-%% Counterfactuals along wealth distribution
-clear all
-generations=21
-FS=11;
-colors = {[0   0.4470    0.7410] [0.4940    0.1840    0.5560]   [0.9290    0.6940    0.1250]  [0.8500    0.3250    0.0980] [0.3010, 0.7450, 0.9330]};
-pattern = {'none' 'o' 's' '^'};
-width={3 1.5 3.5 1.5 2};
-ldash = {'-' '--' ':'  '*'};
-
-figure(6)
-set(6,'position',[50    100    600    250])    
-for i=1:2
-cd('C:\Users\jbueren\Google Drive\JMP\Code\Structural Model\new_model\new_model\new_model');
-fileID = fopen('benchmark.txt');
-benchmark=textscan(fileID,'%f  %f %f %f %f %f ');
-fclose(fileID);
-benchmark=benchmark{i};
-counterfactual(:,1,:)=benchmark(:,1);
-
-fileID = fopen('noLTC.txt');
-noLTC=textscan(fileID,'%f   %f %f %f %f %f ');
-fclose(fileID);
-noLTC=noLTC{i};
-counterfactual(:,2,:)=noLTC;
-
-fileID = fopen('noBeq.txt');
-noBeq=textscan(fileID,'%f   %f %f %f %f %f');
-fclose(fileID);
-noBeq=noBeq{i};
-counterfactual(:,3,:)=noBeq;
-
-fileID = fopen('noMed.txt');
-noMed=textscan(fileID,'%f  %f %f %f %f %f');
-fclose(fileID);
-noMed=noMed{i};
-counterfactual(:,4,:)=noMed;
-
-for c=1:4
-    plot(70:2:100,counterfactual(1:16,c),ldash{c},'Color',colors{c},'LineWidth',width{c})        
-    hold on  
-end
-set(gcf,'color','w')
-xlabel('Age','FontSize',FS)
-ylabel('Assets (000s of 2018 dollars)','FontSize',FS)
- ylim([-9,500])
-%  if i==2
-    I=legend('Benchmark','No long-term care','No bequest','No medical expenses','orientation','horizontal');
-    legend('boxoff')
-    I.FontSize=FS;
-    newPosition = [0.4 0.88 0.2 0.2];
-    newUnits = 'normalized';
-    set(I,'Position', newPosition,'Units', newUnits);
-%  end 
-set(gca,'FontName','Times New Roman','Fontsize',FS);
-end
-print(gcf,'-depsc', 'C:\Users\jbueren\Google Drive\JMP\Draft\figures\counterfactuals.eps')
-print(gcf,'-depsc', 'C:\Users\jbueren\Google Drive\JMP\Slides\figures\counterfactuals.eps')
 
 %% Identification
 clear all
@@ -396,10 +289,11 @@ fclose(fileID);
 model_moments=model_moments{1};
 model_moments=standardizeMissing(model_moments,-9);
 model_moments(model_moments<0) = 0;
-model_beq_ic=model_moments(waves*groups*PI_l*2+1:waves*groups*PI_l*2+f_t*PI_l);
+model_beq_ic=model_moments(waves*groups*PI_l+1:waves*groups*PI_l+f_t*PI_l);
 model_beq_ic=reshape(model_beq_ic,PI_l,f_t);
-model_hr_IC=model_moments(waves*groups*PI_l*2+f_t*PI_l+f_t*waves*groups+groups*PI_l+1:waves*groups*PI_l*2+f_t*PI_l+f_t*waves*groups+groups*PI_l+groups*f_t);
+model_hr_IC=model_moments(waves*groups*PI_l+f_t*PI_l+f_t*waves*groups+groups*PI_l+1:waves*groups*PI_l+f_t*PI_l+f_t*waves*groups+groups*PI_l+groups*f_t);
 model_hr_IC=reshape(model_hr_IC,f_t,groups)
+
 
 % Stronger bequest
 fileID = fopen('moments_high_beq.txt');
@@ -408,9 +302,9 @@ fclose(fileID);
 model_moments=model_moments{1};
 model_moments=standardizeMissing(model_moments,-9);
 model_moments(model_moments<0) = 0;
-model_beq_ic_high_beq=model_moments(waves*groups*PI_l*2+1:waves*groups*PI_l*2+f_t*PI_l);
+model_beq_ic_high_beq=model_moments(waves*groups*PI_l+1:waves*groups*PI_l+f_t*PI_l);
 model_beq_ic_high_beq=reshape(model_beq_ic_high_beq,PI_l,f_t);
-model_hr_IC_high_beq=model_moments(waves*groups*PI_l*2+f_t*PI_l+f_t*waves*groups+groups*PI_l+1:waves*groups*PI_l*2+f_t*PI_l+f_t*waves*groups+groups*PI_l+groups*f_t);
+model_hr_IC_high_beq=model_moments(waves*groups*PI_l+f_t*PI_l+f_t*waves*groups+groups*PI_l+1:waves*groups*PI_l+f_t*PI_l+f_t*waves*groups+groups*PI_l+groups*f_t);
 model_hr_IC_high_beq=reshape(model_hr_IC_high_beq,f_t,groups)
 
 % Stronger LTC needs
@@ -420,9 +314,9 @@ fclose(fileID);
 model_moments=model_moments{1};
 model_moments=standardizeMissing(model_moments,-9);
 model_moments(model_moments<0) = 0;
-model_beq_ic_high_ltc=model_moments(waves*groups*PI_l*2+1:waves*groups*PI_l*2+f_t*PI_l);
+model_beq_ic_high_ltc=model_moments(waves*groups*PI_l+1:waves*groups*PI_l+f_t*PI_l);
 model_beq_ic_high_ltc=reshape(model_beq_ic_high_ltc,PI_l,f_t);
-model_hr_IC_high_ltc=model_moments(waves*groups*PI_l*2+f_t*PI_l+f_t*waves*groups+groups*PI_l+1:waves*groups*PI_l*2+f_t*PI_l+f_t*waves*groups+groups*PI_l+groups*f_t);
+model_hr_IC_high_ltc=model_moments(waves*groups*PI_l+f_t*PI_l+f_t*waves*groups+groups*PI_l+1:waves*groups*PI_l+f_t*PI_l+f_t*waves*groups+groups*PI_l+groups*f_t);
 model_hr_IC_high_ltc=reshape(model_hr_IC_high_ltc,f_t,groups)
 
 
@@ -483,51 +377,111 @@ width={3 1.5 3.5 1.5 2};
 ldash = {'-' '--' ':'  '*'};
 
 figure(7)
-set(7,'position',[50    100    750    400])    
-for i=1:2:3
-cd('C:\Users\jbueren\Google Drive\JMP\Code\Structural Model\DDC');
+set(7,'position',[50    100    650    350])    
+for i=1:2 %family
+
+for p=1:2 % percentile
+cd('C:\Users\jbueren\Google Drive\JMP\Code\Structural Model\new_model\new_model\new_model');
 fileID = fopen('benchmark.txt');
-benchmark=textscan(fileID,'%f  %f %f %f %f %f ');
+benchmark=textscan(fileID,'%f  %f %f %f %f %f %f ');
 fclose(fileID);
-benchmark=benchmark{2+i};
-counterfactual(:,1,:)=benchmark(:,1);
+benchmark=benchmark{2+i+(p-1)*2};
+counterfactual(:,1)=benchmark(:,1);
 
 fileID = fopen('noLTC.txt');
-noLTC=textscan(fileID,'%f   %f %f %f %f %f ');
+noLTC=textscan(fileID,'%f %f %f %f %f %f %f ');
 fclose(fileID);
-noLTC=noLTC{2+i};
-counterfactual(:,2,:)=noLTC;
+noLTC=noLTC{2+i+(p-1)*2};
+counterfactual(:,2)=noLTC;
 
 fileID = fopen('noBeq.txt');
-noBeq=textscan(fileID,'%f   %f %f %f %f %f');
+noBeq=textscan(fileID,'%f %f %f %f %f %f %f');
 fclose(fileID);
-noBeq=noBeq{2+i};
-counterfactual(:,3,:)=noBeq;
+noBeq=noBeq{2+i+(p-1)*2};
+counterfactual(:,3)=noBeq;
 
 if i==1
     subplot(1,2,1)
-    title('Distant')
+    T=title('Distant Families','Position',[85 720])
+
 else
     subplot(1,2,2)
-    title('Close Families')
+    T=title('Close Families','Position',[85 720])
 end
 hold on 
 for c=1:3
     plot(70:2:100,counterfactual(1:16,c),ldash{c},'Color',colors{c},'LineWidth',width{c})        
-     
 end
 set(gcf,'color','w')
 xlabel('Age','FontSize',FS)
 ylabel('Assets (000s of 2018 dollars)','FontSize',FS)
-%  ylim([-9,500])
+% yticks([0:100:500])
+ylim([-9,800])
  if i==1
     I=legend('Benchmark','No long-term care','No bequest','orientation','horizontal');
     legend('boxoff')
     I.FontSize=FS;
-    newPosition = [0.42 0.89 0.2 0.2];
+    newPosition = [0.42 0.88 0.2 0.2];
     newUnits = 'normalized';
     set(I,'Position', newPosition,'Units', newUnits);
  end 
 set(gca,'FontName','Times New Roman','Fontsize',FS);
 end
+end
 print(gcf,'-depsc', 'C:\Users\jbueren\Google Drive\JMP\Draft\figures\counterfactuals_ic.eps')
+
+%% Counterfactuals along wealth distribution
+clear all
+generations=21
+FS=11;
+colors = {[0   0.4470    0.7410] [0.4940    0.1840    0.5560]   [0.9290    0.6940    0.1250]  [0.8500    0.3250    0.0980] [0.3010, 0.7450, 0.9330]};
+pattern = {'none' 'o' 's' '^'};
+width={3 1.5 3.5 1.5 2};
+ldash = {'-' '--' ':'  '*'};
+
+figure(7)
+set(7,'position',[50    100    600    250])    
+for i=1:1
+cd('C:\Users\jbueren\Google Drive\JMP\Code\Structural Model\new_model\new_model\new_model');
+fileID = fopen('benchmark.txt');
+benchmark=textscan(fileID,'%f %f %f %f %f %f %f');
+fclose(fileID);
+benchmark=benchmark{i};
+fileID = fopen('noLTC.txt');
+noLTC=textscan(fileID,'%f %f %f %f %f %f %f ');
+fclose(fileID);
+noLTC=noLTC{i};
+counterfactual(:,1,:)=benchmark(:,1)-noLTC(:,1);
+
+
+fileID = fopen('noFemale.txt');
+benchmark=textscan(fileID,'%f %f %f %f %f %f %f');
+fclose(fileID);
+benchmark=benchmark{i};
+fileID = fopen('noFemale_noLTC.txt');
+noLTC=textscan(fileID,'%f %f %f %f %f %f %f ');
+fclose(fileID);
+noLTC=noLTC{i};
+counterfactual(:,2,:)=benchmark(:,1)-noLTC(:,1);
+
+
+for c=1:2
+    plot(70:2:100,counterfactual(1:16,c),ldash{c},'Color',colors{c},'LineWidth',width{c})        
+    hold on  
+end
+set(gcf,'color','w')
+xlabel('Age','FontSize',FS)
+ylabel('Assets (000s of 2018 dollars)','FontSize',FS)
+ ylim([-9,50])
+%  if i==2
+    I=legend('Benchmark','No Close Families','orientation','horizontal');
+    legend('boxoff')
+    I.FontSize=FS;
+    newPosition = [0.4 0.88 0.2 0.2];
+    newUnits = 'normalized';
+    set(I,'Position', newPosition,'Units', newUnits);
+%  end 
+set(gca,'FontName','Times New Roman','Fontsize',FS);
+end
+print(gcf,'-depsc', 'C:\Users\jbueren\Google Drive\JMP\Draft\figures\counterfactuals.eps')
+print(gcf,'-depsc', 'C:\Users\jbueren\Google Drive\JMP\Slides\figures\counterfactuals.eps')

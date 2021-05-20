@@ -40,13 +40,13 @@ use nrtype
     integer,parameter::f_t=2,clusters=4,L_gender=2,L_PI=5,generations=21,nzz=3,variables=12,groups=4,parameters_to_est=11,obs=9, &
                         wealth_q=3,L_PI2=10,min_obs=39
     integer,parameter:: moment_conditions=L_PI*obs*groups+L_PI*f_t+f_t*obs*groups+L_PI*clusters+2*f_t*clusters
-    integer,parameter::nkk=300,samples_per_i=300
+    integer,parameter::samples_per_i=300,nkk=500
 end module dimensions
         
 module grids
     use dimensions; use nrtype
     implicit none
-    real(SP)::coh_min=0.0_sp,coh_max=600.0_sp
+    real(SP)::coh_min=0.0_sp,coh_max=1200.0_sp
     real(SP),dimension(nkk)::coh_grid 
     real(SP),dimension(nzz,1)::ep_grid 
     real(SP),dimension(nzz,1)::xi_grid 
@@ -81,16 +81,18 @@ module structural_p2
     end module structural_p2
         
 module structural_p1
-    use dimensions; use nrtype
+    use dimensions; use nrtype 
     implicit none
     integer,parameter::DIM=12+11+3
     real(SP),dimension(DIM,1)::med_coef
     real(SP)::rho,sigma2_ep,sigma2_ze
     real(SP),parameter::r=1.02_sp**2_sp-1.0_sp
     real(SP)::p_fc=12.0_sp/1000.0_sp
+    real(SP),dimension(clusters+1)::p_nh=(/8.0_sp/365.0_sp*443.0_sp,8.0_sp/365.0_sp*437.0_sp,8.0/365.0_sp*463.0_sp,8.0/365.0_sp*527.0_sp,8.0/365.0_sp*527.0_sp/2.0_sp/)
     real(SP),parameter::p_or=12.0_sp/1000.0_sp
     real(SP),dimension(L_PI2,L_gender)::b
     real(SP),dimension(f_t,clusters)::l_ic,l_ic_or
+    real(SP),dimension(f_t,clusters+1,2)::pr_nh
     real(SP),dimension(generations,L_gender,L_PI2,clusters,nzz,nzz)::m_exp_all,m_exp_all_or
     real(SP),dimension(clusters+1,clusters+1,generations,L_PI2,L_gender)::H_av
     real(SP)::load_ltci=0.32_sp,benefit_LTCI=5.0_sp !hours of care per day provided by insurance
@@ -115,8 +117,9 @@ implicit none
     real(SP),dimension(indv,f_t):: IC_pr_i
     real(SP),dimension(indv):: x_i
     real(SP),dimension(indv,obs,clusters):: s_h_i,f_h_i
-    real(SP),dimension(indv,obs):: dead_i
+    real(SP),dimension(indv,obs):: dead_i,nhmliv_i
     integer,dimension(indv,obs,2):: h_i
+    integer::ind_no_f=0
 end module
     
 module optimization
@@ -149,7 +152,7 @@ end module
 module HRS_data
     use dimensions; use nrtype; use simulation_input
     implicit none
-    integer,dimension(indv,obs):: IC_q
+    integer,dimension(indv,obs):: IC_q,f1nhmliv
     real(SP),dimension(indv,obs):: fc_h,NW,ic_h,beq100,govmd
 end module HRS_data
 

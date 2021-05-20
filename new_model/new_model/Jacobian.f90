@@ -26,19 +26,14 @@ subroutine Jacobian(parameters,J)
     call empty_missing(densities,densities_nom,int(moment_conditions),real_moments)
     
     eps=0.01_sp
-    !do p_l=1,parameters_to_est
-    !    if (p_l==3) then
-    !        eps(p_l)=0.01_sp
-    !    end if
-    !end do
     
     do p_l=1,parameters_to_est
         do m_l=1,2
             parameters_new(:,m_l)=parameters
             if (m_l==1)then
-                parameters_new(p_l,m_l)=parameters_new(p_l,m_l)+eps(p_l) !*abs(parameters(p_l))
+                parameters_new(p_l,m_l)=parameters_new(p_l,m_l)+eps(p_l) 
             else
-                parameters_new(p_l,m_l)=parameters_new(p_l,m_l)-eps(p_l) !*abs(parameters(p_l))
+                parameters_new(p_l,m_l)=parameters_new(p_l,m_l)-eps(p_l)
             end if
             call SMM_se(parameters_new(:,m_l),moments_new(:,m_l),densities_new(:,m_l))
             do i_l=1,moment_conditions

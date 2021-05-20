@@ -9,6 +9,7 @@ subroutine solve_model(a_policy,g_policy,lfc_x,u_x,beq100_policy)
     real(SP),dimension(nkk,clusters,f_t,L_PI2)::c_x
     integer::x_l,f_l,h_l,k_l2,t_l,i_l,ps_l,ge_l,k2_wo_MD,i_l2,k2_l_min
     real(SP)::V_wo_MD,V_MD,ECV_k2_no_beq,V_k2,beq_wo_md,beq_MD
+    character::pause_k
     !Timer
     integer::calc
     real::calctime
@@ -42,19 +43,20 @@ subroutine solve_model(a_policy,g_policy,lfc_x,u_x,beq100_policy)
     beq100_policy=-9
     call tick(calc)
     
-    !$OMP PARALLEL default(none) private(i_l,t_l,ps_l,h_l,x_l,k2_l_min,V_k2,ECV_k2_no_beq,V_MD,V_wo_MD,k2_wo_MD,k_l2,ge_l,f_l,V,beq_aux,beq_wo_md,beq_md) shared(g_policy,beq100_policy,a_policy,u_x,u_bar,coh_grid,delta,lambda,sigma,sigma_beq,omega,beta,V_70)
+    !$OMP PARALLEL default(none) private(i_l,t_l,ps_l,h_l,x_l,k2_l_min,V_k2,ECV_k2_no_beq,V_MD,V_wo_MD,k2_wo_MD,k_l2,ge_l,f_l,V,beq_aux,beq_wo_md,beq_md,pause_k) shared(g_policy,beq100_policy,a_policy,u_x,u_bar,coh_grid,delta,lambda,sigma,sigma_beq,omega,beta,V_70)
     !$OMP  DO collapse(3)
     do ge_l=1,L_gender;
     do f_l=1,f_t 
     do i_l=1,L_PI2
         !Solve for the value of leaving bequests
+        beq_aux=-9.0_sp
         V=-9.0_sp
         do x_l=1,nkk
             V(x_l,clusters+1,:,1:2)=lambda(f_l)*(coh_grid(x_l)+delta(f_l))**(1.0_sp-sigma_beq)/(1.0_sp-sigma_beq)
             if (coh_grid(x_l)>0.0d0) then
-                beq_aux(x_l,clusters+1,:,1:2)=1.0d0
+                beq_aux(x_l,clusters+1,:,1:2)=1.0_sp
             else
-                beq_aux(x_l,clusters+1,:,1:2)=0.0d0
+                beq_aux(x_l,clusters+1,:,1:2)=0.0_sp
             end if
         end do
     do t_l=generations,1,-1 
@@ -67,6 +69,7 @@ subroutine solve_model(a_policy,g_policy,lfc_x,u_x,beq100_policy)
         else
             k2_l_min=1
         end if
+
         call std_vfi(u_x,k2_l_min,x_l,ge_l,i_l,f_l,t_l,h_l,ps_l,V,V_wo_MD,k2_wo_MD,beq_aux,beq_wo_md)
         !Value of Medicaid
         k_l2=1
@@ -88,6 +91,7 @@ subroutine solve_model(a_policy,g_policy,lfc_x,u_x,beq100_policy)
             g_policy(x_l,h_l,ps_l,ge_l,i_l,f_l,t_l)=0
             beq100_policy(x_l,h_l,ps_l,ge_l,i_l,f_l,t_l)=beq_wo_md 
         end if
+
         !if (V(x_l,h_l,ps_l,1)==-1.0d0/0.0d0 ) then
         !    print*,''
         !end if   

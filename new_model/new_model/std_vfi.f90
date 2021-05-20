@@ -20,5 +20,6 @@ subroutine std_vfi(u_x,k2_l_min,x_l,ge_l,i_l,f_l,t_l,h_l,ps_l,V,V_wo_MD,k2_wo_MD
         V_wo_MD=maxval(V_k2(k2_l_min:k2_l_max))
         k2_wo_MD=maxloc(V_k2(k2_l_min:k2_l_max),1)+k2_l_min-1
         beq_wo_md=beq_k2(k2_wo_MD)
+        
 
 end subroutine    

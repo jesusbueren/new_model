@@ -10,13 +10,15 @@ subroutine simulate_HRS_70(parameters,p50_75_assets_ic_age,p50_75_assets_all_age
     integer,dimension(nkk,clusters,nzz,L_gender,L_PI2,f_t,generations)::a_policy,g_policy
     real(SP),dimension(nkk,clusters,f_t,L_PI2)::u_x
     real(SP),dimension(nkk,clusters,f_t,L_PI2)::lfc_x
-    integer::i_l,xi_l,i_l2,t_l,ind,k2_l,pos_x,xi_l2,f_l,ts_l2,pi_l,nwq_l,h_l,pos_x2,k2_l2
+    integer::i_l,xi_l,i_l2,t_l,ind,k2_l,pos_x,xi_l2,f_l,ts_l2,pi_l,nwq_l,h_l,pos_x2,k2_l2,nh_l
     real(SP)::u,x_pr_md,sum_t,sum_t_md
-    real(SP),dimension(indv_c)::tr_i
+    real(SP),dimension(indv_c)::tr_i,fam_i
+    real(SP),dimension(indv_c,clusters)::tr_h
     integer,dimension(indv_c)::pi_i2
     integer,dimension(generations)::h_s,g_it
     real(SP),dimension(generations)::x_it,tr_it,a_it
     integer,dimension(L_PI,generations)::counter_pi_age
+    integer,dimension(f_t)::counter_f
     integer,dimension(f_t,generations)::counter_ic_age
     integer,dimension(generations)::counter_all_age
     real(SP),dimension(L_PI,generations,indv_c/2)::assets_pi_age,g_tr,c_pi_age
@@ -85,9 +87,11 @@ subroutine simulate_HRS_70(parameters,p50_75_assets_ic_age,p50_75_assets_all_age
     print*,'simulating'
     !Simulate decisions
     counter_pi_age=0
+    counter_f=0
     counter_ic_age=0
     counter_all_age=0
     tr_i=0.0_sp
+    tr_h=0.0_sp
     lambda_pi=0.0_sp
     ltci_pi=0.0_sp
     m_av=0.0_sp
@@ -106,11 +110,10 @@ subroutine simulate_HRS_70(parameters,p50_75_assets_ic_age,p50_75_assets_all_age
         call RANDOM_NUMBER(u)
         if (u<IC_pr_i(i_l,1)) then
             f_l=1
-        elseif (u<sum(IC_pr_i(i_l,1:2))) then
-            f_l=2
         else
-            f_l=3
+            f_l=2
         end if
+        fam_i(i_l2)=f_l
         h_s=-9
         g_it=-9
         a_it(1)=min(x_i(i_l),coh_grid(nkk))
@@ -131,9 +134,9 @@ subroutine simulate_HRS_70(parameters,p50_75_assets_ic_age,p50_75_assets_all_age
             end if
         end do
         !Mortality bias
-        if (h_s(16)==clusters+1) then
-            go to 1
-        end if
+        !if (h_s(16)==clusters+1) then
+        !    go to 1
+        !end if
         tr_it=0.0_sp
         do t_l=1,generations-1
             if (h_s(t_l)<clusters+1 ) then 
@@ -173,8 +176,16 @@ subroutine simulate_HRS_70(parameters,p50_75_assets_ic_age,p50_75_assets_all_age
                     end if
                 end do
                 
+                !Nursing home state
+                call RANDOM_NUMBER(u)
+                if (u<pr_nh(f_l,h_s(t_l),2)) then
+                    nh_l=1
+                else
+                    nh_l=0
+                end if
+                
                 !Cash on hand
-                x_it(t_l)=(1+r)*a_it(t_l)-m_exp_all(t_l,gender_i(i_l),PI_q_i2(i_l),h_s(t_l),xi_l2,ts_l2)+b(PI_q_i2(i_l),gender_i(i_l))
+                x_it(t_l)=(1+r)*a_it(t_l)-m_exp_all(t_l,gender_i(i_l),PI_q_i2(i_l),h_s(t_l),xi_l2,ts_l2)+b(PI_q_i2(i_l),gender_i(i_l))-real(nh_l)*p_nh(h_s(t_l))
                 obs_m_av(PI_q_i(i_l),t_l)=obs_m_av(PI_q_i(i_l),t_l)+1.0_sp
                 m_av(PI_q_i(i_l),t_l)=(obs_m_av(PI_q_i(i_l),t_l)-1.0_sp)/obs_m_av(PI_q_i(i_l),t_l)*m_av(PI_q_i(i_l),t_l) + &
                                         1.0_sp/obs_m_av(PI_q_i(i_l),t_l)*m_exp_all(t_l,gender_i(i_l),PI_q_i2(i_l),h_s(t_l),xi_l2,ts_l2)
@@ -190,16 +201,19 @@ subroutine simulate_HRS_70(parameters,p50_75_assets_ic_age,p50_75_assets_all_age
                 end if 
                 a_it(t_l+1)=coh_grid(k2_l)
                 if (g_it(t_l)==1) then
-                    tr_it(t_l)=max(c_bar(h_s(t_l))+p_or*l_bar(h_s(t_l))- &
-                                x_it(t_l),0.0_sp)
+                    tr_it(t_l)=max(c_bar(h_s(t_l))+p_or*l_bar(h_s(t_l))-x_it(t_l),0.0_sp)
                     x_it(t_l)=0.0_sp
                 else
                     tr_it(t_l)=lfc_x(pos_x-k2_l+1,h_s(t_l),f_l,PI_q_i2(i_l))*(p_or-p_fc)
                 end if
                 tr_it(t_l)=tr_it(t_l)/(1.0_sp+r)**(t_l-1)
+                tr_h(i_l2,h_s(t_l))=tr_h(i_l2,h_s(t_l))+tr_it(t_l)
                 
                 !Store assets
                 counter_pi_age(PI_q_i(i_l),t_l)=counter_pi_age(PI_q_i(i_l),t_l)+1
+                if (t_l==1) then
+                    counter_f(f_l)=counter_f(f_l)+1
+                end if
                 assets_pi_age(PI_q_i(i_l),t_l,counter_pi_age(PI_q_i(i_l),t_l))=a_it(t_l)
                 if (g_it(t_l)==0) then
                     c_pi_age(PI_q_i(i_l),t_l,counter_pi_age(PI_q_i(i_l),t_l))=coh_grid(pos_x)-coh_grid(k2_l)-lfc_x(pos_x-k2_l+1,h_s(t_l),f_l,PI_q_i2(i_l))*p_fc
@@ -216,14 +230,13 @@ subroutine simulate_HRS_70(parameters,p50_75_assets_ic_age,p50_75_assets_all_age
                 !Compute Compensating Variation
                 if (ind_or==0 .and. t_l==1) then
                     if (V_70_or(pos_x,h_s(t_l),xi_l,gender_i(i_l),PI_q_i2(i_l),f_l)==V_70_new(pos_x,h_s(t_l),xi_l,gender_i(i_l),PI_q_i2(i_l),f_l)) then
-                        lambda_pi(PI_q_i(i_l),counter_pi_age(PI_q_i(i_l),t_l))=0.0_sp
-                        ltci_pi(PI_q_i(i_l),counter_pi_age(PI_q_i(i_l),t_l))=0.0_sp
+                        lambda_pi(f_l,counter_f(f_l))=0.0_sp
+                        !ltci_pi(PI_q_i(i_l),counter_pi_age(PI_q_i(i_l),t_l))=0.0_sp
                     elseif (V_70_or(pos_x,h_s(t_l),xi_l,gender_i(i_l),PI_q_i2(i_l),f_l)<V_70_new(1,h_s(t_l),xi_l,gender_i(i_l),PI_q_i2(i_l),f_l)) then
-                        lambda_pi(PI_q_i(i_l),counter_pi_age(PI_q_i(i_l),t_l))=-coh_grid(pos_x) 
+                        lambda_pi(f_l,counter_f(f_l))=coh_grid(pos_x) 
                     else
-                        lambda_pi(PI_q_i(i_l),counter_pi_age(PI_q_i(i_l),t_l))=&
-                        coh_grid(minloc(abs(V_70_new(:,h_s(t_l),xi_l,gender_i(i_l),PI_q_i2(i_l),f_l)-V_70_or(pos_x,h_s(t_l),xi_l,gender_i(i_l),PI_q_i2(i_l),f_l)),1))- &
-                        coh_grid(pos_x)
+                        lambda_pi(f_l,counter_f(f_l))=&
+                        coh_grid(pos_x)-coh_grid(minloc(abs(V_70_new(:,h_s(t_l),xi_l,gender_i(i_l),PI_q_i2(i_l),f_l)-V_70_or(pos_x,h_s(t_l),xi_l,gender_i(i_l),PI_q_i2(i_l),f_l)),1)) 
                     end if
                 end if
             end if
@@ -255,15 +268,16 @@ subroutine simulate_HRS_70(parameters,p50_75_assets_ic_age,p50_75_assets_all_age
                                         p50_75_assets_ic_age(f_l,t_l,1))
                 call compute_percentile(assets_ic_age(f_l,t_l,1:counter_ic_age(f_l,t_l)), &
                                         counter_ic_age(f_l,t_l),&
-                                        75, & 
+                                        85, & 
                                         p50_75_assets_ic_age(f_l,t_l,2))
             end if
         end do
         if (counter_all_age(t_l)>1) then
-            call compute_percentile(assets_all_age(t_l,1:counter_all_age(t_l)), &
-                                    counter_all_age(t_l),&
-                                    50, & 
-                                    p50_75_assets_all_age(t_l,1))
+            p50_75_assets_all_age(t_l,1)=sum(assets_all_age(t_l,1:counter_all_age(t_l)))/counter_all_age(t_l)
+            !call compute_percentile(assets_all_age(t_l,1:counter_all_age(t_l)), &
+            !                        counter_all_age(t_l),&
+            !                        50, & 
+            !                        p50_75_assets_all_age(t_l,1))
             call compute_percentile(assets_all_age(t_l,1:counter_all_age(t_l)), &
                                     counter_all_age(t_l),&
                                     75, & 
@@ -272,13 +286,13 @@ subroutine simulate_HRS_70(parameters,p50_75_assets_ic_age,p50_75_assets_all_age
     end do
  
 
-    do pi_l=1,L_PI+1
+    do f_l=1,f_t+1
         ind=0
         sum_t=0.0_sp
-        print*,'pi_l',pi_l
+        print*,'f_l',f_l
         do i_l=1,indv_c
-            if (pi_l<L_PI+1) then
-                if (pi_i2(i_l)==pi_l)then
+            if (f_l<f_t+1) then
+                if (fam_i(i_l)==f_l)then
                     ind=ind+1
                     sum_t=sum_t+tr_i(i_l)
                 end if
@@ -287,20 +301,22 @@ subroutine simulate_HRS_70(parameters,p50_75_assets_ic_age,p50_75_assets_all_age
                 sum_t=sum_t+tr_i(i_l)
             end if
         end do
-        EDP(pi_l)=sum_t/real(ind)
-        print*,'EDPV of transfers to income q ',pi_l,': ',EDP(pi_l)
-    end do; 
+        EDP(f_l)=sum_t/real(ind)
+        print*,'EDPV of transfers to family ',f_l,': ',EDP(f_l)
+    end do;
+   
     CV=0.0_sp
     if (ind_or==0)then
-        do pi_l=1,L_PI+1
-            if (pi_l<=L_PI) then
-                CV(pi_l)=sum(lambda_pi(pi_l,:))/real(counter_pi_age(pi_l,1))  
-                print*,'LTCI demand', pi_l,sum(ltci_pi(pi_l,:))/real(counter_pi_age(pi_l,1))  
+        do f_l=1,f_t+1
+            if (f_l<=f_t) then
+                CV(f_l)=sum(lambda_pi(f_l,:))/real(counter_f(f_l))  
+                !print*,'LTCI demand', pi_l,sum(ltci_pi(pi_l,:))/real(counter_pi_age(pi_l,1))  
             else
-                CV(pi_l)=sum(sum(lambda_pi,2),1)/real(sum(counter_pi_age(:,1)))  
+                CV(f_l)=sum(sum(lambda_pi,2),1)/real(sum(counter_f))  
             end if
-            print*,'Compensated Variation to income q ',pi_l,': ',CV(pi_l)
+            print*,'Compensated Variation to income q ',f_l,': ',CV(f_l)
         end do
+        print*,'share each family',real(counter_f)/real(sum(counter_f))  
     end if
 
     

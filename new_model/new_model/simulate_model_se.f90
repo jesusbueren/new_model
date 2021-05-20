@@ -7,7 +7,7 @@ subroutine simulate_model_se(a_policy,g_policy,lfc_x,beq100_policy, &
     real(SP),dimension(nkk,clusters,f_t,L_PI2),intent(in)::lfc_x
     real(SP),dimension(moment_conditions,1),intent(out)::densities,model_moments
     !Loop variables
-    integer::i_l,t_l,pos_x,xi_l,xi_l2,ts_l2,ind,k2_l,ns,g_l,pi_l,ic_l,h_l,f_l2,nwq_l,s_l,it,f_ll
+    integer::i_l,t_l,pos_x,xi_l,xi_l2,ts_l2,ind,k2_l,ns,g_l,pi_l,ic_l,h_l,f_l2,nwq_l,s_l,it,f_ll,nh_l
     integer,dimension(2)::f_l
     !Counter variables
     integer,dimension(L_PI,obs,groups)::counter_pi_age_group,counter_pi_age_group_b
@@ -178,8 +178,11 @@ subroutine simulate_model_se(a_policy,g_policy,lfc_x,beq100_policy, &
                         print*,'something wrong 2'
                         ts_l2=nzz
                     end if
+                    !Nursing home state
+                    nh_l=nhmliv_i(i_l,t_l)
+                    
                     !Cash on hand
-                    x_it(t_l)=(1+r)*a_it(t_l)-m_exp_all(generation_i(i_l)+t_l-1,gender_i(i_l),PI_q_i2(i_l),h_i(i_l,t_l,1),xi_l2,ts_l2)+b(PI_q_i2(i_l),gender_i(i_l))
+                    x_it(t_l)=(1+r)*a_it(t_l)-m_exp_all(generation_i(i_l)+t_l-1,gender_i(i_l),PI_q_i2(i_l),h_i(i_l,t_l,1),xi_l2,ts_l2)+b(PI_q_i2(i_l),gender_i(i_l))-real(nh_l)*p_nh(h_i(i_l,t_l,1))
                     pos_x=int(max(min(x_it(t_l),coh_grid(nkk)),0.0_sp)/(coh_grid(2)-coh_grid(1))+1.00000001_sp)
                     !Draw on the discrete choice
                     call RANDOM_NUMBER(u)
@@ -228,8 +231,11 @@ subroutine simulate_model_se(a_policy,g_policy,lfc_x,beq100_policy, &
                         nw_ic_it(f_l(2),t_l,group_i(i_l))=-0.75_sp
                     end if 
                     
-                    if (fc_h(i_l,t_l)/=-9.0_sp .and. IC_q(i_l,t_l)/=-9 .and. ic_h(i_l,t_l)/=-9.0_sp) then
+                    if (fc_h(i_l,t_l)/=-9.0_sp) then
                         fc_pi_h_it(PI_q_i(i_l),h_i(i_l,t_l,2))=lfc_pi_h(PI_q_i(i_l),h_i(i_l,t_l,2),counter_pi_h(PI_q_i(i_l),h_i(i_l,t_l,2)))-data_lfc_PI(PI_q_i(i_l),h_i(i_l,t_l,2))
+                    end if
+                    
+                    if (fc_h(i_l,t_l)/=-9.0_sp .and. IC_q(i_l,t_l)/=-9 .and. ic_h(i_l,t_l)/=-9.0_sp) then
                         fc_ic_h_it(f_l(1),h_i(i_l,t_l,2))=lfc_ic_h(f_l(1),h_i(i_l,t_l,2),counter_ic_h(f_l(1),h_i(i_l,t_l,2)))-data_lfc_IC(f_l(1),h_i(i_l,t_l,2))
                     end if
                     if (govmd(i_l,t_l)/=-9.0_sp .and. IC_q(i_l,t_l)/=-9) then

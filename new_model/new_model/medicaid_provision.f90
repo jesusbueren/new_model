@@ -1,5 +1,5 @@
 subroutine medicaid_provision()
-    use nrtype; use dimensions; use structural_p2; use structural_p1
+    use nrtype; use dimensions; use structural_p2; use structural_p1;use MD_reform
     implicit none
     integer::h_l,f_l,z_l,it
     real(SP)::g,R_max,R_min,u_g,R_g
@@ -37,10 +37,13 @@ subroutine medicaid_provision()
             end if
         end do
         
-
+        if (ind_or==0) then
+            l_bar=l_bar*1.20d0
+        end if
         !Utility of medicaid for individuals
         do h_l=1,clusters; do f_l=1,f_t
             if (h_l==1) then
+
                 u_bar(h_l,f_l)=c_bar(h_l)**(1.0_sp-sigma)/(1.0_sp-sigma)
             else
                 if (subs_p==0.0_sp)then

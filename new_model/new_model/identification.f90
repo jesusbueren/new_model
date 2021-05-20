@@ -12,7 +12,7 @@ subroutine identification(parameters_original)
     open(unit=9,file='model_moments.txt')
         write(9,*) model_moments1
     close(9)
-    !
+    
     !!Stronger bequest motives
     !parameters=parameters_original
     !parameters(8:9)=parameters(8:9)*1.20d0
@@ -21,7 +21,7 @@ subroutine identification(parameters_original)
     !open(unit=9,file='moments_high_beq.txt')
     !    write(9,*) model_moments1
     !close(9)
-    
+    !
     !!Larger LTC needs
     !parameters=parameters_original
     !parameters(5)=parameters(5)*1.05d0
@@ -71,5 +71,22 @@ subroutine get_moments(parameters,model_moments1)
     !print*,'Simulating Model'
     call simulate_model(a_policy,g_policy,lfc_x,beq100_policy, & !policy fcts
                         model_moments1,model_moments) !moments
+    
+    !Missing moments in the data to missing in the model
+    do i_l=1,moment_conditions
+        if (data_moments(i_l,1)==-9.0_sp) then
+            model_moments(i_l,1)=-9.0_sp
+            !model_moments1(i_l,1)=-9.0_sp
+        end if
+    end do
+    
+    call empty_missing(model_moments,model_moments_new ,int(moment_conditions),real_moments)
+        
+    !Compute objective function
+    obj_fct=real(indv)/(1.0_dp+1.0_dp/real(samples_per_i))*matmul(matmul(transpose(model_moments_new(1:real_moments,1:1)), & 
+                                    W_opt(1:real_moments,1:real_moments)), &
+                                    model_moments_new(1:real_moments,1:1))
+    
+    print*,'objective fct: ',obj_fct
 
 end subroutine

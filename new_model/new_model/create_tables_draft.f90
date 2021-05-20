@@ -38,9 +38,9 @@ subroutine create_tables_draft(parameters)
     open(unit=9,file='C:\Users\jbueren\Google Drive\JMP\Draft\tables\data_LTC_IC.txt')
     do f_l=1,f_t;do h_l=2,clusters            
         if (h_l==clusters .and. f_l/=f_t) then
-            write(9,'(A20,A2,A18,A2,F5.1,A2,F5.1,A9)') strings_f(f_l),"&",strings_h(h_l),"&",l_ic(f_l,h_l)/365/2,"&",data_lfc_IC(f_l,h_l),"\\ [5pt]"
+            write(9,'(A20,A2,A18,A2,F5.1,A2,F5.1,A2,F5.1,A9)') strings_f(f_l),"&",strings_h(h_l),"&",l_ic(f_l,h_l)/365/2,"&",data_lfc_IC(f_l,h_l),"&",pr_nh(f_l,h_l,2)*100.0d0,"\\ [5pt]"
         else
-            write(9,'(A20,A2,A18,A2,F5.1,A2,F5.1,A3)') strings_f(f_l),"&",strings_h(h_l),"&",l_ic(f_l,h_l)/365/2,"&",data_lfc_IC(f_l,h_l),"\\"
+            write(9,'(A20,A2,A18,A2,F5.1,A2,F5.1,A2,F5.1,A3)') strings_f(f_l),"&",strings_h(h_l),"&",l_ic(f_l,h_l)/365/2,"&",data_lfc_IC(f_l,h_l),"&",pr_nh(f_l,h_l,2)*100.0d0,"\\"
         end if
     end do;end do
     close(9)
@@ -58,8 +58,8 @@ subroutine create_tables_draft(parameters)
         write(9,'(A50, F6.2, A3, F5.2,A10 )') '$\omega$: substitution formal/informal care &', parameters(11),"& (",se(11),")\\ [5pt]"
         write(9,'(A50 )') 'Bequest & & \\'
         write(9,'(A50, F9.2, A3, F9.2,A10 )') '$\delta$: curvature &', parameters(6),"& (",se(6),")\\"
-        write(9,'(A55, F6.2, A3, F5.2,A10 )') '$\lambda$($F$=\textit{Distant}): marginal utility &', parameters(8),"& (",se(8),")\\ "
-        write(9,'(A50, F6.2, A3, F5.2,A10 )') '$\lambda$($F$=\textit{Close}): marginal utility &', parameters(9),"& (",se(9),")\\ [5pt]"
+        write(9,'(A55, F6.2, A3, F9.2,A10 )') '$\lambda$($F$=\textit{Distant}): marginal utility &', parameters(8),"& (",se(8),")\\ "
+        write(9,'(A50, F6.2, A3, F9.2,A10 )') '$\lambda$($F$=\textit{Close}): marginal utility &', parameters(9),"& (",se(9),")\\ [5pt]"
         write(9,'(A70 )') 'Maximum transfer to achieve utility floor $\times 10^3 $ & & \\'
         write(9,'(A50, F6.2, A3, F5.2,A10 )') '\underline{x}\textit{(h=1)}: Healthy &', parameters(2),"& (",se(2),")\\"
     close(9)

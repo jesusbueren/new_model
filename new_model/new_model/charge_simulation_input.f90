@@ -21,6 +21,7 @@ subroutine charge_simulation_input_moments(data_NW_PI1,data_NW_PI,&
     integer,dimension(2,obs)::counter_ut
     integer,dimension(L_PI,clusters)::counter_pi_h
     integer,dimension(f_t,clusters)::counter_ic_h,counter_ic_MD
+    integer,dimension(f_t,clusters,2)::counter_nh
     integer,dimension(f_t,obs,groups)::counter_ic_nw
     integer,dimension(L_PI,f_t)::counter_beq100
     integer,dimension(L_PI,obs,groups)::counter_pi_age_group
@@ -40,10 +41,11 @@ subroutine charge_simulation_input_moments(data_NW_PI1,data_NW_PI,&
     real(SP),dimension(f_t,clusters,samples_per_i)::pr_ic_h_s,pr_ic_h2_s
     real(SP),dimension(f_t,obs,groups,samples_per_i)::assets_ic_ns
     real(SP),dimension(L_PI,f_t,samples_per_i)::data_beq100_IC_s
+    real(SP),dimension(f_t,clusters,samples_per_i)::pr_nh_s
     !Random draw
     real(SP)::u
     !Moments
-    real(SP),dimension(6,obs,indv)::data_moments
+    real(SP),dimension(7,obs,indv)::data_moments
     
     !Charge individuals HRS data
     open(unit=9,file=fdir_inputs//'data_moments.txt')
@@ -57,6 +59,7 @@ subroutine charge_simulation_input_moments(data_NW_PI1,data_NW_PI,&
     beq100=beq100/100.0_sp
     ic_h=reshape(data_moments(5,:,:), (/indv, obs/), order = (/ 2, 1 /))
     govmd=reshape(data_moments(6,:,:), (/indv, obs/), order = (/ 2, 1 /))
+    f1nhmliv=reshape(data_moments(7,:,:), (/indv, obs/), order = (/ 2, 1 /))+1
     
     !Compute data moments from original data
     !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -64,6 +67,7 @@ subroutine charge_simulation_input_moments(data_NW_PI1,data_NW_PI,&
     do s_l=1,samples_per_i
         counter_pi_h=0
         counter_ic_h=0
+        counter_nh=0
         counter_ic_MD=0
         counter_pi_age_group=0
         counter_ut=0
@@ -75,6 +79,7 @@ subroutine charge_simulation_input_moments(data_NW_PI1,data_NW_PI,&
         counter_ic_nw=0
         counter_beq100=0
         h_i=-9.0
+        
         !Store vector with all: 
         !       - Formal care hours across PI quartiles and health status
         !       - Formal care and informal care hours across observed families and health status
@@ -141,7 +146,11 @@ subroutine charge_simulation_input_moments(data_NW_PI1,data_NW_PI,&
                 if (govmd(i_l,t_l)/=-9.0_sp .and. IC_q(i_l,t_l)/=-9) then
                     counter_ic_MD(IC_q(i_l,t_l),h_i(i_l,t_l,1))=counter_ic_MD(IC_q(i_l,t_l),h_i(i_l,t_l,1))+1
                     govmd_ic(IC_q(i_l,t_l),h_i(i_l,t_l,1),counter_ic_MD(IC_q(i_l,t_l),h_i(i_l,t_l,1)))=govmd(i_l,t_l)
-                end if                    
+                end if
+                if (f1nhmliv(i_l,t_l)/=-8 .and. IC_q(i_l,t_l)/=-9) then
+                    counter_nh(IC_q(i_l,t_l),h_i(i_l,t_l+1,1),f1nhmliv(i_l,t_l))=counter_nh(IC_q(i_l,t_l),h_i(i_l,t_l+1,1),f1nhmliv(i_l,t_l))+1
+                end if
+                
                 if (NW(i_l,t_l)/=-9.0_sp ) then
                     counter_pi_age_group(PI_q_i(i_l),t_l,group_i(i_l))=counter_pi_age_group(PI_q_i(i_l),t_l,group_i(i_l))+1
                     assets_pi_age_group(PI_q_i(i_l),t_l,group_i(i_l),counter_pi_age_group(PI_q_i(i_l),t_l,group_i(i_l)))=NW(i_l,t_l)
@@ -172,6 +181,7 @@ subroutine charge_simulation_input_moments(data_NW_PI1,data_NW_PI,&
         data_lfc_IC_s(:,:,s_l)=sum(fc_ic_h,3)/counter_ic_h
         data_govmd_IC_s(:,:,s_l)=sum(govmd_ic,3)/counter_ic_MD 
         data_lfc_IC_s(:,1,s_l)=-9.0_sp
+        pr_nh_s(:,:,s_l)=real(counter_nh(:,:,2))/real(sum(counter_nh,3))
     
         !Compute hours of informal care across families l_ic_s(3,:,s_l)
         l_ic_s(:,:,s_l)=sum(ic_ic_h,3)/counter_ic_h
@@ -209,7 +219,9 @@ subroutine charge_simulation_input_moments(data_NW_PI1,data_NW_PI,&
     l_ic=sum(l_ic_s,3)/real(samples_per_i) !l_ic
     data_lfc_IC=sum(data_lfc_IC_s,3)/real(samples_per_i)
     data_govmd_IC=sum(data_govmd_IC_s,3)/real(samples_per_i)
-
+    pr_nh(:,1:clusters,2)=sum(pr_nh_s,3)/real(samples_per_i)
+    pr_nh(:,clusters+1,2)=pr_nh(:,clusters,2)
+    pr_nh(:,:,1)=1-pr_nh(:,:,2)
     !Wealth moments by PIq
     do pi_l=1,L_PI; do t_l=1,7; do g_l=1,4
         if (counter_pi_age_group(pi_l,t_l,g_l)>min_obs) then

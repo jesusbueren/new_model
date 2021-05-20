@@ -97,9 +97,13 @@ subroutine optimization_sa(parameters_end)
     close(11)
     parameters=reshape(parameters_v,(/parameters_to_est+1,parameters_to_est/),order=(/2,1/))
     do p_l=1,parameters_to_est+1
+        print*,'p_l',p_l
         call p2R(parameters(p_l,:))
         obj_fct(p_l)=SMM(parameters(p_l,:))        
+        !print*,'pause'
+        !read*,end_key
     end do
+    print*,'amoeba started'
     call amoeba(parameters,obj_fct,ftol,SMM,iter)
     call R2p(parameters(1,:),parameters_end)
 
