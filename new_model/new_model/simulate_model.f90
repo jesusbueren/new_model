@@ -371,5 +371,9 @@ subroutine simulate_model(a_policy,g_policy,lfc_x,beq100_policy, &
         write(9,*) moments_NW_IC1
     close(9)
     
+    open(unit=9,file='model_moments_h_ut.txt')
+        write(9,*) model_NW_h_ut
+    close(9)
+    
 end subroutine
     

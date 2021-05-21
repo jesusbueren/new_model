@@ -38,9 +38,11 @@ subroutine data_moments_W()
     open(unit=9,file='data_moments1.txt')
         write(9,*) data_moments1
     close(9)
-
     open(unit=9,file='data_moments_ut.txt')
         write(9,*) data_NW_IC1
+    close(9)
+    open(unit=9,file='data_moments_h_ut.txt')
+        write(9,*) data_NW_h_ut
     close(9)
     
     !select moments to untarget
