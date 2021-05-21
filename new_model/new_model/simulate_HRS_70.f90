@@ -134,9 +134,9 @@ subroutine simulate_HRS_70(parameters,p50_75_assets_ic_age,p50_75_assets_all_age
             end if
         end do
         !Mortality bias
-        !if (h_s(16)==clusters+1) then
-        !    go to 1
-        !end if
+        if (h_s(16)==clusters+1) then
+            go to 1
+        end if
         tr_it=0.0_sp
         do t_l=1,generations-1
             if (h_s(t_l)<clusters+1 ) then 
