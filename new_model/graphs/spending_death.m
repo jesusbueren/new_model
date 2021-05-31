@@ -244,8 +244,8 @@ FS=11
 %% Share devoted to fc from 20000 spending
 
 m_l=1
-
-cts=100; %cash to spend
+IC_l=1
+cts=20; %cash to spend
 for h_l=1:4
     c_max=cts;
 if mu(h_l,m_l)==0 

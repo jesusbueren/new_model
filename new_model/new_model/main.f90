@@ -38,17 +38,17 @@ program jmp
     !close(9)
     !call create_tables_draft(parameters)
     !
-    !!Compute the counterfactuals to identify key mechanisms
-    !open(unit=9,file='parameters_new.txt')
-    !    read(9,*) parameters
-    !close(9)
-    !call counterfactuals(parameters)
-    
-    !!Identification bequest from LTC
+    !Compute the counterfactuals to identify key mechanisms
     open(unit=9,file='parameters_new.txt')
         read(9,*) parameters
     close(9)
-    call identification(parameters)
+    call counterfactuals(parameters)
+    
+    !!Identification bequest from LTC
+    !open(unit=9,file='parameters_new.txt')
+    !    read(9,*) parameters
+    !close(9)
+    !call identification(parameters)
     
     
     

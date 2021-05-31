@@ -84,7 +84,7 @@ fclose(fileID);
 data_moments_ut2=data_moments_ut2{1};
 data_moments_ut2=standardizeMissing(data_moments_ut2,-9);
 data_moments_ut2(data_moments_ut2<0) = 0;
-data_moments_ut2=reshape(data_moments_ut2,2,9)
+data_moments_ut2=reshape(data_moments_ut2,2,f_t,9)
 
 fileID = fopen('model_moments_h_ut.txt');
 model_moments_ut2=textscan(fileID,'%f');
@@ -92,7 +92,7 @@ fclose(fileID);
 model_moments_ut2=model_moments_ut2{1};
 model_moments_ut2=standardizeMissing(model_moments_ut2,-9);
 model_moments_ut2(model_moments_ut2<0) = 0;
-model_moments_ut2=reshape(model_moments_ut2,2,9)
+model_moments_ut2=reshape(model_moments_ut2,2,f_t,9)
 
 
 
@@ -103,9 +103,8 @@ waves2=7
 
 % Graph by PI
 
-final_f=figure(3)
-set(3,'position',[50 20    700    750])
-h1=subplot(3,1,1)
+final_f=figure(1)
+set(1,'position',[150 100 700    250])
 for m=1:2
 for c=1:groups
 for p=1:PI_l
@@ -159,96 +158,64 @@ newUnits = 'normalized';
 set(I1,'Position', newPosition,'Units', newUnits);
 hold off
 set(gca,'FontName','Times New Roman','Fontsize',FS);
-%%
-subplot(3,1,2)
-j=1
-for m=1:2
-for c=1:groups
-for p=1:f_t
-    if m==1
-        if p>1
-            scatter(1+(waves2+1)*(c-1):waves2+(waves2+1)*(c-1),data_moments_ut(p,1:1:waves2,c,j),pattern{p},'MarkerEdgeColor',colors{p},'MarkerFaceColor',colors{p})
-        end
-        plot(1+(waves2+1)*(c-1):waves2+(waves2+1)*(c-1),data_moments_ut(p,1:1:waves2,c,j),'Color',colors{p},'LineWidth',width{p})        
-    else
-        plot(1+(waves2+1)*(c-1):waves2+(waves2+1)*(c-1),model_moments_ut(p,1:1:waves2,c,j),':','Color',colors{p},'LineWidth',width{p})
-    end
-     hold on  
-end
-end
-end
-c=1;
-p=1;
-p1=plot(1+waves2*(c-1):waves2+(waves2)*(c-1),data_moments_ut(p,1:1:waves2,c,j),'Color',colors{p},'LineWidth',width{p});
-p=2;
-p2=scatter(1+waves2*(c-1):waves2+(waves2)*(c-1),data_moments_ut(p,1:1:waves2,c,j),pattern{p},'MarkerEdgeColor',colors{p},'MarkerFaceColor',colors{p});
-set(gcf,'color','w')
-xlabel('Age','FontSize',FS)
-ylabel('Assets (000s of 2018 dollars)','FontSize',FS)
-ylim([-9,ylim_pi])
-xticks([1:2:32])
-xticklabels({'72','76','80','84',...
-             '76','80','84','88',...
-             '82','86','90','94',...
-             '86','90','94','98'})
-xlim([0 32])
-alpha=0.6;
-line([8 8], [-9 ylim_pi], 'Color', [alpha alpha alpha]);
-line([16 16], [-9 ylim_pi], 'Color', [alpha alpha alpha]);
-line([24 24], [-9 ylim_pi], 'Color', [alpha alpha alpha]);
-text(2.4,ylim_pi-50,'Group 1','FontName','Times New Roman','Fontsize',FS)
-text(10.4,ylim_pi-50,'Group 2','FontName','Times New Roman','Fontsize',FS)
-text(18.4,ylim_pi-50,'Group 3','FontName','Times New Roman','Fontsize',FS)
-text(26.4,ylim_pi-50,'Group 4','FontName','Times New Roman','Fontsize',FS)
-I1=legend([p1 p2],'Distant','Close','orientation','horizontal');
-legend('boxoff')
-I1.FontSize=FS;
-newPosition = [0.4 0.54 0.2 0.2];
-newUnits = 'normalized';
-set(I1,'Position', newPosition,'Units', newUnits);
-hold off
-set(gca,'FontName','Times New Roman','Fontsize',FS);
-%%
-subplot(3,1,3)
+print(gcf,'-depsc', 'C:\Users\jbueren\Google Drive\JMP\Draft\figures\model_fit1.eps')
+
+
+figure(2)
+set(2,'position',[150 100 700    250])
+for f_l=1:2
+subplot(1,2,f_l)
 j=1
 for m=1:2
 for p=1:2
     if m==1
         if p>1
-            scatter(1:7,data_moments_ut2(p,1:7),pattern{p},'MarkerEdgeColor',colors{p},'MarkerFaceColor',colors{p})
+            scatter(1:7,data_moments_ut2(p,f_l,1:7),pattern{p},'MarkerEdgeColor',colors{p},'MarkerFaceColor',colors{p})
         end
-        plot(data_moments_ut2(p,1:7),'Color',colors{p},'LineWidth',width{p})        
+        plot(squeeze(data_moments_ut2(p,f_l,1:7)),'Color',colors{p},'LineWidth',width{p})        
     else
-        plot(model_moments_ut2(p,1:7),':','Color',colors{p},'LineWidth',width{p})
+        plot(squeeze(model_moments_ut2(p,f_l,1:7)),':','Color',colors{p},'LineWidth',width{p})
     end
      hold on  
 end
 end
 p=1
-p1=plot(data_moments_ut2(p,1:7),'Color',colors{p},'LineWidth',width{p});
+p1=plot(squeeze(data_moments_ut2(p,f_l,1:7)),'Color',colors{p},'LineWidth',width{p});
 p=2;
-p2=scatter(1:7,data_moments_ut2(p,1:7),pattern{p},'MarkerEdgeColor',colors{p},'MarkerFaceColor',colors{p});
+p2=scatter(1:7,data_moments_ut2(p,f_l,1:7),pattern{p},'MarkerEdgeColor',colors{p},'MarkerFaceColor',colors{p});
 set(gcf,'color','w')
-xlabel('Observation','FontSize',FS)
+xlabel('Interview','FontSize',FS)
 ylabel('Assets (000s of 2018 dollars)','FontSize',FS)
 ylim([-9,180])
 xticks([1:1:7])
 xlim([0 8])
-I1=legend([p1 p2],'Healthy','In LTC need','orientation','horizontal');
+set(gca,'FontName','Times New Roman','Fontsize',FS);
+end
+I1=legend([p1 p2],'Healthy','In LTC need','location','NorthEast');
 legend('boxoff')
-I1.FontSize=FS;
-newPosition = [0.41 0.24 0.2 0.2];
-newUnits = 'normalized';
-set(I1,'Position', newPosition,'Units', newUnits);
+I1.FontSize = FS
+% I1.FontSize=FS;
+% newPosition = [0.41 0.87 0.2 0.2];
+% newUnits = 'normalized';
+% set(I1,'Position', newPosition,'Units', newUnits);
 hold off
+for f_l=1:2
+    if f_l==1
+        subplot(1,2,1)
+        title('Distant Family')
+    else
+        subplot(1,2,2)
+        title('Close Family')
+    end
+end
 set(gca,'FontName','Times New Roman','Fontsize',FS);
 
-print(gcf,'-depsc', 'C:\Users\jbueren\Google Drive\JMP\Draft\figures\model_fit1.eps')
+print(gcf,'-depsc', 'C:\Users\jbueren\Google Drive\JMP\Draft\figures\model_fit3.eps')
 
 
 %%
-figure(4)
-set(4,'position',[450    400    700    500])
+figure(3)
+set(3,'position',[450    400    700    500])
 clrs = [0 0 0; 0.9 0.9 0.9 ];
 for m=1:2
     subplot(2,2,m)
@@ -482,7 +449,7 @@ end
 end
 print(gcf,'-depsc', 'C:\Users\jbueren\Google Drive\JMP\Draft\figures\counterfactuals_ic.eps')
 
-%% Counterfactuals along wealth distribution
+%% Counterfactuals along no close families
 clear all
 generations=21
 FS=11;
@@ -492,14 +459,15 @@ width={3 1.5 3.5 1.5 2};
 ldash = {'-' '--' ':'  '*'};
 
 figure(7)
-set(7,'position',[50    100    600    250])    
+set(7,'position',[50    100    600    500])    
+subplot(2,1,2)
 for i=1:1
 cd('C:\Users\jbueren\Google Drive\JMP\Code\Structural Model\new_model\new_model\new_model');
-fileID = fopen('benchmark.txt');
+fileID = fopen('benchmark_MB.txt');
 benchmark=textscan(fileID,'%f %f %f %f %f %f %f');
 fclose(fileID);
 benchmark=benchmark{i};
-fileID = fopen('noLTC.txt');
+fileID = fopen('noLTC_MB.txt');
 noLTC=textscan(fileID,'%f %f %f %f %f %f %f ');
 fclose(fileID);
 noLTC=noLTC{i};
@@ -507,26 +475,93 @@ counterfactual(:,1,:)=benchmark(:,1)-noLTC(:,1);
 
 
 fileID = fopen('noFemale.txt');
+benchmark2=textscan(fileID,'%f %f %f %f %f %f %f');
+fclose(fileID);
+benchmark2=benchmark2{i};
+fileID = fopen('noFemale_noLTC.txt');
+noLTC=textscan(fileID,'%f %f %f %f %f %f %f ');
+fclose(fileID);
+noLTC=noLTC{i};
+counterfactual(:,2,:)=benchmark2(:,1)-noLTC(:,1);
+
+
+for c=1:2
+    if c==1
+        plot(70:2:96,counterfactual(1:14,c)./benchmark(1:14,1),ldash{c},'Color',colors{c},'LineWidth',width{c})    
+    else
+        plot(70:2:96,counterfactual(1:14,c)./benchmark2(1:14,1),ldash{c},'Color',colors{c},'LineWidth',width{c}) 
+    end
+    hold on  
+end
+set(gcf,'color','w')
+xlabel('Age','FontSize',FS)
+ylim([0,0.30])
+%  yticks([0:0.05:0.3])
+xlim([70,96])
+%  if i==2
+    I=legend('Benchmark','No Close Families','orientation','horizontal');
+    legend('boxoff')
+    I.FontSize=FS;
+    newPosition = [0.4 0.38 0.2 0.2];
+    newUnits = 'normalized';
+    set(I,'Position', newPosition,'Units', newUnits);
+%  end 
+set(gca,'FontName','Times New Roman','Fontsize',FS);
+end
+
+generations=21
+FS=11;
+colors = {[0   0.4470    0.7410] [0.4940    0.1840    0.5560]   [0.9290    0.6940    0.1250]  [0.8500    0.3250    0.0980] [0.3010, 0.7450, 0.9330]};
+pattern = {'none' 'o' 's' '^'};
+width={3 1.5 3.5 1.5 2};
+ldash = {'-' '--' ':'  '*'};
+
+subplot(2,1,1)
+for i=1:1
+cd('C:\Users\jbueren\Google Drive\JMP\Code\Structural Model\new_model\new_model\new_model');
+
+fileID = fopen('benchmark_MB.txt');
 benchmark=textscan(fileID,'%f %f %f %f %f %f %f');
 fclose(fileID);
 benchmark=benchmark{i};
-fileID = fopen('noFemale_noLTC.txt');
+
+fileID = fopen('noLTC_MB.txt');
+noLTC=textscan(fileID,'%f %f %f %f %f %f %f ');
+fclose(fileID);
+noLTC=noLTC{i};
+counterfactual(:,1,:)=benchmark(:,1)-noLTC(:,1);
+
+
+fileID = fopen('noLTC_physical.txt');
 noLTC=textscan(fileID,'%f %f %f %f %f %f %f ');
 fclose(fileID);
 noLTC=noLTC{i};
 counterfactual(:,2,:)=benchmark(:,1)-noLTC(:,1);
 
+fileID = fopen('noLTC_mental.txt');
+noLTC=textscan(fileID,'%f %f %f %f %f %f %f ');
+fclose(fileID);
+noLTC=noLTC{i};
+counterfactual(:,3,:)=benchmark(:,1)-noLTC(:,1);
 
-for c=1:2
-    plot(70:2:100,counterfactual(1:16,c),ldash{c},'Color',colors{c},'LineWidth',width{c})        
+fileID = fopen('noLTC_impaired.txt');
+noLTC=textscan(fileID,'%f %f %f %f %f %f %f ');
+fclose(fileID);
+noLTC=noLTC{i};
+counterfactual(:,4,:)=benchmark(:,1)-noLTC(:,1);
+
+
+for c=1:4
+    plot(70:2:96,counterfactual(1:14,c)./benchmark(1:14,1),ldash{c},'Color',colors{c},'LineWidth',width{c})        
     hold on  
 end
 set(gcf,'color','w')
 xlabel('Age','FontSize',FS)
-ylabel('Assets (000s of 2018 dollars)','FontSize',FS)
- ylim([-9,50])
+ ylim([0,0.30])
+%  yticks([0:0.05:0.3])
+ xlim([70,96])
 %  if i==2
-    I=legend('Benchmark','No Close Families','orientation','horizontal');
+    I=legend('All LTC','No Physical LTC','No Mental LTC','No Impaired LTC','orientation','horizontal');
     legend('boxoff')
     I.FontSize=FS;
     newPosition = [0.4 0.88 0.2 0.2];
@@ -535,5 +570,6 @@ ylabel('Assets (000s of 2018 dollars)','FontSize',FS)
 %  end 
 set(gca,'FontName','Times New Roman','Fontsize',FS);
 end
-print(gcf,'-depsc', 'C:\Users\jbueren\Google Drive\JMP\Draft\figures\counterfactuals.eps')
-print(gcf,'-depsc', 'C:\Users\jbueren\Google Drive\JMP\Slides\figures\counterfactuals.eps')
+
+% print(gcf,'-depsc', 'C:\Users\jbueren\Google Drive\JMP\Draft\figures\counterfactuals.eps')
+% print(gcf,'-depsc', 'C:\Users\jbueren\Google Drive\JMP\Slides\figures\counterfactuals.eps')

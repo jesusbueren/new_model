@@ -58,7 +58,7 @@ module targets
     use dimensions; use nrtype
     implicit none
     real(SP),dimension(L_PI,obs,groups)::data_NW_PI,data_NW_PI1,data_NW_PIb,data_NW_PI1b
-    real(SP),dimension(2,obs)::data_NW_h_ut
+    real(SP),dimension(2,f_t,obs)::data_NW_h_ut
     real(SP),dimension(L_PI,f_t)::data_beq100_IC
     real(SP),dimension(L_PI,clusters)::data_lfc_PI
     real(SP),dimension(f_t,clusters)::data_lfc_IC,data_govmd_IC

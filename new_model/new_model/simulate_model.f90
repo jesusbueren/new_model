@@ -6,7 +6,7 @@ subroutine simulate_model(a_policy,g_policy,lfc_x,beq100_policy, &
     integer,dimension(nkk,clusters,nzz,L_gender,L_PI2,f_t,generations),intent(in)::a_policy,g_policy
     real(SP),dimension(nkk,clusters,f_t,L_PI2),intent(in)::lfc_x
     real(SP),dimension(moment_conditions,1),intent(out)::model_moments1,model_moments
-    real(SP),dimension(2,obs)::model_NW_h_ut
+    real(SP),dimension(2,f_t,obs)::model_NW_h_ut
     !Loop variables
     integer::i_l,t_l,pos_x,xi_l,xi_l2,ts_l2,ind,k2_l,ns,g_l,pi_l,ic_l,h_l,f_l2,nwq_l,s_l,it,f_ll,nh_l
     integer,dimension(2)::f_l
@@ -18,7 +18,7 @@ subroutine simulate_model(a_policy,g_policy,lfc_x,beq100_policy, &
     integer,dimension(L_PI,clusters)::counter_pi_h2
     integer,dimension(f_t,clusters)::counter_ic_h,counter_md_h
     integer,dimension(f_t)::counter_ic
-    integer,dimension(2,obs)::counter_ut
+    integer,dimension(2,f_t,obs)::counter_ut
     integer,dimension(f_t,obs,groups)::counter_ic_nw
     integer,dimension(L_PI,f_t)::counter_beq100
     !Hours of care variables and medicaid variables
@@ -28,11 +28,11 @@ subroutine simulate_model(a_policy,g_policy,lfc_x,beq100_policy, &
     real(SP),dimension(L_PI,f_t,samples_per_i)::av_beq100_ic
     real(SP),dimension(L_PI,clusters,samples_per_i)::av_lfc_pi_h
     real(SP),dimension(f_t,clusters,samples_per_i)::av_lfc_ic_h,av_md_ic_h
-    real(SP),dimension(2,obs,samples_per_i)::model_NW_h_ut_ns
+    real(SP),dimension(2,f_t,obs,samples_per_i)::model_NW_h_ut_ns
     real(SP),dimension(f_t,obs,groups,samples_per_i)::assets_ic_ns
     !Store vector variables for assets
     real(SP),dimension(L_PI,obs,groups,1400)::assets_pi_age_group,assets_pi_age_group_b !1400: maximum number of individuals in a group
-    real(SP),dimension(2,obs,6000)::assets_ut
+    real(SP),dimension(2,f_t,obs,6000)::assets_ut
     real(SP),dimension(L_PI,f_t,30000)::beq100_ic
     real(SP),dimension(f_t,obs,groups,4000)::assets_ic
     !Model moments
@@ -274,11 +274,11 @@ subroutine simulate_model(a_policy,g_policy,lfc_x,beq100_policy, &
                     end if
                     
                     if (h_i(i_l,t_l,2)==1) then
-                        counter_ut(1,t_l)=counter_ut(1,t_l)+1
-                        assets_ut(1,t_l,counter_ut(1,t_l))=a_it(t_l)
+                        counter_ut(1,f_l(2),t_l)=counter_ut(1,f_l(2),t_l)+1
+                        assets_ut(1,f_l(2),t_l,counter_ut(1,f_l(2),t_l))=a_it(t_l)
                     else
-                        counter_ut(2,t_l)=counter_ut(2,t_l)+1
-                        assets_ut(2,t_l,counter_ut(2,t_l))=a_it(t_l)
+                        counter_ut(2,f_l(2),t_l)=counter_ut(2,f_l(2),t_l)+1
+                        assets_ut(2,f_l(2),t_l,counter_ut(2,f_l(2),t_l))=a_it(t_l)
                     end if
                 else 
                     x_it(t_l+1)=-9.0_sp
@@ -326,11 +326,11 @@ subroutine simulate_model(a_policy,g_policy,lfc_x,beq100_policy, &
             end if
         end do; end do
         moments_s(:,ns)=sum(sum(moments_it,3),2)/real(indv)/real(obs)
-        do h_l=1,2; do t_l=1,7
-            call compute_percentile(assets_ut(h_l,t_l,1:counter_ut(h_l,t_l)), &
-                                    counter_ut(h_l,t_l),50, & 
-                                    model_NW_h_ut_ns(h_l,t_l,ns))
-        end do; end do
+        do h_l=1,2; do t_l=1,7; do f_l2=1,f_t
+            call compute_percentile(assets_ut(h_l,f_l2,t_l,1:counter_ut(h_l,f_l2,t_l)), &
+                                    counter_ut(h_l,f_l2,t_l),50, & 
+                                    model_NW_h_ut_ns(h_l,f_l2,t_l,ns))
+        end do; end do; end do
         !Wealth moments by ic
         do f_ll=1,f_t;do t_l=1,7;do g_l=1,4
             if (counter_ic_nw(f_ll,t_l,g_l)>1) then
@@ -365,7 +365,7 @@ subroutine simulate_model(a_policy,g_policy,lfc_x,beq100_policy, &
                           reshape(moments_lfc_IC,(/f_t*clusters,1/)), &
                           reshape(moments_md_IC,(/f_t*clusters,1/)) /)
     
-    model_NW_h_ut=sum(model_NW_h_ut_ns,3)/real(samples_per_i)
+    model_NW_h_ut=sum(model_NW_h_ut_ns,4)/real(samples_per_i)
     
     open(unit=9,file='moments_NW_IC1.txt')
         write(9,*) moments_NW_IC1

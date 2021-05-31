@@ -12,13 +12,13 @@ subroutine charge_simulation_input_moments(data_NW_PI1,data_NW_PI,&
     real(SP),dimension(f_t,clusters),intent(inout)::data_lfc_IC,data_govmd_IC
     real(SP),dimension(f_t,obs,groups),intent(inout)::data_NW_IC,data_NW_IC1
     real(SP),dimension(L_PI,obs,groups),intent(inout)::data_NW_PI,data_NW_PI1
-    real(SP),dimension(2,obs),intent(inout)::data_NW_h_ut
+    real(SP),dimension(2,f_t,obs),intent(inout)::data_NW_h_ut
     real(SP),dimension(L_PI,obs,groups,samples_per_i)::data_NW_PI1_ns
-    real(SP),dimension(2,obs,samples_per_i)::data_NW_h_ut_ns
+    real(SP),dimension(2,f_t,obs,samples_per_i)::data_NW_h_ut_ns
     !Loop variables
     integer::i_l,t_l,pi_l,h_l,g_l,f_l,s_l,ind,ic_p,ic_l,q_l
     !Counter variables
-    integer,dimension(2,obs)::counter_ut
+    integer,dimension(2,f_t,obs)::counter_ut
     integer,dimension(L_PI,clusters)::counter_pi_h
     integer,dimension(f_t,clusters)::counter_ic_h,counter_ic_MD
     integer,dimension(f_t,clusters,2)::counter_nh
@@ -31,7 +31,7 @@ subroutine charge_simulation_input_moments(data_NW_PI1,data_NW_PI,&
     real(SP),dimension(L_PI,f_t,10000)::beq100_ic
     !Store vector variables    
     real(SP),dimension(L_PI,obs,groups,1500)::assets_pi_age_group,assets_pi_age_group_b !1500: maximum number of individuals in a group
-    real(SP),dimension(2,obs,8000)::assets_ut
+    real(SP),dimension(2,f_t,obs,8000)::assets_ut
     real(SP),dimension(f_t,obs,groups,4000)::assets_ic    
     !Across latent health types
     real(SP),dimension(L_PI,clusters,samples_per_i)::data_NW_PI_s
@@ -155,11 +155,11 @@ subroutine charge_simulation_input_moments(data_NW_PI1,data_NW_PI,&
                     counter_pi_age_group(PI_q_i(i_l),t_l,group_i(i_l))=counter_pi_age_group(PI_q_i(i_l),t_l,group_i(i_l))+1
                     assets_pi_age_group(PI_q_i(i_l),t_l,group_i(i_l),counter_pi_age_group(PI_q_i(i_l),t_l,group_i(i_l)))=NW(i_l,t_l)
                     if (h_i(i_l,t_l,1)==1) then
-                        counter_ut(1,t_l)=counter_ut(1,t_l)+1
-                        assets_ut(1,t_l,counter_ut(1,t_l))=NW(i_l,t_l)
+                        counter_ut(1,f_l,t_l)=counter_ut(1,f_l,t_l)+1
+                        assets_ut(1,f_l,t_l,counter_ut(1,f_l,t_l))=NW(i_l,t_l)
                     else
-                        counter_ut(2,t_l)=counter_ut(2,t_l)+1
-                        assets_ut(2,t_l,counter_ut(2,t_l))=NW(i_l,t_l)
+                        counter_ut(2,f_l,t_l)=counter_ut(2,f_l,t_l)+1
+                        assets_ut(2,f_l,t_l,counter_ut(2,f_l,t_l))=NW(i_l,t_l)
                     end if
                 end if
                 if (NW(i_l,t_l)/=-9.0_sp) then
@@ -197,13 +197,13 @@ subroutine charge_simulation_input_moments(data_NW_PI1,data_NW_PI,&
             end if 
         end do; end do; end do
         !Wealth moments by h 
-        do h_l=1,2; do t_l=1,7
-            if (counter_ut(h_l,t_l)>min_obs) then
-                call compute_percentile(assets_ut(h_l,t_l,1:counter_ut(h_l,t_l)), &
-                                    counter_ut(h_l,t_l),50, &
-                                    data_NW_h_ut_ns(h_l,t_l,s_l)) 
+        do f_l=1,f_t;do h_l=1,2; do t_l=1,7
+            if (counter_ut(h_l,f_l,t_l)>min_obs) then
+                call compute_percentile(assets_ut(h_l,f_l,t_l,1:counter_ut(h_l,f_l,t_l)), &
+                                    counter_ut(h_l,f_l,t_l),50, &
+                                    data_NW_h_ut_ns(h_l,f_l,t_l,s_l)) 
             end if 
-        end do; end do
+        end do; end do;end do
         !Wealth moments by ic
         do f_l=1,f_t; do t_l=1,7; do g_l=1,4
             if (counter_ic_nw(f_l,t_l,g_l)>min_obs) then
@@ -230,11 +230,11 @@ subroutine charge_simulation_input_moments(data_NW_PI1,data_NW_PI,&
         end if    
     end do; end do; end do
     !Wealth moments by h
-    do h_l=1,2; do t_l=1,7;
-        if (counter_ut(h_l,t_l)>min_obs) then
-            data_NW_h_ut(h_l,t_l)=sum(data_NW_h_ut_ns(h_l,t_l,:))/real(samples_per_i)
+    do h_l=1,2; do t_l=1,7;do f_l=1,f_t
+        if (counter_ut(h_l,f_l,t_l)>min_obs) then
+            data_NW_h_ut(h_l,f_l,t_l)=sum(data_NW_h_ut_ns(h_l,f_l,t_l,:))/real(samples_per_i)
         end if  
-    end do; end do
+    end do; end do;end do
     !Wealth moments by family
     do f_l=1,f_t;do t_l=1,7; do g_l=1,4
         if (counter_ic_nw(f_l,t_l,g_l)>min_obs) then
