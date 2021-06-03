@@ -4,12 +4,12 @@ subroutine SMM_se(parameters,moments,densities)
     real(SP),dimension(moment_conditions,1),intent(out)::moments,densities
     real(SP),dimension(parameters_to_est),intent(in)::parameters
     integer::h_l
-    integer,dimension(nkk,clusters,nzz,L_gender,L_PI2,f_t,generations)::a_policy,g_policy
-    real(SP),dimension(nkk,clusters,nzz,L_gender,L_PI2,f_t,generations)::beq100_policy
-    real(SP),dimension(nkk,clusters,f_t,L_PI2)::lfc_x
+    integer,dimension(nkk,clusters,nzz,L_gender,L_PI2,f_t,2,generations)::a_policy,g_policy
+    real(SP),dimension(nkk,clusters,nzz,L_gender,L_PI2,f_t,2,generations)::beq100_policy
+    real(SP),dimension(nkk,clusters,f_t,L_PI2,2)::lfc_x
     character::pause_k
     real(SP)::c,l_fc,mu_av
-    real(SP),dimension(nkk,clusters,f_t,L_PI2)::u_x
+    real(SP),dimension(nkk,clusters,f_t,L_PI2,2)::u_x
     
     H_av(clusters+1,clusters+1,:,:,:)=1.0_sp
     

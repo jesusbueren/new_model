@@ -216,12 +216,18 @@ subroutine charge_simulation_input_moments(data_NW_PI1,data_NW_PI,&
     end do
     data_lfc_PI=sum(data_lfc_PI_s,3)/real(samples_per_i)
     data_beq100_IC=sum(data_beq100_IC_s,3)/real(samples_per_i)
-    l_ic=sum(l_ic_s,3)/real(samples_per_i) !l_ic
+    l_ic(:,:,1)=sum(l_ic_s,3)/real(samples_per_i)
+    l_ic(:,:,2)=l_ic(:,:,1)
+    !Close families are like distant families when in nursing homes
+    l_ic(2,:,2)=l_ic(1,:,2)
+
     data_lfc_IC=sum(data_lfc_IC_s,3)/real(samples_per_i)
     data_govmd_IC=sum(data_govmd_IC_s,3)/real(samples_per_i)
-    pr_nh(:,1:clusters,2)=sum(pr_nh_s,3)/real(samples_per_i)
-    pr_nh(:,clusters+1,2)=pr_nh(:,clusters,2)
-    pr_nh(:,:,1)=1-pr_nh(:,:,2)
+    pr_nh(:,1:clusters,1,2)=sum(pr_nh_s,3)/real(samples_per_i)
+    pr_nh(:,clusters+1,1,2)=pr_nh(:,clusters,1,2)
+    pr_nh(:,:,1,1)=1-pr_nh(:,:,1,2)
+    pr_nh(:,:,2,1)=0.0_sp
+    pr_nh(:,:,2,2)=1.0_sp
     !Wealth moments by PIq
     do pi_l=1,L_PI; do t_l=1,7; do g_l=1,4
         if (counter_pi_age_group(pi_l,t_l,g_l)>min_obs) then

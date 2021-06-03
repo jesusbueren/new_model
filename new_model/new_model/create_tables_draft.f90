@@ -38,9 +38,9 @@ subroutine create_tables_draft(parameters)
     open(unit=9,file='C:\Users\jbueren\Google Drive\JMP\Draft\tables\data_LTC_IC.txt')
     do f_l=1,f_t;do h_l=2,clusters            
         if (h_l==clusters .and. f_l/=f_t) then
-            write(9,'(A20,A2,A18,A2,F5.1,A2,F5.1,A2,F5.1,A9)') strings_f(f_l),"&",strings_h(h_l),"&",l_ic(f_l,h_l)/365/2,"&",data_lfc_IC(f_l,h_l),"&",pr_nh(f_l,h_l,2)*100.0d0,"\\ [5pt]"
+            write(9,'(A20,A2,A18,A2,F5.1,A2,F5.1,A2,F5.1,A9)') strings_f(f_l),"&",strings_h(h_l),"&",l_ic(f_l,h_l,1)/365/2,"&",data_lfc_IC(f_l,h_l),"&",pr_nh(f_l,h_l,1,2)*100.0d0,"\\ [5pt]"
         else
-            write(9,'(A20,A2,A18,A2,F5.1,A2,F5.1,A2,F5.1,A3)') strings_f(f_l),"&",strings_h(h_l),"&",l_ic(f_l,h_l)/365/2,"&",data_lfc_IC(f_l,h_l),"&",pr_nh(f_l,h_l,2)*100.0d0,"\\"
+            write(9,'(A20,A2,A18,A2,F5.1,A2,F5.1,A2,F5.1,A3)') strings_f(f_l),"&",strings_h(h_l),"&",l_ic(f_l,h_l,1)/365/2,"&",data_lfc_IC(f_l,h_l),"&",pr_nh(f_l,h_l,1,2)*100.0d0,"\\"
         end if
     end do;end do
     close(9)

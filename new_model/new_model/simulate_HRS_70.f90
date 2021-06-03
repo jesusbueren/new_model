@@ -6,10 +6,10 @@ subroutine simulate_HRS_70(parameters,p50_75_assets_ic_age,p50_75_assets_all_age
     integer,intent(in)::ind_h
     real(SP),dimension(L_PI+1),intent(out)::EDP,CV
     integer,parameter::indv_c=150000
-    real(SP),dimension(nkk,clusters,nzz,L_gender,L_PI2,f_t,generations)::beq100_policy
-    integer,dimension(nkk,clusters,nzz,L_gender,L_PI2,f_t,generations)::a_policy,g_policy
-    real(SP),dimension(nkk,clusters,f_t,L_PI2)::u_x
-    real(SP),dimension(nkk,clusters,f_t,L_PI2)::lfc_x
+    real(SP),dimension(nkk,clusters,nzz,L_gender,L_PI2,f_t,2,generations)::beq100_policy
+    integer,dimension(nkk,clusters,nzz,L_gender,L_PI2,f_t,2,generations)::a_policy,g_policy
+    real(SP),dimension(nkk,clusters,f_t,L_PI2,2)::u_x
+    real(SP),dimension(nkk,clusters,f_t,L_PI2,2)::lfc_x
     integer::i_l,xi_l,i_l2,t_l,ind,k2_l,pos_x,xi_l2,f_l,ts_l2,pi_l,nwq_l,h_l,pos_x2,k2_l2,nh_l
     real(SP)::u,x_pr_md,sum_t,sum_t_md
     real(SP),dimension(indv_c)::tr_i,fam_i
@@ -124,13 +124,16 @@ subroutine simulate_HRS_70(parameters,p50_75_assets_ic_age,p50_75_assets_all_age
             else 
                 call RANDOM_NUMBER(u)
                 ind=1
-                do while (h_s(t_l)==-9)
-                    if (u<sum(H_av(h_s(t_l-1),1:ind,t_l,PI_q_i2(i_l),gender_i(i_l)))) then 
+                do while (h_s(t_l)==-9 .and. ind<=clusters+1)
+                    if (u<sum(H_av(h_s(t_l-1),1:ind,t_l,PI_q_i2(i_l),gender_i(i_l)))) then  
                             h_s(t_l)=ind
                     else
                         ind=ind+1
                     end if
                 end do
+                if (h_s(t_l)==-9) then
+                    h_s(t_l)=clusters+1
+                end if
             end if
         end do
         !Mortality bias
@@ -140,6 +143,8 @@ subroutine simulate_HRS_70(parameters,p50_75_assets_ic_age,p50_75_assets_all_age
             end if
         end if
         tr_it=0.0_sp
+        !start out of nursing home
+        nh_l=1
         do t_l=1,generations-1
             if (h_s(t_l)<clusters+1 ) then 
                 !Sample initial medical persistent shock to chracterize the state variable
@@ -180,33 +185,33 @@ subroutine simulate_HRS_70(parameters,p50_75_assets_ic_age,p50_75_assets_all_age
                 
                 !Nursing home state
                 call RANDOM_NUMBER(u)
-                if (u<pr_nh(f_l,h_s(t_l),2)) then
+                if (u<pr_nh(f_l,h_s(t_l),nh_l,2)) then
                     nh_l=1
                 else
-                    nh_l=0
+                    nh_l=2
                 end if
                 
                 !Cash on hand
-                x_it(t_l)=(1+r)*a_it(t_l)-m_exp_all(t_l,gender_i(i_l),PI_q_i2(i_l),h_s(t_l),xi_l2,ts_l2)+b(PI_q_i2(i_l),gender_i(i_l))-real(nh_l)*p_nh(h_s(t_l))
+                x_it(t_l)=(1+r)*a_it(t_l)-m_exp_all(t_l,gender_i(i_l),PI_q_i2(i_l),h_s(t_l),xi_l2,ts_l2)+b(PI_q_i2(i_l),gender_i(i_l))-real(nh_l-1)*p_nh(h_s(t_l))
                 obs_m_av(PI_q_i(i_l),t_l)=obs_m_av(PI_q_i(i_l),t_l)+1.0_sp
                 m_av(PI_q_i(i_l),t_l)=(obs_m_av(PI_q_i(i_l),t_l)-1.0_sp)/obs_m_av(PI_q_i(i_l),t_l)*m_av(PI_q_i(i_l),t_l) + &
                                         1.0_sp/obs_m_av(PI_q_i(i_l),t_l)*m_exp_all(t_l,gender_i(i_l),PI_q_i2(i_l),h_s(t_l),xi_l2,ts_l2)
                 pos_x=int(max(min(x_it(t_l),coh_grid(nkk)),0.0_sp)/(coh_grid(2)-coh_grid(1))+1.00000001_sp)
                 !Draw on the discrete choice
                 call RANDOM_NUMBER(u)
-                if (g_policy(pos_x,h_s(t_l),xi_l,gender_i(i_l),PI_q_i2(i_l),f_l,t_l)==1) then
+                if (g_policy(pos_x,h_s(t_l),xi_l,gender_i(i_l),PI_q_i2(i_l),f_l,nh_l,t_l)==1) then
                     g_it(t_l)=1
                     k2_l=1
                 else
                     g_it(t_l)=0
-                    k2_l=a_policy(pos_x,h_s(t_l),xi_l,gender_i(i_l),PI_q_i2(i_l),f_l,t_l)
+                    k2_l=a_policy(pos_x,h_s(t_l),xi_l,gender_i(i_l),PI_q_i2(i_l),f_l,nh_l,t_l)
                 end if 
                 a_it(t_l+1)=coh_grid(k2_l)
                 if (g_it(t_l)==1) then
                     tr_it(t_l)=max(c_bar(h_s(t_l))+p_or*l_bar(h_s(t_l))-x_it(t_l),0.0_sp)
                     x_it(t_l)=0.0_sp
                 else
-                    tr_it(t_l)=lfc_x(pos_x-k2_l+1,h_s(t_l),f_l,PI_q_i2(i_l))*(p_or-p_fc)
+                    tr_it(t_l)=lfc_x(pos_x-k2_l+1,h_s(t_l),f_l,PI_q_i2(i_l),nh_l)*(p_or-p_fc)
                 end if
                 tr_it(t_l)=tr_it(t_l)/(1.0_sp+r)**(t_l-1)
                 tr_h(i_l2,h_s(t_l))=tr_h(i_l2,h_s(t_l))+tr_it(t_l)
@@ -218,7 +223,7 @@ subroutine simulate_HRS_70(parameters,p50_75_assets_ic_age,p50_75_assets_all_age
                 end if
                 assets_pi_age(PI_q_i(i_l),t_l,counter_pi_age(PI_q_i(i_l),t_l))=a_it(t_l)
                 if (g_it(t_l)==0) then
-                    c_pi_age(PI_q_i(i_l),t_l,counter_pi_age(PI_q_i(i_l),t_l))=coh_grid(pos_x)-coh_grid(k2_l)-lfc_x(pos_x-k2_l+1,h_s(t_l),f_l,PI_q_i2(i_l))*p_fc
+                    c_pi_age(PI_q_i(i_l),t_l,counter_pi_age(PI_q_i(i_l),t_l))=coh_grid(pos_x)-coh_grid(k2_l)-lfc_x(pos_x-k2_l+1,h_s(t_l),f_l,PI_q_i2(i_l),nh_l)*p_fc
                 else
                     c_pi_age(PI_q_i(i_l),t_l,counter_pi_age(PI_q_i(i_l),t_l))=c_bar(h_s(t_l))
                 end if
@@ -231,14 +236,14 @@ subroutine simulate_HRS_70(parameters,p50_75_assets_ic_age,p50_75_assets_all_age
                 
                 !Compute Compensating Variation
                 if (ind_or==0 .and. t_l==1) then
-                    if (V_70_or(pos_x,h_s(t_l),xi_l,gender_i(i_l),PI_q_i2(i_l),f_l)==V_70_new(pos_x,h_s(t_l),xi_l,gender_i(i_l),PI_q_i2(i_l),f_l)) then
+                    if (V_70_or(pos_x,h_s(t_l),xi_l,gender_i(i_l),PI_q_i2(i_l),f_l,nh_l)==V_70_new(pos_x,h_s(t_l),xi_l,gender_i(i_l),PI_q_i2(i_l),f_l,nh_l)) then
                         lambda_pi(f_l,counter_f(f_l))=0.0_sp
                         !ltci_pi(PI_q_i(i_l),counter_pi_age(PI_q_i(i_l),t_l))=0.0_sp
-                    elseif (V_70_or(pos_x,h_s(t_l),xi_l,gender_i(i_l),PI_q_i2(i_l),f_l)<V_70_new(1,h_s(t_l),xi_l,gender_i(i_l),PI_q_i2(i_l),f_l)) then
+                    elseif (V_70_or(pos_x,h_s(t_l),xi_l,gender_i(i_l),PI_q_i2(i_l),f_l,nh_l)<V_70_new(1,h_s(t_l),xi_l,gender_i(i_l),PI_q_i2(i_l),f_l,nh_l)) then
                         lambda_pi(f_l,counter_f(f_l))=coh_grid(pos_x) 
                     else
                         lambda_pi(f_l,counter_f(f_l))=&
-                        coh_grid(pos_x)-coh_grid(minloc(abs(V_70_new(:,h_s(t_l),xi_l,gender_i(i_l),PI_q_i2(i_l),f_l)-V_70_or(pos_x,h_s(t_l),xi_l,gender_i(i_l),PI_q_i2(i_l),f_l)),1)) 
+                        coh_grid(pos_x)-coh_grid(minloc(abs(V_70_new(:,h_s(t_l),xi_l,gender_i(i_l),PI_q_i2(i_l),f_l,nh_l)-V_70_or(pos_x,h_s(t_l),xi_l,gender_i(i_l),PI_q_i2(i_l),f_l,nh_l)),1)) 
                     end if
                 end if
             end if
