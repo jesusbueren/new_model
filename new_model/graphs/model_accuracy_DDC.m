@@ -213,7 +213,7 @@ set(gca,'FontName','Times New Roman','Fontsize',FS);
 print(gcf,'-depsc', 'C:\Users\jbueren\Google Drive\JMP\Draft\figures\model_fit3.eps')
 
 
-%%
+
 figure(3)
 set(3,'position',[450    400    700    500])
 clrs = [0 0 0; 0.9 0.9 0.9 ];
@@ -353,6 +353,7 @@ xticklabels({'Distant','Close'})
 I=legend('Benchmark','High bequest','High LTC','Location','NorthEast')
 legend('boxoff')
 I.FontSize=FS
+ylim([0 7])
 hold off
 set(gca,'FontName','Times New Roman','Fontsize',FS);
 xlabel('Family Type','FontSize',FS)
@@ -495,7 +496,7 @@ for c=1:2
 end
 set(gcf,'color','w')
 xlabel('Age','FontSize',FS)
-ylim([0,0.30])
+ylim([0,0.60])
 %  yticks([0:0.05:0.3])
 xlim([70,96])
 %  if i==2
@@ -557,7 +558,7 @@ for c=1:4
 end
 set(gcf,'color','w')
 xlabel('Age','FontSize',FS)
- ylim([0,0.30])
+ ylim([0,0.60])
 %  yticks([0:0.05:0.3])
  xlim([70,96])
 %  if i==2
