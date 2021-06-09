@@ -54,7 +54,7 @@ subroutine R2p(parameters,parameters_n)
     
     !Utility at the floor when healthy
     do h_l=1,1
-        call solve_intratemporal(p_fc,x_bar(h_l),h_l,0.0_sp,u_bar_no_f(h_l),l_fc,c)
+        call solve_intratemporal(p_fc(1),x_bar(h_l),h_l,0.0_sp,u_bar_no_f(h_l),l_fc,c)
     end do
     u_bar_no_f=u_bar_no_f(1)
     

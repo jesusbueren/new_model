@@ -90,11 +90,11 @@ subroutine simulate_i(a_policy,g_policy,lfc_x,samples,h_ini,x_ini,f_l,PI_q_ii,PI
                 if (g_policy(pos_x,h_s(t_l),xi_l,gender_ii,PI_q_ii2,f_l,t_l)==1) then
                     g_it(t_l)=1
                     k2_l=1
-                    cons(counter_age(t_l),t_l)=c_bar(h_s(t_l))
+                    cons(counter_age(t_l),t_l)=c_bar(h_s(t_l),1)
                 else
                     g_it(t_l)=0
                     k2_l=a_policy(pos_x,h_s(t_l),xi_l,gender_ii,PI_q_ii2,f_l,t_l)
-                    cons(counter_age(t_l),t_l)=coh_grid(pos_x)-coh_grid(k2_l)-lfc_x(pos_x-k2_l+1,h_s(t_l),f_l,PI_q_ii2)*p_fc
+                    cons(counter_age(t_l),t_l)=coh_grid(pos_x)-coh_grid(k2_l)-lfc_x(pos_x-k2_l+1,h_s(t_l),f_l,PI_q_ii2)*p_fc(1)
                 end if
                 a_it(t_l+1)=coh_grid(k2_l)
                 !Formal care decision

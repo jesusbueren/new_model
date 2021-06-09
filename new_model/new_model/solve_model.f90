@@ -32,7 +32,7 @@ subroutine solve_model(a_policy,g_policy,lfc_x,u_x,beq100_policy)
             lfc_x(x_l,h_l,f_l,i_l,nh_l)=0.0_sp
             c_x(x_l,h_l,f_l,i_l,nh_l)=0.0_sp
         else
-            call solve_intratemporal(p_fc,coh_grid(x_l),h_l,l_ic(f_l,h_l,nh_l),u_x(x_l,h_l,f_l,i_l,nh_l),lfc_x(x_l,h_l,f_l,i_l,nh_l),c_x(x_l,h_l,f_l,i_l,nh_l))
+            call solve_intratemporal(p_fc(nh_l),coh_grid(x_l),h_l,l_ic(f_l,h_l,nh_l),u_x(x_l,h_l,f_l,i_l,nh_l),lfc_x(x_l,h_l,f_l,i_l,nh_l),c_x(x_l,h_l,f_l,i_l,nh_l))
         end if
     end do; end do; end do; end do;end do
 

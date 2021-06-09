@@ -464,7 +464,7 @@ set(7,'position',[50    100    600    500])
 subplot(2,1,2)
 for i=1:1
 cd('C:\Users\jbueren\Google Drive\JMP\Code\Structural Model\new_model\new_model\new_model');
-fileID = fopen('benchmark_MB.txt');
+fileID = fopen('benchmark.txt');
 benchmark=textscan(fileID,'%f %f %f %f %f %f %f');
 fclose(fileID);
 benchmark=benchmark{i};
@@ -572,5 +572,5 @@ xlabel('Age','FontSize',FS)
 set(gca,'FontName','Times New Roman','Fontsize',FS);
 end
 
-% print(gcf,'-depsc', 'C:\Users\jbueren\Google Drive\JMP\Draft\figures\counterfactuals.eps')
-% print(gcf,'-depsc', 'C:\Users\jbueren\Google Drive\JMP\Slides\figures\counterfactuals.eps')
+print(gcf,'-depsc', 'C:\Users\jbueren\Google Drive\JMP\Draft\figures\counterfactuals.eps')
+print(gcf,'-depsc', 'C:\Users\jbueren\Google Drive\JMP\Slides\figures\counterfactuals.eps')

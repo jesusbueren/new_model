@@ -31,7 +31,7 @@ subroutine simulate_HRS_70(parameters,p50_75_assets_ic_age,p50_75_assets_all_age
     real(SP)::c,l_fc,mu_av
     integer,dimension(1)::seed=254
     character::pause_k
-    real(SP)::sub_per_h
+
     real(SP),dimension(moment_conditions,1)::model_moments1,model_moments, &
                                              model_moments_new,model_moments1_new
     real(SP),dimension(L_PI,obs,groups)::moments_PI_ut
@@ -59,7 +59,7 @@ subroutine simulate_HRS_70(parameters,p50_75_assets_ic_age,p50_75_assets_all_age
     
     !Utility at the floor when healthy
     do h_l=1,1
-        call solve_intratemporal(p_fc,x_bar(h_l),h_l,0.0_sp,u_bar_no_f(h_l),l_fc,c)
+        call solve_intratemporal(p_fc(1),x_bar(h_l),h_l,0.0_sp,u_bar_no_f(h_l),l_fc,c)
     end do
     u_bar_no_f=u_bar_no_f(1)
     
@@ -71,9 +71,6 @@ subroutine simulate_HRS_70(parameters,p50_75_assets_ic_age,p50_75_assets_all_age
         mu(h_l)=exp(alpha_mu(h_l-1))
     end do
     
-    !Change price of formal care
-    sub_per_h=p_fc-p_fc*(1.0_sp-p_sub)
-    p_fc=p_fc*(1.0_sp-p_sub)
     
     !Solve the model given a set of parameters
     call solve_model(a_policy,g_policy,lfc_x,u_x,beq100_policy)
@@ -208,10 +205,10 @@ subroutine simulate_HRS_70(parameters,p50_75_assets_ic_age,p50_75_assets_all_age
                 end if 
                 a_it(t_l+1)=coh_grid(k2_l)
                 if (g_it(t_l)==1) then
-                    tr_it(t_l)=max(c_bar(h_s(t_l))+p_or*l_bar(h_s(t_l))-x_it(t_l),0.0_sp)
+                    tr_it(t_l)=max(c_bar(h_s(t_l),nh_l)+p_or(nh_l)*l_bar(h_s(t_l),nh_l)-x_it(t_l),0.0_sp)
                     x_it(t_l)=0.0_sp
                 else
-                    tr_it(t_l)=lfc_x(pos_x-k2_l+1,h_s(t_l),f_l,PI_q_i2(i_l),nh_l)*(p_or-p_fc)
+                    tr_it(t_l)=lfc_x(pos_x-k2_l+1,h_s(t_l),f_l,PI_q_i2(i_l),nh_l)*(p_or(nh_l)-p_fc(nh_l))
                 end if
                 tr_it(t_l)=tr_it(t_l)/(1.0_sp+r)**(t_l-1)
                 tr_h(i_l2,h_s(t_l))=tr_h(i_l2,h_s(t_l))+tr_it(t_l)
@@ -223,9 +220,9 @@ subroutine simulate_HRS_70(parameters,p50_75_assets_ic_age,p50_75_assets_all_age
                 end if
                 assets_pi_age(PI_q_i(i_l),t_l,counter_pi_age(PI_q_i(i_l),t_l))=a_it(t_l)
                 if (g_it(t_l)==0) then
-                    c_pi_age(PI_q_i(i_l),t_l,counter_pi_age(PI_q_i(i_l),t_l))=coh_grid(pos_x)-coh_grid(k2_l)-lfc_x(pos_x-k2_l+1,h_s(t_l),f_l,PI_q_i2(i_l),nh_l)*p_fc
+                    c_pi_age(PI_q_i(i_l),t_l,counter_pi_age(PI_q_i(i_l),t_l))=coh_grid(pos_x)-coh_grid(k2_l)-lfc_x(pos_x-k2_l+1,h_s(t_l),f_l,PI_q_i2(i_l),nh_l)*p_fc(nh_l)
                 else
-                    c_pi_age(PI_q_i(i_l),t_l,counter_pi_age(PI_q_i(i_l),t_l))=c_bar(h_s(t_l))
+                    c_pi_age(PI_q_i(i_l),t_l,counter_pi_age(PI_q_i(i_l),t_l))=c_bar(h_s(t_l),nh_l)
                 end if
                 if (PI_q_i(i_l)==4) then
                     counter_ic_age(f_l,t_l)=counter_ic_age(f_l,t_l)+1

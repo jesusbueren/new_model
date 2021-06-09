@@ -25,13 +25,13 @@ program jmp
     open(unit=9,file='parameters_new.txt')
         write(9,*) parameters
     close(9)
-    
+  
     !Compute standard errors of estimated parameters
     open(unit=9,file='parameters_new.txt')
         read(9,*) parameters
     close(9)
     call compute_se(parameters)
-    
+   
     !Create paper's tables in Latex
     open(unit=9,file='parameters_new.txt')
         read(9,*) parameters
@@ -44,7 +44,7 @@ program jmp
     close(9)
     call counterfactuals(parameters)
     
-    !!Identification bequest from LTC
+    !Identification bequest from LTC
     open(unit=9,file='parameters_new.txt')
         read(9,*) parameters
     close(9)

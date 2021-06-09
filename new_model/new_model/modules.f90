@@ -40,7 +40,7 @@ use nrtype
     integer,parameter::f_t=2,clusters=4,L_gender=2,L_PI=5,generations=21,nzz=3,variables=12,groups=4,parameters_to_est=11,obs=9, &
                         wealth_q=3,L_PI2=10,min_obs=39
     integer,parameter:: moment_conditions=L_PI*obs*groups+L_PI*f_t+f_t*obs*groups+L_PI*clusters+2*f_t*clusters
-    integer,parameter::samples_per_i=300,nkk=400
+    integer,parameter::samples_per_i=300,nkk=30!400
 end module dimensions
         
 module grids
@@ -73,7 +73,7 @@ module structural_p2
     real(SP),dimension(clusters):: kappa_h,delta_h,u_bar_no_f,x_bar
     real(SP),dimension(clusters,f_t,2)::u_bar
     real(SP),dimension(clusters-1)::alpha_mu
-    real(SP),dimension(clusters)::c_bar,l_bar
+    real(SP),dimension(clusters,2)::c_bar,l_bar
     real(SP),dimension(f_t):: lambda,delta
     real(SP),dimension(clusters):: mu
     real(SP),dimension(moment_conditions,moment_conditions):: W_opt,Phi
@@ -87,9 +87,9 @@ module structural_p1
     real(SP),dimension(DIM,1)::med_coef
     real(SP)::rho,sigma2_ep,sigma2_ze
     real(SP),parameter::r=1.02_sp**2_sp-1.0_sp
-    real(SP)::p_fc=12.0_sp/1000.0_sp
-    real(SP),dimension(clusters+1)::p_nh=(/8.0_sp/365.0_sp*443.0_sp,8.0_sp/365.0_sp*437.0_sp,8.0/365.0_sp*463.0_sp,8.0/365.0_sp*527.0_sp,8.0/365.0_sp*527.0_sp/2.0_sp/)
-    real(SP),parameter::p_or=12.0_sp/1000.0_sp
+    real(SP),dimension(2)::p_fc=(/12.0_sp/1000.0_sp,15.0_sp/1000.0_sp/)
+    real(SP),dimension(clusters+1)::p_nh=0.0_sp
+    real(SP),dimension(2),parameter::p_or=(/12.0_sp/1000.0_sp,15.0_sp/1000.0_sp/)
     real(SP),dimension(L_PI2,L_gender)::b
     real(SP),dimension(f_t,clusters,2)::l_ic,l_ic_or
     real(SP),dimension(f_t,clusters+1,2,2)::pr_nh
@@ -145,14 +145,14 @@ module MD_reform
 use dimensions;use nrtype
 implicit none
 real(SP),dimension(nkk,clusters+1,nzz,L_gender,L_PI2,2,f_t)::V_70_or,V_70_new,V_70
-integer::ind_or=1
+integer::ind_or=1,pol_exp=0
 real(SP)::p_sub=0.0_sp
 end module
     
 module HRS_data
     use dimensions; use nrtype; use simulation_input
     implicit none
-    integer,dimension(indv,obs):: IC_q,f1nhmliv
+    integer,dimension(indv,obs):: IC_q,f1nhmliv,nhmliv
     real(SP),dimension(indv,obs):: fc_h,NW,ic_h,beq100,govmd
 end module HRS_data
 
