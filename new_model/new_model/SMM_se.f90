@@ -18,9 +18,9 @@ subroutine SMM_se(parameters,moments,densities)
     alpha_mu(1:3)=parameters(3:5)
     delta(1:f_t)=parameters(6)
     nu=parameters(7)
-    lambda(1:f_t)=exp(parameters(8:9)) 
-    share_p=parameters(10)
-    subs_p=parameters(11)
+    lambda(1:f_t)=exp(parameters(8)) 
+    share_p=parameters(9)
+    subs_p=parameters(10)
         
     sigma_beq=sigma
     beta=0.95_sp
