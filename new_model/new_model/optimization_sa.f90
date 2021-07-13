@@ -6,7 +6,8 @@ subroutine optimization_sa(parameters_end)
     real(SP),dimension(parameters_to_est,2)::limits
     real(SP),dimension(parameters_to_est,parameters_to_est)::xi
     real(SP),dimension(parameters_to_est+1,parameters_to_est)::parameters
-    real(SP),dimension((parameters_to_est+1)*parameters_to_est)::parameters_v
+    real(SP),dimension(parameters_to_est+2,parameters_to_est+1)::parameters_old
+    real(SP),dimension((parameters_to_est+2)*(parameters_to_est+1))::parameters_v
     real(SP),dimension(parameters_to_est+1)::obj_fct
     real(SP)::ftol=0.0005_sp,temptr,obj_fct_end
     real(DP),dimension(parameters_to_est)::u
@@ -95,7 +96,9 @@ subroutine optimization_sa(parameters_end)
     open(unit=11,file='initial_simplex.txt')
         read(11,*) parameters_v
     close(11)
-    parameters=reshape(parameters_v,(/parameters_to_est+1,parameters_to_est/),order=(/2,1/))
+    parameters_old=reshape(parameters_v,(/parameters_to_est+2,parameters_to_est+1/),order=(/2,1/))
+    parameters(:,1:8)=parameters_old(1:parameters_to_est+1,1:8)
+    parameters(:,9:10)=parameters_old(1:parameters_to_est+1,10:11) 
     do p_l=1,parameters_to_est+1
         print*,'p_l',p_l
         call p2R(parameters(p_l,:))
