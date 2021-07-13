@@ -37,9 +37,9 @@ subroutine medicaid_provision()
             end if
         end do;end do
         
-        if (pol_exp==1) then
-            l_bar=l_bar*1.20d0
-        end if
+        !if (pol_exp==1) then
+        !    l_bar(:,1)=l_bar(:,1)*1.20d0
+        !end if
         !Utility of medicaid for individuals
         do h_l=1,clusters; do f_l=1,f_t; do nh_l=1,2
             if (h_l==1) then

@@ -40,7 +40,7 @@ use nrtype
     integer,parameter::f_t=2,clusters=4,L_gender=2,L_PI=5,generations=21,nzz=3,variables=12,groups=4,parameters_to_est=11,obs=9, &
                         wealth_q=3,L_PI2=10,min_obs=39
     integer,parameter:: moment_conditions=L_PI*obs*groups+L_PI*f_t+f_t*obs*groups+L_PI*clusters+2*f_t*clusters
-    integer,parameter::samples_per_i=300,nkk=30!400
+    integer,parameter::samples_per_i=300,nkk=400
 end module dimensions
         
 module grids

@@ -170,25 +170,25 @@ for m=1:2
 for p=1:2
     if m==1
         if p>1
-            scatter(1:7,data_moments_ut2(p,f_l,1:7),pattern{p},'MarkerEdgeColor',colors{p},'MarkerFaceColor',colors{p})
+            scatter(1:6,data_moments_ut2(p,f_l,1:6),pattern{p},'MarkerEdgeColor',colors{p},'MarkerFaceColor',colors{p})
         end
-        plot(squeeze(data_moments_ut2(p,f_l,1:7)),'Color',colors{p},'LineWidth',width{p})        
+        plot(squeeze(data_moments_ut2(p,f_l,1:6)),'Color',colors{p},'LineWidth',width{p})        
     else
-        plot(squeeze(model_moments_ut2(p,f_l,1:7)),':','Color',colors{p},'LineWidth',width{p})
+        plot(squeeze(model_moments_ut2(p,f_l,1:6)),':','Color',colors{p},'LineWidth',width{p})
     end
      hold on  
 end
 end
 p=1
-p1=plot(squeeze(data_moments_ut2(p,f_l,1:7)),'Color',colors{p},'LineWidth',width{p});
+p1=plot(squeeze(data_moments_ut2(p,f_l,1:6)),'Color',colors{p},'LineWidth',width{p});
 p=2;
-p2=scatter(1:7,data_moments_ut2(p,f_l,1:7),pattern{p},'MarkerEdgeColor',colors{p},'MarkerFaceColor',colors{p});
+p2=scatter(1:6,data_moments_ut2(p,f_l,1:6),pattern{p},'MarkerEdgeColor',colors{p},'MarkerFaceColor',colors{p});
 set(gcf,'color','w')
 xlabel('Interview','FontSize',FS)
 ylabel('Assets (000s of 2018 dollars)','FontSize',FS)
 ylim([-9,180])
-xticks([1:1:7])
-xlim([0 8])
+xticks([1:1:6])
+xlim([0 7])
 set(gca,'FontName','Times New Roman','Fontsize',FS);
 end
 I1=legend([p1 p2],'Healthy','In LTC need','location','NorthEast');
@@ -396,8 +396,8 @@ pattern = {'none' 'o' 's' '^'};
 width={3 1.5 3.5 1.5 2};
 ldash = {'-' '--' ':'  '*'};
 
-figure(7)
-set(7,'position',[50    100    650    350])    
+figure(8)
+set(8,'position',[50    100    650    350])    
 for i=1:2 %family
 
 for p=1:2 % percentile
@@ -422,11 +422,11 @@ counterfactual(:,3)=noBeq;
 
 if i==1
     subplot(1,2,1)
-    T=title('Distant Families','Position',[85 720])
+    T=title('Distant Families','Position',[85 460])
 
 else
     subplot(1,2,2)
-    T=title('Close Families','Position',[85 720])
+    T=title('Close Families','Position',[85 460])
 end
 hold on 
 for c=1:3
@@ -436,7 +436,7 @@ set(gcf,'color','w')
 xlabel('Age','FontSize',FS)
 ylabel('Assets (000s of 2018 dollars)','FontSize',FS)
 % yticks([0:100:500])
-ylim([-9,800])
+ylim([-9,500])
  if i==1
     I=legend('Benchmark','No long-term care','No bequest','orientation','horizontal');
     legend('boxoff')
@@ -468,7 +468,7 @@ fileID = fopen('benchmark.txt');
 benchmark=textscan(fileID,'%f %f %f %f %f %f %f');
 fclose(fileID);
 benchmark=benchmark{i};
-fileID = fopen('noLTC_MB.txt');
+fileID = fopen('noLTC.txt');
 noLTC=textscan(fileID,'%f %f %f %f %f %f %f ');
 fclose(fileID);
 noLTC=noLTC{i};
@@ -488,17 +488,17 @@ counterfactual(:,2,:)=benchmark2(:,1)-noLTC(:,1);
 
 for c=1:2
     if c==1
-        plot(70:2:96,counterfactual(1:14,c)./benchmark(1:14,1),ldash{c},'Color',colors{c},'LineWidth',width{c})    
+        plot(70:2:90,counterfactual(1:11,c)./benchmark(1:11,1),ldash{c},'Color',colors{c},'LineWidth',width{c})    
     else
-        plot(70:2:96,counterfactual(1:14,c)./benchmark2(1:14,1),ldash{c},'Color',colors{c},'LineWidth',width{c}) 
+        plot(70:2:90,counterfactual(1:11,c)./benchmark2(1:11,1),ldash{c},'Color',colors{c},'LineWidth',width{c}) 
     end
     hold on  
 end
 set(gcf,'color','w')
 xlabel('Age','FontSize',FS)
-ylim([0,0.60])
+ylim([-0.01,0.33])
 %  yticks([0:0.05:0.3])
-xlim([70,96])
+xlim([70,90])
 %  if i==2
     I=legend('Benchmark','No Close Families','orientation','horizontal');
     legend('boxoff')
@@ -521,12 +521,12 @@ subplot(2,1,1)
 for i=1:1
 cd('C:\Users\jbueren\Google Drive\JMP\Code\Structural Model\new_model\new_model\new_model');
 
-fileID = fopen('benchmark_MB.txt');
+fileID = fopen('benchmark.txt');
 benchmark=textscan(fileID,'%f %f %f %f %f %f %f');
 fclose(fileID);
 benchmark=benchmark{i};
 
-fileID = fopen('noLTC_MB.txt');
+fileID = fopen('noLTC.txt');
 noLTC=textscan(fileID,'%f %f %f %f %f %f %f ');
 fclose(fileID);
 noLTC=noLTC{i};
@@ -553,14 +553,14 @@ counterfactual(:,4,:)=benchmark(:,1)-noLTC(:,1);
 
 
 for c=1:4
-    plot(70:2:96,counterfactual(1:14,c)./benchmark(1:14,1),ldash{c},'Color',colors{c},'LineWidth',width{c})        
+    plot(70:2:90,counterfactual(1:11,c)./benchmark(1:11,1),ldash{c},'Color',colors{c},'LineWidth',width{c})        
     hold on  
 end
 set(gcf,'color','w')
 xlabel('Age','FontSize',FS)
- ylim([0,0.60])
+ylim([-0.01,0.33])
 %  yticks([0:0.05:0.3])
- xlim([70,96])
+ xlim([70,90])
 %  if i==2
     I=legend('All LTC','No Physical LTC','No Mental LTC','No Impaired LTC','orientation','horizontal');
     legend('boxoff')

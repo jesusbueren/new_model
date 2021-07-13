@@ -12,64 +12,64 @@ subroutine counterfactuals(parameters_original)
     real(SP),dimension(L_PI+1)::EDP_bnk,CV_bnk
     
     
-    !Benchmark model
-    print*,'++++++++++++++++++++++++++++++++++++++'
-    print*,'++++++++++++++++++++++++++++++++++++++'
-    print*,'Simulating benchmark'
-    ind_or=1
-    parameters=parameters_original
-    call simulate_HRS_70(parameters,p50_75_assets_ic_age,p50_75_assets_all_age,med_c_pi_age,EDP_bnk,CV_bnk,1)
-    open(unit=9,file='benchmark.txt')
-    do t_l=1,generations-1
-        write(9,'(F10.2,F10.2,F10.2,F10.2,F10.2,F10.2,F10.2)') p50_75_assets_all_age(t_l,1), &
-                    p50_75_assets_all_age(t_l,2), &
-                    p50_75_assets_ic_age(1,t_l,1),&
-                    p50_75_assets_ic_age(2,t_l,1),&
-                    p50_75_assets_ic_age(1,t_l,2),&
-                    p50_75_assets_ic_age(2,t_l,2),&
-                    med_c_pi_age(L_PI,t_l)
-    end do
-    close(9)
-    
-    print*,'++++++++++++++++++++++++++++++++++++++'
-    print*,'++++++++++++++++++++++++++++++++++++++'
-    print*,'Simulating no ltc'
-    ind_or=0
-    parameters=parameters_original
-    !LTC need shifter equal to zero
-    parameters(3:5)=-1.0_sp/0.0_sp
-    call simulate_HRS_70(parameters,p50_75_assets_ic_age,p50_75_assets_all_age,med_c_pi_age,EDP_bnk,CV_bnk,1)
-    open(unit=9,file='noLTC.txt')
-    do t_l=1,generations-1
-        write(9,'(F10.2,F10.2,F10.2,F10.2,F10.2,F10.2,F10.2)') p50_75_assets_all_age(t_l,1), &
-                    p50_75_assets_all_age(t_l,2), &
-                    p50_75_assets_ic_age(1,t_l,1),&
-                    p50_75_assets_ic_age(2,t_l,1),&
-                    p50_75_assets_ic_age(1,t_l,2),&
-                    p50_75_assets_ic_age(2,t_l,2),&
-                    med_c_pi_age(L_PI,t_l)
-    end do
-    close(9)
-    
-    !Counterfactual for w/o bequest motives
-    print*,'++++++++++++++++++++++++++++++++++++++'
-    print*,'++++++++++++++++++++++++++++++++++++++'
-    print*,'Simulating no bequests'
-    ind_or=0
-    parameters=parameters_original
-    parameters(8:9)=-1.0_sp/0.0_sp
-    call simulate_HRS_70(parameters,p50_75_assets_ic_age,p50_75_assets_all_age,med_c_pi_age,EDP_bnk,CV_bnk,1)
-    open(unit=9,file='noBeq.txt')
-    do t_l=1,generations-1
-        write(9,'(F10.2,F10.2,F10.2,F10.2,F10.2,F10.2,F10.2)') p50_75_assets_all_age(t_l,1), &
-                    p50_75_assets_all_age(t_l,2), &
-                    p50_75_assets_ic_age(1,t_l,1),&
-                    p50_75_assets_ic_age(2,t_l,1),&
-                    p50_75_assets_ic_age(1,t_l,2),&
-                    p50_75_assets_ic_age(2,t_l,2),&
-                    med_c_pi_age(L_PI,t_l)
-    end do
-    close(9)
+    !!Benchmark model
+    !print*,'++++++++++++++++++++++++++++++++++++++'
+    !print*,'++++++++++++++++++++++++++++++++++++++'
+    !print*,'Simulating benchmark'
+    !ind_or=1
+    !parameters=parameters_original
+    !call simulate_HRS_70(parameters,p50_75_assets_ic_age,p50_75_assets_all_age,med_c_pi_age,EDP_bnk,CV_bnk,1)
+    !open(unit=9,file='benchmark.txt')
+    !do t_l=1,generations-1
+    !    write(9,'(F10.2,F10.2,F10.2,F10.2,F10.2,F10.2,F10.2)') p50_75_assets_all_age(t_l,1), &
+    !                p50_75_assets_all_age(t_l,2), &
+    !                p50_75_assets_ic_age(1,t_l,1),&
+    !                p50_75_assets_ic_age(2,t_l,1),&
+    !                p50_75_assets_ic_age(1,t_l,2),&
+    !                p50_75_assets_ic_age(2,t_l,2),&
+    !                med_c_pi_age(L_PI,t_l)
+    !end do
+    !close(9)
+    !
+    !print*,'++++++++++++++++++++++++++++++++++++++'
+    !print*,'++++++++++++++++++++++++++++++++++++++'
+    !print*,'Simulating no ltc'
+    !ind_or=0
+    !parameters=parameters_original
+    !!LTC need shifter equal to zero
+    !parameters(3:5)=-1.0_sp/0.0_sp
+    !call simulate_HRS_70(parameters,p50_75_assets_ic_age,p50_75_assets_all_age,med_c_pi_age,EDP_bnk,CV_bnk,1)
+    !open(unit=9,file='noLTC.txt')
+    !do t_l=1,generations-1
+    !    write(9,'(F10.2,F10.2,F10.2,F10.2,F10.2,F10.2,F10.2)') p50_75_assets_all_age(t_l,1), &
+    !                p50_75_assets_all_age(t_l,2), &
+    !                p50_75_assets_ic_age(1,t_l,1),&
+    !                p50_75_assets_ic_age(2,t_l,1),&
+    !                p50_75_assets_ic_age(1,t_l,2),&
+    !                p50_75_assets_ic_age(2,t_l,2),&
+    !                med_c_pi_age(L_PI,t_l)
+    !end do
+    !close(9)
+    !
+    !!Counterfactual for w/o bequest motives
+    !print*,'++++++++++++++++++++++++++++++++++++++'
+    !print*,'++++++++++++++++++++++++++++++++++++++'
+    !print*,'Simulating no bequests'
+    !ind_or=0
+    !parameters=parameters_original
+    !parameters(8:9)=-1.0_sp/0.0_sp
+    !call simulate_HRS_70(parameters,p50_75_assets_ic_age,p50_75_assets_all_age,med_c_pi_age,EDP_bnk,CV_bnk,1)
+    !open(unit=9,file='noBeq.txt')
+    !do t_l=1,generations-1
+    !    write(9,'(F10.2,F10.2,F10.2,F10.2,F10.2,F10.2,F10.2)') p50_75_assets_all_age(t_l,1), &
+    !                p50_75_assets_all_age(t_l,2), &
+    !                p50_75_assets_ic_age(1,t_l,1),&
+    !                p50_75_assets_ic_age(2,t_l,1),&
+    !                p50_75_assets_ic_age(1,t_l,2),&
+    !                p50_75_assets_ic_age(2,t_l,2),&
+    !                med_c_pi_age(L_PI,t_l)
+    !end do
+    !close(9)
     
     
     !!Counterfactual for no med
@@ -96,23 +96,34 @@ subroutine counterfactuals(parameters_original)
     
     
     
-    !Benchmark model
+    !!Benchmark model
     print*,'++++++++++++++++++++++++++++++++++++++'
     print*,'++++++++++++++++++++++++++++++++++++++'
     print*,'Simulating benchmark with mortality bias'
     ind_or=1
     parameters=parameters_original
-    call simulate_HRS_70(parameters,p50_75_assets_ic_age,p50_75_assets_all_age,med_c_pi_age,EDP_bnk,CV_bnk,0)
-
+    call simulate_HRS_70(parameters,p50_75_assets_ic_age,p50_75_assets_all_age,med_c_pi_age,EDP_bnk,CV_bnk,0)    
+    open(unit=9,file='MD_rec_bench.txt')
+    do t_l=1,generations-1
+        write(9,'(F10.3,F10.3,F10.3,F10.3,F10.3)') med_c_pi_age(1,t_l), &
+            med_c_pi_age(2,t_l), &
+            med_c_pi_age(3,t_l), &
+            med_c_pi_age(4,t_l), &
+            med_c_pi_age(5,t_l)
+    end do
+    close(9)
     
-    !20% expansion Consumption floor
-    print*,'++++++++++++++++++++++++++++++++++++++'
-    print*,'++++++++++++++++++++++++++++++++++++++'
-    print*,'Simulating policy reform: change medicaid provision'
-    ind_or=0
-    pol_exp=1
-    parameters=parameters_original
-    call simulate_HRS_70(parameters,p50_75_assets_ic_age,p50_75_assets_all_age,med_c_pi_age,EDP_bnk,CV_bnk,0)
+    !!20% expansion care floor
+    !print*,'++++++++++++++++++++++++++++++++++++++'
+    !print*,'++++++++++++++++++++++++++++++++++++++'
+    !print*,'Simulating policy reform: change medicaid provision'
+    !ind_or=0
+    !pol_exp=1
+    !
+    !parameters=parameters_original
+    !parameters(2)=parameters(2)*1.10d0
+    !call simulate_HRS_70(parameters,p50_75_assets_ic_age,p50_75_assets_all_age,med_c_pi_age,EDP_bnk,CV_bnk,0)
+    !pol_exp=0
     
     
     !No close families
@@ -123,104 +134,113 @@ subroutine counterfactuals(parameters_original)
     parameters=parameters_original
     ind_no_f=1
     call load_hrs_data()
-    call simulate_HRS_70(parameters,p50_75_assets_ic_age,p50_75_assets_all_age,med_c_pi_age,EDP_bnk,CV_bnk,1)
-    open(unit=9,file='noFemale.txt')
+    call simulate_HRS_70(parameters,p50_75_assets_ic_age,p50_75_assets_all_age,med_c_pi_age,EDP_bnk,CV_bnk,0)
+    open(unit=9,file='MD_rec_noclose.txt')
     do t_l=1,generations-1
-        write(9,'(F10.2,F10.2,F10.2,F10.2,F10.2,F10.2,F10.2)') p50_75_assets_all_age(t_l,1), &
-                    p50_75_assets_all_age(t_l,2), &
-                    p50_75_assets_ic_age(1,t_l,1),&
-                    p50_75_assets_ic_age(2,t_l,1),&
-                    p50_75_assets_ic_age(1,t_l,2),&
-                    p50_75_assets_ic_age(2,t_l,2),&
-                    med_c_pi_age(L_PI,t_l)
-    end do
-    close(9) 
-    
-    print*,'++++++++++++++++++++++++++++++++++++++'
-    print*,'++++++++++++++++++++++++++++++++++++++'
-    print*,'Simulating no ltc no close families'
-    ind_or=0
-    parameters=parameters_original
-    
-    !LTC need shifter equal to zero for all LTC states
-    parameters(3:5)=-1.0_sp/0.0_sp
-    call simulate_HRS_70(parameters,p50_75_assets_ic_age,p50_75_assets_all_age,med_c_pi_age,EDP_bnk,CV_bnk,1)
-    open(unit=9,file='noFemale_noLTC.txt')
-    do t_l=1,generations-1
-        write(9,'(F10.2,F10.2,F10.2,F10.2,F10.2,F10.2,F10.2)') p50_75_assets_all_age(t_l,1), &
-                    p50_75_assets_all_age(t_l,2), &
-                    p50_75_assets_ic_age(1,t_l,1),&
-                    p50_75_assets_ic_age(2,t_l,1),&
-                    p50_75_assets_ic_age(1,t_l,2),&
-                    p50_75_assets_ic_age(2,t_l,2),&
-                    med_c_pi_age(L_PI,t_l)
+        write(9,'(F10.3,F10.3,F10.3,F10.3,F10.3)') med_c_pi_age(1,t_l), &
+            med_c_pi_age(2,t_l), &
+            med_c_pi_age(3,t_l), &
+            med_c_pi_age(4,t_l), &
+            med_c_pi_age(5,t_l)
     end do
     close(9)
+    !open(unit=9,file='noFemale.txt')
+    !do t_l=1,generations-1
+    !    write(9,'(F10.2,F10.2,F10.2,F10.2,F10.2,F10.2,F10.2)') p50_75_assets_all_age(t_l,1), &
+    !                p50_75_assets_all_age(t_l,2), &
+    !                p50_75_assets_ic_age(1,t_l,1),&
+    !                p50_75_assets_ic_age(2,t_l,1),&
+    !                p50_75_assets_ic_age(1,t_l,2),&
+    !                p50_75_assets_ic_age(2,t_l,2),&
+    !                med_c_pi_age(L_PI,t_l)
+    !end do
+    !close(9) 
     
-    ind_no_f=0
-    call load_hrs_data()
-    
-    print*,'++++++++++++++++++++++++++++++++++++++'
-    print*,'++++++++++++++++++++++++++++++++++++++'
-    print*,'Simulating no physically frail'
-    ind_or=0
-    parameters=parameters_original
-    
-    !LTC need shifter equal to zero when physically frail
-    parameters(3)=-1.0_sp/0.0_sp
-    call simulate_HRS_70(parameters,p50_75_assets_ic_age,p50_75_assets_all_age,med_c_pi_age,EDP_bnk,CV_bnk,1)
-    open(unit=9,file='noLTC_physical.txt')
-    do t_l=1,generations-1
-        write(9,'(F10.2,F10.2,F10.2,F10.2,F10.2,F10.2,F10.2)') p50_75_assets_all_age(t_l,1), &
-                    p50_75_assets_all_age(t_l,2), &
-                    p50_75_assets_ic_age(1,t_l,1),&
-                    p50_75_assets_ic_age(2,t_l,1),&
-                    p50_75_assets_ic_age(1,t_l,2),&
-                    p50_75_assets_ic_age(2,t_l,2),&
-                    med_c_pi_age(L_PI,t_l)
-    end do
-    close(9)
-    
-    print*,'++++++++++++++++++++++++++++++++++++++'
-    print*,'++++++++++++++++++++++++++++++++++++++'
-    print*,'Simulating no mentally frail'
-    ind_or=0
-    parameters=parameters_original
-    
-    !LTC need shifter equal to zero when mentally frail
-    parameters(4)=-1.0_sp/0.0_sp
-    call simulate_HRS_70(parameters,p50_75_assets_ic_age,p50_75_assets_all_age,med_c_pi_age,EDP_bnk,CV_bnk,1)
-    open(unit=9,file='noLTC_mental.txt')
-    do t_l=1,generations-1
-        write(9,'(F10.2,F10.2,F10.2,F10.2,F10.2,F10.2,F10.2)') p50_75_assets_all_age(t_l,1), &
-                    p50_75_assets_all_age(t_l,2), &
-                    p50_75_assets_ic_age(1,t_l,1),&
-                    p50_75_assets_ic_age(2,t_l,1),&
-                    p50_75_assets_ic_age(1,t_l,2),&
-                    p50_75_assets_ic_age(2,t_l,2),&
-                    med_c_pi_age(L_PI,t_l)
-    end do
-    close(9)
-    
-    print*,'++++++++++++++++++++++++++++++++++++++'
-    print*,'++++++++++++++++++++++++++++++++++++++'
-    print*,'Simulating no impaired'
-    ind_or=0
-    parameters=parameters_original
-    
-    !LTC need shifter equal to zero when impaired
-    parameters(5)=-1.0_sp/0.0_sp
-    call simulate_HRS_70(parameters,p50_75_assets_ic_age,p50_75_assets_all_age,med_c_pi_age,EDP_bnk,CV_bnk,1)
-    open(unit=9,file='noLTC_impaired.txt')
-    do t_l=1,generations-1
-        write(9,'(F10.2,F10.2,F10.2,F10.2,F10.2,F10.2,F10.2)') p50_75_assets_all_age(t_l,1), &
-                    p50_75_assets_all_age(t_l,2), &
-                    p50_75_assets_ic_age(1,t_l,1),&
-                    p50_75_assets_ic_age(2,t_l,1),&
-                    p50_75_assets_ic_age(1,t_l,2),&
-                    p50_75_assets_ic_age(2,t_l,2),&
-                    med_c_pi_age(L_PI,t_l)
-    end do
-    close(9)
+    !print*,'++++++++++++++++++++++++++++++++++++++'
+    !print*,'++++++++++++++++++++++++++++++++++++++'
+    !print*,'Simulating no ltc no close families'
+    !ind_or=0
+    !parameters=parameters_original
+    !
+    !!LTC need shifter equal to zero for all LTC states
+    !parameters(3:5)=-1.0_sp/0.0_sp
+    !call simulate_HRS_70(parameters,p50_75_assets_ic_age,p50_75_assets_all_age,med_c_pi_age,EDP_bnk,CV_bnk,1)
+    !open(unit=9,file='noFemale_noLTC.txt')
+    !do t_l=1,generations-1
+    !    write(9,'(F10.2,F10.2,F10.2,F10.2,F10.2,F10.2,F10.2)') p50_75_assets_all_age(t_l,1), &
+    !                p50_75_assets_all_age(t_l,2), &
+    !                p50_75_assets_ic_age(1,t_l,1),&
+    !                p50_75_assets_ic_age(2,t_l,1),&
+    !                p50_75_assets_ic_age(1,t_l,2),&
+    !                p50_75_assets_ic_age(2,t_l,2),&
+    !                med_c_pi_age(L_PI,t_l)
+    !end do
+    !close(9)
+    !
+    !ind_no_f=0
+    !call load_hrs_data()
+    !
+    !print*,'++++++++++++++++++++++++++++++++++++++'
+    !print*,'++++++++++++++++++++++++++++++++++++++'
+    !print*,'Simulating no physically frail'
+    !ind_or=0
+    !parameters=parameters_original
+    !
+    !!LTC need shifter equal to zero when physically frail
+    !parameters(3)=-1.0_sp/0.0_sp
+    !call simulate_HRS_70(parameters,p50_75_assets_ic_age,p50_75_assets_all_age,med_c_pi_age,EDP_bnk,CV_bnk,1)
+    !open(unit=9,file='noLTC_physical.txt')
+    !do t_l=1,generations-1
+    !    write(9,'(F10.2,F10.2,F10.2,F10.2,F10.2,F10.2,F10.2)') p50_75_assets_all_age(t_l,1), &
+    !                p50_75_assets_all_age(t_l,2), &
+    !                p50_75_assets_ic_age(1,t_l,1),&
+    !                p50_75_assets_ic_age(2,t_l,1),&
+    !                p50_75_assets_ic_age(1,t_l,2),&
+    !                p50_75_assets_ic_age(2,t_l,2),&
+    !                med_c_pi_age(L_PI,t_l)
+    !end do
+    !close(9)
+    !
+    !print*,'++++++++++++++++++++++++++++++++++++++'
+    !print*,'++++++++++++++++++++++++++++++++++++++'
+    !print*,'Simulating no mentally frail'
+    !ind_or=0
+    !parameters=parameters_original
+    !
+    !!LTC need shifter equal to zero when mentally frail
+    !parameters(4)=-1.0_sp/0.0_sp
+    !call simulate_HRS_70(parameters,p50_75_assets_ic_age,p50_75_assets_all_age,med_c_pi_age,EDP_bnk,CV_bnk,1)
+    !open(unit=9,file='noLTC_mental.txt')
+    !do t_l=1,generations-1
+    !    write(9,'(F10.2,F10.2,F10.2,F10.2,F10.2,F10.2,F10.2)') p50_75_assets_all_age(t_l,1), &
+    !                p50_75_assets_all_age(t_l,2), &
+    !                p50_75_assets_ic_age(1,t_l,1),&
+    !                p50_75_assets_ic_age(2,t_l,1),&
+    !                p50_75_assets_ic_age(1,t_l,2),&
+    !                p50_75_assets_ic_age(2,t_l,2),&
+    !                med_c_pi_age(L_PI,t_l)
+    !end do
+    !close(9)
+    !
+    !print*,'++++++++++++++++++++++++++++++++++++++'
+    !print*,'++++++++++++++++++++++++++++++++++++++'
+    !print*,'Simulating no impaired'
+    !ind_or=0
+    !parameters=parameters_original
+    !
+    !!LTC need shifter equal to zero when impaired
+    !parameters(5)=-1.0_sp/0.0_sp
+    !call simulate_HRS_70(parameters,p50_75_assets_ic_age,p50_75_assets_all_age,med_c_pi_age,EDP_bnk,CV_bnk,1)
+    !open(unit=9,file='noLTC_impaired.txt')
+    !do t_l=1,generations-1
+    !    write(9,'(F10.2,F10.2,F10.2,F10.2,F10.2,F10.2,F10.2)') p50_75_assets_all_age(t_l,1), &
+    !                p50_75_assets_all_age(t_l,2), &
+    !                p50_75_assets_ic_age(1,t_l,1),&
+    !                p50_75_assets_ic_age(2,t_l,1),&
+    !                p50_75_assets_ic_age(1,t_l,2),&
+    !                p50_75_assets_ic_age(2,t_l,2),&
+    !                med_c_pi_age(L_PI,t_l)
+    !end do
+    !close(9)
 
 end subroutine

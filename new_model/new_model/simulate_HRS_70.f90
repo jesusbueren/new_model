@@ -5,7 +5,7 @@ subroutine simulate_HRS_70(parameters,p50_75_assets_ic_age,p50_75_assets_all_age
     real(SP),dimension(parameters_to_est),intent(in)::parameters
     integer,intent(in)::ind_h
     real(SP),dimension(L_PI+1),intent(out)::EDP,CV
-    integer,parameter::indv_c=150000
+    integer,parameter::indv_c=300000
     real(SP),dimension(nkk,clusters,nzz,L_gender,L_PI2,f_t,2,generations)::beq100_policy
     integer,dimension(nkk,clusters,nzz,L_gender,L_PI2,f_t,2,generations)::a_policy,g_policy
     real(SP),dimension(nkk,clusters,f_t,L_PI2,2)::u_x
@@ -21,8 +21,8 @@ subroutine simulate_HRS_70(parameters,p50_75_assets_ic_age,p50_75_assets_all_age
     integer,dimension(f_t)::counter_f
     integer,dimension(f_t,generations)::counter_ic_age
     integer,dimension(generations)::counter_all_age
-    real(SP),dimension(L_PI,generations,indv_c/2)::assets_pi_age,g_tr,c_pi_age
-    real(SP),dimension(f_t,generations,indv_c/2)::assets_ic_age
+    real(SP),dimension(L_PI,generations,indv_c)::assets_pi_age,g_tr,c_pi_age
+    real(SP),dimension(f_t,generations,indv_c)::assets_ic_age
     real(SP),dimension(L_PI,indv_c)::lambda_pi,ltci_pi
     real(SP),dimension(generations,indv_c)::assets_all_age
     real(SP),dimension(L_PI,generations-1)::med_assets_pi_age,med_c_pi_age
@@ -182,14 +182,14 @@ subroutine simulate_HRS_70(parameters,p50_75_assets_ic_age,p50_75_assets_all_age
                 
                 !Nursing home state
                 call RANDOM_NUMBER(u)
-                if (u<pr_nh(f_l,h_s(t_l),nh_l,2)) then
+                if (u<pr_nh(f_l,h_s(t_l),nh_l,1)) then
                     nh_l=1
                 else
                     nh_l=2
                 end if
                 
                 !Cash on hand
-                x_it(t_l)=(1+r)*a_it(t_l)-m_exp_all(t_l,gender_i(i_l),PI_q_i2(i_l),h_s(t_l),xi_l2,ts_l2)+b(PI_q_i2(i_l),gender_i(i_l))-real(nh_l-1)*p_nh(h_s(t_l))
+                x_it(t_l)=(1+r)*a_it(t_l)-m_exp_all(t_l,gender_i(i_l),PI_q_i2(i_l),h_s(t_l),xi_l2,ts_l2)+b(PI_q_i2(i_l),gender_i(i_l))
                 obs_m_av(PI_q_i(i_l),t_l)=obs_m_av(PI_q_i(i_l),t_l)+1.0_sp
                 m_av(PI_q_i(i_l),t_l)=(obs_m_av(PI_q_i(i_l),t_l)-1.0_sp)/obs_m_av(PI_q_i(i_l),t_l)*m_av(PI_q_i(i_l),t_l) + &
                                         1.0_sp/obs_m_av(PI_q_i(i_l),t_l)*m_exp_all(t_l,gender_i(i_l),PI_q_i2(i_l),h_s(t_l),xi_l2,ts_l2)
@@ -205,10 +205,8 @@ subroutine simulate_HRS_70(parameters,p50_75_assets_ic_age,p50_75_assets_all_age
                 end if 
                 a_it(t_l+1)=coh_grid(k2_l)
                 if (g_it(t_l)==1) then
-                    tr_it(t_l)=max(c_bar(h_s(t_l),nh_l)+p_or(nh_l)*l_bar(h_s(t_l),nh_l)-x_it(t_l),0.0_sp)
+                    tr_it(t_l)=c_bar(h_s(t_l),nh_l)+p_or(nh_l)*l_bar(h_s(t_l),nh_l)-x_it(t_l) !max(c_bar(h_s(t_l),nh_l)+p_or(nh_l)*l_bar(h_s(t_l),nh_l)-x_it(t_l),0.0_sp)
                     x_it(t_l)=0.0_sp
-                else
-                    tr_it(t_l)=lfc_x(pos_x-k2_l+1,h_s(t_l),f_l,PI_q_i2(i_l),nh_l)*(p_or(nh_l)-p_fc(nh_l))
                 end if
                 tr_it(t_l)=tr_it(t_l)/(1.0_sp+r)**(t_l-1)
                 tr_h(i_l2,h_s(t_l))=tr_h(i_l2,h_s(t_l))+tr_it(t_l)
@@ -219,15 +217,14 @@ subroutine simulate_HRS_70(parameters,p50_75_assets_ic_age,p50_75_assets_all_age
                     counter_f(f_l)=counter_f(f_l)+1
                 end if
                 assets_pi_age(PI_q_i(i_l),t_l,counter_pi_age(PI_q_i(i_l),t_l))=a_it(t_l)
-                if (g_it(t_l)==0) then
-                    c_pi_age(PI_q_i(i_l),t_l,counter_pi_age(PI_q_i(i_l),t_l))=coh_grid(pos_x)-coh_grid(k2_l)-lfc_x(pos_x-k2_l+1,h_s(t_l),f_l,PI_q_i2(i_l),nh_l)*p_fc(nh_l)
-                else
-                    c_pi_age(PI_q_i(i_l),t_l,counter_pi_age(PI_q_i(i_l),t_l))=c_bar(h_s(t_l),nh_l)
-                end if
-                if (PI_q_i(i_l)==4) then
+
+                 c_pi_age(f_l,t_l,counter_ic_age(f_l,t_l))=g_it(t_l)
+
+                !if (PI_q_i(i_l)==4) then
                     counter_ic_age(f_l,t_l)=counter_ic_age(f_l,t_l)+1
                     assets_ic_age(f_l,t_l,counter_ic_age(f_l,t_l))=a_it(t_l)
-                end if
+                    c_pi_age(f_l,t_l,counter_ic_age(f_l,t_l))=g_it(t_l)
+                !end if
                 counter_all_age(t_l)=counter_all_age(t_l)+1
                 assets_all_age(t_l,counter_all_age(t_l))=a_it(t_l)
                 
@@ -236,11 +233,19 @@ subroutine simulate_HRS_70(parameters,p50_75_assets_ic_age,p50_75_assets_all_age
                     if (V_70_or(pos_x,h_s(t_l),xi_l,gender_i(i_l),PI_q_i2(i_l),f_l,nh_l)==V_70_new(pos_x,h_s(t_l),xi_l,gender_i(i_l),PI_q_i2(i_l),f_l,nh_l)) then
                         lambda_pi(f_l,counter_f(f_l))=0.0_sp
                         !ltci_pi(PI_q_i(i_l),counter_pi_age(PI_q_i(i_l),t_l))=0.0_sp
-                    elseif (V_70_or(pos_x,h_s(t_l),xi_l,gender_i(i_l),PI_q_i2(i_l),f_l,nh_l)<V_70_new(1,h_s(t_l),xi_l,gender_i(i_l),PI_q_i2(i_l),f_l,nh_l)) then
-                        lambda_pi(f_l,counter_f(f_l))=coh_grid(pos_x) 
+                    !elseif (V_70_or(pos_x,h_s(t_l),xi_l,gender_i(i_l),PI_q_i2(i_l),f_l,nh_l)<V_70_new(1,h_s(t_l),xi_l,gender_i(i_l),PI_q_i2(i_l),f_l,nh_l)) then
+                    !    lambda_pi(f_l,counter_f(f_l))=coh_grid(pos_x) 
                     else
                         lambda_pi(f_l,counter_f(f_l))=&
-                        coh_grid(pos_x)-coh_grid(minloc(abs(V_70_new(:,h_s(t_l),xi_l,gender_i(i_l),PI_q_i2(i_l),f_l,nh_l)-V_70_or(pos_x,h_s(t_l),xi_l,gender_i(i_l),PI_q_i2(i_l),f_l,nh_l)),1)) 
+                        coh_grid(minloc(abs(V_70_or(:,h_s(t_l),xi_l,gender_i(i_l),PI_q_i2(i_l),f_l,nh_l)-V_70_new(pos_x,h_s(t_l),xi_l,gender_i(i_l),PI_q_i2(i_l),f_l,nh_l)),1, BACK=.TRUE.))-coh_grid(pos_x)
+                        !if (lambda_pi(f_l,counter_f(f_l))<0.0d0) then
+                        !    print*,coh_grid(minloc(abs(V_70_or(:,h_s(t_l),xi_l,gender_i(i_l),PI_q_i2(i_l),f_l,nh_l)-V_70_new(pos_x,h_s(t_l),xi_l,gender_i(i_l),PI_q_i2(i_l),f_l,nh_l)),1))
+                        !    print*,coh_grid(pos_x)
+                        !    print*,pos_x
+                        !    print*,V_70_new(pos_x,h_s(t_l),xi_l,gender_i(i_l),PI_q_i2(i_l),f_l,nh_l)
+                        !    print*,V_70_or(1:10,h_s(t_l),xi_l,gender_i(i_l),PI_q_i2(i_l),f_l,nh_l)
+                        !    read*,pause_k
+                        !end if
                     end if
                 end if
             end if
@@ -249,7 +254,9 @@ subroutine simulate_HRS_70(parameters,p50_75_assets_ic_age,p50_75_assets_all_age
         pi_i2(i_l2)=PI_q_i(i_l)
         tr_i(i_l2)=sum(tr_it)
     end do
-
+    
+    med_c_pi_age=-9.0d0
+    p50_75_assets_ic_age=-9.0d0
     do t_l=1,generations-1;
         do pi_l=1,L_PI; 
             if (counter_pi_age(pi_l,t_l)>1) then
@@ -257,14 +264,12 @@ subroutine simulate_HRS_70(parameters,p50_75_assets_ic_age,p50_75_assets_all_age
                                         counter_pi_age(pi_l,t_l),&
                                         50, & 
                                         med_assets_pi_age(pi_l,t_l))
-                call compute_percentile(c_pi_age(pi_l,t_l,1:counter_pi_age(pi_l,t_l)), &
-                                        counter_pi_age(pi_l,t_l),&
-                                        50, & 
-                                        med_c_pi_age(pi_l,t_l)) 
             end if
         end do
-
+        
+        
         do f_l=1,f_t; 
+            print*,f_l,t_l,counter_ic_age(f_l,t_l)
             if (counter_ic_age(f_l,t_l)>1) then
                 call compute_percentile(assets_ic_age(f_l,t_l,1:counter_ic_age(f_l,t_l)), &
                                         counter_ic_age(f_l,t_l),&
@@ -272,8 +277,9 @@ subroutine simulate_HRS_70(parameters,p50_75_assets_ic_age,p50_75_assets_all_age
                                         p50_75_assets_ic_age(f_l,t_l,1))
                 call compute_percentile(assets_ic_age(f_l,t_l,1:counter_ic_age(f_l,t_l)), &
                                         counter_ic_age(f_l,t_l),&
-                                        85, & 
+                                        75, & 
                                         p50_75_assets_ic_age(f_l,t_l,2))
+                med_c_pi_age(f_l,t_l)=sum(c_pi_age(f_l,t_l,1:counter_ic_age(f_l,t_l)))/dble(counter_ic_age(f_l,t_l))
             end if
         end do
         if (counter_all_age(t_l)>1) then
